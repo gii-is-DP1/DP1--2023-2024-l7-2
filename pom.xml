@@ -36,9 +36,12 @@
 
 	<developers>
 		<developer>
-			<name>JAParejo</name>
-			<email>japarejo@gmail.com</email>
-			<url>http://www.isa.us.es</url>
+            <id>Delfin</id>
+			<name>delsanrub</name>
+			<email>delsanrub@alum.us.es</email>
+            <roles>
+                <role>leader</role>
+            </roles>
 		</developer>
 	</developers>
 
