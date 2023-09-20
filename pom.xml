@@ -47,17 +47,21 @@
 			<id>marzamzap</id>
  			<name>Mario</name>
  			<email>marzamzap@alum.us.es</email>
- 			<url>http://www.isa.us.es</url>
  			<roles>
  				<role>
  					developer
  				</role>
  			</roles>
- 			<properties>
- 				<picUrl>
-					https://upload.wikimedia.org/wikipedia/commons/a/a4/Fuento_de_Cantos_Parish_Church_22_09_12.JPG
-				</picUrl>
-			</properties>
+ 		</developer>
+		<developer>
+			<id>antoniommff</id>
+ 			<name>Antonio Macias</name>
+ 			<email>antmacfer1@alum.us.es</email>
+ 			<roles>
+ 				<role>
+ 					developer
+ 				</role>
+ 			</roles>
  		</developer>
 
 	</developers>
