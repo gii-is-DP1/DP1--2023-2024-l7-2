@@ -63,7 +63,16 @@
  				</role>
  			</roles>
  		</developer>
-
+		<developer>
+			<id>davvicval</id>
+ 			<name>David</name>
+ 			<email>davvicval@alum.us.es</email>
+ 			<roles>
+ 				<role>
+ 					developer
+ 				</role>
+ 			</roles>
+ 		</developer>
 	</developers>
 
 	<dependencies>		
