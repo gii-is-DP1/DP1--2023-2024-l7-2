@@ -83,6 +83,16 @@
  				</role>
  			</roles>
  		</developer>
+		 <developer>
+			<id>alegallla</id>
+ 			<name>Alejandro</name>
+ 			<email>alegallla@alum.us.es</email>
+ 			<roles>
+ 				<role>
+ 					developer
+ 				</role>
+ 			</roles>
+ 		</developer>
 	</developers>
 	
 
