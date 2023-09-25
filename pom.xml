@@ -73,7 +73,18 @@
  				</role>
  			</roles>
  		</developer>
+		 <developer>
+			<id>fradegut</id>
+ 			<name>Francisco José</name>
+ 			<email>fradegut@alum.us.es</email>
+ 			<roles>
+ 				<role>
+ 					developer
+ 				</role>
+ 			</roles>
+ 		</developer>
 	</developers>
+	
 
 	<dependencies>		
 
