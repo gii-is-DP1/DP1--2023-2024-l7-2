@@ -16,4 +16,13 @@ public class Achievement extends NamedEntity {
     @NotBlank
     private String description;
     private String badgeImage;
+
+
+    // The achievement is based on one or more of this variables
+    private Integer totalIron;
+    private Integer totalGold;
+    private Integer totalSteal;
+    private Integer totalObjects;
+    private Integer totalMatches;
+    private Integer totalVictories;
 }
