@@ -129,4 +129,5 @@ INSERT INTO consultation_tickets(id,description,creation_date, user_id, consulta
 INSERT INTO achievement(id,name,description,total_iron,total_gold,total_steal,total_objects,total_matches,total_victories) 
                         VALUES (1,'sample','sample achievement',10,9,8,7,6,5);
 
-    
+INSERT INTO achievement(id,name,description,total_iron,total_gold,total_steal,total_objects,total_matches,total_victories) 
+                        VALUES (2,'well come','You won your first match',0,0,0,0,1,1);
