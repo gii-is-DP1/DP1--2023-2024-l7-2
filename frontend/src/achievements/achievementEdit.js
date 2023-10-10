@@ -108,7 +108,6 @@ export default function AchievementEdit() {
                     <div className="custom-form-input">
                         <Label for="badgeImage" className="custom-form-input-label"> Badge Image Url: </Label>
                         <Input type="text"
-                            required
                             name="badgeImage"
                             id="badgeImage"
                             value={achievement.badgeImage || ""}
