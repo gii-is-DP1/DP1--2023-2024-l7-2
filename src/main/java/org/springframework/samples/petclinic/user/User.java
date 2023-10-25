@@ -18,6 +18,8 @@ import lombok.Setter;
 @Table(name = "appusers")
 public class User extends BaseEntity {
 
+	String profilePicture;
+	
 	@Column(unique = true)
 	String username;
 
