@@ -15,17 +15,16 @@ import lombok.Setter;
 public class Card extends NamedEntity {
     @NotBlank
     private String description;
-    @NotBlank
     private Integer position;
-    @NotBlank
     private Boolean specialCard;
+    private String badgeImage;
    
 
 
-    // The achievement is based on one or more of this variables
     private Integer totalIron;
     private Integer totalGold;
     private Integer totalSteal;
+    private Integer totalMedals;
     private Boolean helpCard;
     
     
