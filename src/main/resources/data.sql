@@ -131,3 +131,7 @@ INSERT INTO achievement(id,name,description,total_iron,total_gold,total_steal,to
 
 INSERT INTO achievement(id,name,description,total_iron,total_gold,total_steal,total_objects,total_matches,total_victories) 
                         VALUES (2,'well come','You won your first match',0,0,0,0,1,1);
+
+INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,null,null,null,null,null),
+                                                    (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1),
+                                                    (3,'super cool game', null,'2023-04-11 18:20','2023-04-11 19:20', 2, null); 
