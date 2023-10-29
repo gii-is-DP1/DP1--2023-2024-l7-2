@@ -77,7 +77,7 @@ export default function GameEdit() {
     return (
         <div className="auth-page-container">
             <h2 className="text-center">
-                {game.id ? "Edit Consultation" : "Add Consultation"}
+                {game.id ? "Edit Game" : "Add Game"}
             </h2>
             <div className="auth-form-container">
                 {modal}
