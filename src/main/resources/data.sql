@@ -141,137 +141,139 @@ INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,nul
                                                     (3,'super cool game', null,'2023-04-11 18:20','2023-04-11 19:20', 2, null); 
 
 
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (1,'Iron Seam','Take 3 iron from the supply',1,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (2,'Iron Seam','Take 3 iron from the supply',2,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (3,'Iron Seam','Take 3 iron from the supply',3,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (4,'Iron Seam','Take 3 iron from the supply',4,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (5,'Iron Seam','Take 3 iron from the supply',5,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (6,'Iron Seam','Take 3 iron from the supply',6,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (7,'Gold Seam','Take 1 gold from the supply',7,False,0,1,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (8,'Iron Seam','Take 3 iron from the supply',8,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (9,'Gold Seam','Take 1 gold from the supply',9,False,0,1,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (10,'Alloy Steel','Return 3 to the iron supply then take 2 steel',1,False,-3,0,2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (11,'Orc Raiders','If undefended at the end of the round, player cannot take any recolection actions',2,False,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (1,'Iron Seam','Take 3 iron from the supply',1,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (2,'Iron Seam','Take 3 iron from the supply',2,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (3,'Iron Seam','Take 3 iron from the supply',3,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (4,'Iron Seam','Take 3 iron from the supply',4,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (5,'Iron Seam','Take 3 iron from the supply',5,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (6,'Iron Seam','Take 3 iron from the supply',6,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (7,'Gold Seam','Take 1 gold from the supply',7,0,1,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (8,'Iron Seam','Take 3 iron from the supply',8,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (9,'Gold Seam','Take 1 gold from the supply',9,0,1,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (10,'Alloy Steel','Return 3 to the iron supply then take 2 steel',1,-3,0,2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (11,'Orc Raiders','If undefended at the end of the round, player cannot take any recolection actions',2,0,0,0,1,False);
 /*OBJETO*/
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (12,'Forge Sword','Return 3 steel to the supply then take 1 item.',3,False,0,0,-3,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (13,'Great Dragon','If undefended at the end of the round, each player must return all gold they possess to the supply.',4,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (14,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',5,False,0,0,0,1,False);                        
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (15,'Alloy Steel','Return 3 to the iron supply then take 2 steel',6,False,-3,0,2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (12,'Forge Sword','Return 3 steel to the supply then take 1 item.',3,0,0,-3,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (13,'Great Dragon','If undefended at the end of the round, each player must return all gold they possess to the supply.',4,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (14,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',5,0,0,0,1,False);                        
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (15,'Alloy Steel','Return 3 to the iron supply then take 2 steel',6,-3,0,2,0,False);
 /*OBJETO*/
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (16,'Forge Mace','Return 2 steel and 1 gold to the supply then take 1 item.',7,False,0,-1,-2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (17,'Gold Seam','Take 1 gold from the supply',8,False,0,1,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (18,'Iron Seam','Take 3 iron from the supply',9,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (19,'Alloy Steel','Return 3 to the iron supply then take 2 steel',1,False,-3,0,2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (20,'Orc Raiders','If undefended at the end of the round, player cannot take any recolection actions',2,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (21,'Alloy Steel','Return 3 to the iron supply then take 2 steel',3,False,-3,0,2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (22,'Dragon','If undefended at the end of the round, each player must return 1 gold to the supply.',4,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (23,'Alloy Steel','Return 3 to the iron supply then take 2 steel',5,False,-3,0,2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (24,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',6,False,0,0,0,0,True);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (16,'Forge Mace','Return 2 steel and 1 gold to the supply then take 1 item.',7,0,-1,-2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (17,'Gold Seam','Take 1 gold from the supply',8,0,1,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (18,'Iron Seam','Take 3 iron from the supply',9,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (19,'Alloy Steel','Return 3 to the iron supply then take 2 steel',1,-3,0,2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (20,'Orc Raiders','If undefended at the end of the round, player cannot take any recolection actions',2,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (21,'Alloy Steel','Return 3 to the iron supply then take 2 steel',3,-3,0,2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (22,'Dragon','If undefended at the end of the round, each player must return 1 gold to the supply.',4,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (23,'Alloy Steel','Return 3 to the iron supply then take 2 steel',5,-3,0,2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (24,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',6,0,0,0,0,True);
 /*OBJETO*/
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (25,'Forge Diadem','Return 1 iron, 1 steel and 1 gold to the supply then take 1 item.',7,False,-1,-1,-1,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (25,'Forge Diadem','Return 1 iron, 1 steel and 1 gold to the supply then take 1 item.',7,-1,-1,-1,0,False);
 /*OBJETO*/
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (26,'Forge Helm','Return 1 steel and 2 gold to the supply then take 1 item.',8,False,0,-2,-1,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (27,'Dragon','If undefended at the end of the round, each player must return 1 gold to the supply.',9,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (28,'Gold Seam','Take 1 gold from the supply',1,False,0,1,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (29,'Alloy Steel','Return 3 to the iron supply then take 2 steel',2,False,-3,0,2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (30,'Orc Raiders','If undefended at the end of the round, player cannot take any recolection actions',3,False,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (26,'Forge Helm','Return 1 steel and 2 gold to the supply then take 1 item.',8,0,-2,-1,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (27,'Dragon','If undefended at the end of the round, each player must return 1 gold to the supply.',9,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (28,'Gold Seam','Take 1 gold from the supply',1,0,1,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (29,'Alloy Steel','Return 3 to the iron supply then take 2 steel',2,-3,0,2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (30,'Orc Raiders','If undefended at the end of the round, player cannot take any recolection actions',3,0,0,0,1,False);
 /*OBJETO*/
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (31,'Forge Axe','Return 2 steel to the supply then take 1 item.',4,False,0,0,-2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (32,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',5,False,0,0,0,0,True);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (31,'Forge Axe','Return 2 steel to the supply then take 1 item.',4,0,0,-2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (32,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',5,0,0,0,0,True);
 /*OBJETO*/
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (33,'Forge Crown','Return 3 gold to the supply then take 1 item.',6,False,0,-3,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (34,'Iron Seam','Take 3 iron from the supply',7,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (35,'Dragon','If undefended at the end of the round, each player must return 1 gold to the supply.',8,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (36,'Iron Seam','Take 3 iron from the supply',9,False,3,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (37,'Sidhe','If undefended at the end of the round, each player must replace two gold they possess with two iron.',1,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (38,'Sidhe','If undefended at the end of the round, each player must replace two gold they possess with two iron.',2,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (39,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',3,False,0,0,0,0,True);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (40,'Gold Seam','Take 1 gold from the supply',4,False,0,1,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (41,'Gold Seam','Take 1 gold from the supply',5,False,0,1,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (42,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',6,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (43,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',7,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (44,'Alloy Steel','Return 3 to the iron supply then take 2 steel',8,False,-3,0,2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (33,'Forge Crown','Return 3 gold to the supply then take 1 item.',6,0,-3,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (34,'Iron Seam','Take 3 iron from the supply',7,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (35,'Dragon','If undefended at the end of the round, each player must return 1 gold to the supply.',8,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (36,'Iron Seam','Take 3 iron from the supply',9,3,0,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (37,'Sidhe','If undefended at the end of the round, each player must replace two gold they possess with two iron.',1,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (38,'Sidhe','If undefended at the end of the round, each player must replace two gold they possess with two iron.',2,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (39,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',3,0,0,0,0,True);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (40,'Gold Seam','Take 1 gold from the supply',4,0,1,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (41,'Gold Seam','Take 1 gold from the supply',5,0,1,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (42,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',6,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (43,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',7,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (44,'Alloy Steel','Return 3 to the iron supply then take 2 steel',8,-3,0,2,0,False);
 /*OBJETO*/
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (45,'Forge Dagger','Return 1 iron and 2 steel to the supply then take 1 item.',9,False,-1,0,-2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (46,'Gold Seam','Take 1 gold from the supply',1,False,0,1,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (47,'Sidhe','If undefended at the end of the round, each player must replace two gold they possess with two iron.',2,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (48,'Great Dragon','If undefended at the end of the round, each player must return all gold they possess to the supply.',3,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (49,'Orc Raiders','If undefended at the end of the round, player cannot take any recolection actions',4,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (50,'Gold Seam','Take 1 gold from the supply',5,False,0,1,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (45,'Forge Dagger','Return 1 iron and 2 steel to the supply then take 1 item.',9,-1,0,-2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (46,'Gold Seam','Take 1 gold from the supply',1,0,1,0,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (47,'Sidhe','If undefended at the end of the round, each player must replace two gold they possess with two iron.',2,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (48,'Great Dragon','If undefended at the end of the round, each player must return all gold they possess to the supply.',3,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (49,'Orc Raiders','If undefended at the end of the round, player cannot take any recolection actions',4,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (50,'Gold Seam','Take 1 gold from the supply',5,0,1,0,0,False);
 /*OBJETO*/
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (51,'Forge Armour','Return 2 steel and 1 gold to the supply then take 1 item.',6,False,0,-1,-2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (52,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',7,False,0,0,0,0,True);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (53,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',8,False,0,0,0,1,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (54,'Alloy Steel','Return 3 to the iron supply then take 2 steel',9,False,-3,0,2,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (55,'Muster an army','When resolving actions this round, treat all defend locations as if they are occupied.',10,True,0,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (56,'Hold a council','Remove the top card from each location (leaving at least one card) and shuffle them back into The Mountain.',11,True,0,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (57,'Sell an intem','Exchange 1 of your items for 5 resources of your choice.',12,True,0,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (58,'Past Glories','Name a card previously on top in any location and return it to the top of that location.',10,True,0,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (59,'Special order','Return 5 resources of your choice, including at least 1 of each type, to the supply and take 1 item.',11,True,0,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (60,'Turn back','Remove the top card from 1 location and shuffle it back into the mountain. Immediately place 1 on that location.',12,True,0,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (61,'Apprentice','Place one worker on a location occupied by the other player.',10,True,0,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (62,'Collapse the Shafts ','Remove the top card from each location and place it on the bottom of that stack.',11,True,0,0,0,0,False);
-INSERT INTO card(id, name, description, position, specialCard, total_iron,total_gold,total_steal, total_medals, helpCard) 
-                        VALUES (63,'Run Amok','Collect all of the cards from each location, in turn, shuffle them and return them to that location.',12,True,0,0,0,0,False);                                                
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (51,'Forge Armour','Return 2 steel and 1 gold to the supply then take 1 item.',6,0,-1,-2,0,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (52,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',7,0,0,0,0,True);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (53,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',8,0,0,0,1,False);
+INSERT INTO card(id, name, description, position, total_iron,total_gold,total_steal, total_medals, helpCard) 
+                        VALUES (54,'Alloy Steel','Return 3 to the iron supply then take 2 steel',9,-3,0,2,0,False);
+
+
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (1,'Muster an army','When resolving actions this round, treat all defend locations as if they are occupied.',10);
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (2,'Hold a council','Remove the top card from each location (leaving at least one card) and shuffle them back into The Mountain.',11);
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (3,'Sell an intem','Exchange 1 of your items for 5 resources of your choice.',12);
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (4,'Past Glories','Name a card previously on top in any location and return it to the top of that location.',10);
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (5,'Special order','Return 5 resources of your choice, including at least 1 of each type, to the supply and take 1 item.',11);
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (6,'Turn back','Remove the top card from 1 location and shuffle it back into the mountain. Immediately place 1 on that location.',12);
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (7,'Apprentice','Place one worker on a location occupied by the other player.',10);
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (8,'Collapse the Shafts ','Remove the top card from each location and place it on the bottom of that stack.',11);
+INSERT INTO specialCard(id, name, description, position) 
+                        VALUES (9,'Run Amok','Collect all of the cards from each location, in turn, shuffle them and return them to that location.',12);                                                
