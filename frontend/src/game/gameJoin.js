@@ -10,15 +10,7 @@ const jwt = tokenService.getLocalAccessToken();
 
 export default function GameJoin() {
 
-    let game = {
-        id: null,
-        name: "",
-        code: "",
-        start: null,
-        finish: null,
-        winner_id: null,
-        round: 0
-    };
+    const [game, setGame] = useState("");
 
     const [message, setMessage] = useState(null);
     const [visible, setVisible] = useState(false);
@@ -35,31 +27,31 @@ export default function GameJoin() {
     }
 
 
-    function handleChange(event) {
-        const target = event.target;
-        const code = target.code;
+    function handleSubmit(event) {
+
+        event.preventDefault();
         
         fetch(
-            "/api/v1/game" + (code ? "/" + code : ""),
+            "/api/v1/game/check" + (game ? "/" + game : ""),
             {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${jwt}`,
                     Accept: "application/json",
                     "Content-Type": "application/json",
-                },
-                body: JSON.stringify(game),
+                }
             }
         )
         .then((response) => response.text())
         .then((data) => {
+            console.log(data);
             if(data==="")
                 //window.location.href = "/game/";
                 console.log("Not found")
             else{
                 let json = JSON.parse(data);
                 if(json.id){
-                    window.location.href = `/game/${json.id}`
+                    window.location.href = `/game/${game}`
                 }else
                     //window.location.href = "/game";
                     console.log("error in json format")
@@ -68,6 +60,13 @@ export default function GameJoin() {
 
         .catch((message) => alert(message));
 
+    }
+
+    function handleChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        setGame(value);
     }
 
 
@@ -86,14 +85,13 @@ export default function GameJoin() {
                             required
                             name="name"
                             id="name"
-                            value={""}
+                            value={game || ""}
                             onChange={handleChange}
                             className="custom-input"
                         />
                     </div>
                     <div className="custom-button-row">
                         <button className="auth-button">Join</button>
-                        <Link to={`/game`} className="auth-button" style={{ textDecoration: "none" }}> Cancel </Link>
                     </div>
                 </Form>
             </div>

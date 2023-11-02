@@ -61,9 +61,10 @@ public class GameRestController {
         return g.get();
     }
 
-    @GetMapping("/{code}")
+    @GetMapping("/check/{code}")
     public Game getGameByCode(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
+        System.out.println(g);
         return g;
     }
 

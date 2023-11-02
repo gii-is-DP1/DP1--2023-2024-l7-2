@@ -23,8 +23,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/cards")
-@Tag(name = "Cardss", description = "The Cards management API")
+@RequestMapping("/api/v1/specialcard")
+@Tag(name = "Special Cards", description = "The Special Cards management API")
 @SecurityRequirement(name = "bearerAuth")
 public class SpecialCardRestController {
     

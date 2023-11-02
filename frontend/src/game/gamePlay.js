@@ -23,7 +23,7 @@ export default function GamePlay() {
   const [visible, setVisible] = useState(false);
   const [game, setGame] = useFetchState(
       emptyGame,
-      `/api/v1/game/${id}`,
+      `/api/v1/game/check/${id}`,
       jwt,
       setMessage,
       setVisible,
