@@ -61,6 +61,12 @@ public class GameRestController {
         return g.get();
     }
 
+    @GetMapping("/{code}")
+    public Game getGameByCode(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+        return g;
+    }
+
     @PostMapping
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
         g = gs.saveGame(g);

@@ -37,7 +37,7 @@ export default function GameList() {
                   tag={Link}
                   to={"/games/" + game.id}
                 >
-                    <Link to={`/game/${game.id}`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
+                    <Link to={`/game/edit/${game.id}`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
                 </Button>
                 <Button
                   size="sm"

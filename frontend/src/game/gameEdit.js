@@ -9,7 +9,7 @@ import useFetchState from "./../util/useFetchState";
 const jwt = tokenService.getLocalAccessToken();
 
 export default function GameEdit() {
-    const id = getIdFromUrl(2);
+    const id = getIdFromUrl(3);
     const emptyGame = {
         id: id==="new"?null:id,
         name: "",
@@ -90,6 +90,18 @@ export default function GameEdit() {
                             name="name"
                             id="name"
                             value={game.name || ""}
+                            onChange={handleChange}
+                            className="custom-input"
+                        />
+                    </div>
+                    <div  className="custom-form-input">
+                        <Label for="name" className="custom-form-input-label"> Code </Label>
+                        <Input
+                            type="text"
+                            required
+                            name="name"
+                            id="name"
+                            value={game.code || ""}
                             onChange={handleChange}
                             className="custom-input"
                         />
