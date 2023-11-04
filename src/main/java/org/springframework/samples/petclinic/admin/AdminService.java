@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.petclinic.player.Player;
-import org.springframework.samples.petclinic.player.PlayerRepository;
-import org.springframework.samples.petclinic.statistic.Achievement;
-import org.springframework.samples.petclinic.statistic.AchievementRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
