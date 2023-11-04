@@ -50,6 +50,13 @@ import VetEditClinicOwner from "./clinicOwner/vets/VetEditClinicOwner";
 import AchievementList from "./achievements/achievementList";
 import AchievementEdit from "./achievements/achievementEdit";
 
+import GameList from "./game/gameList";
+import GameEdit from "./game/gameEdit";
+import GameJoin from "./game/gameJoin";
+import GamePlay from "./game/gamePlay";
+
+
+
 function ErrorFallback({ error, resetErrorBoundary }) {
   return (
     <div role="alert">
@@ -102,6 +109,9 @@ function App() {
           <Route path="/consultations/:consultationId/tickets" exact={true} element={<PrivateRoute><TicketListAdmin /></PrivateRoute>} />
           <Route path="/achievements/" exact={true} element={<PrivateRoute><AchievementList /></PrivateRoute>} />
           <Route path="/achievements/:achievementId" exact={true} element={<PrivateRoute><AchievementEdit/></PrivateRoute>} />
+          <Route path="/game/" exact={true} element={<PrivateRoute><GameList/></PrivateRoute>} />
+          <Route path="/game/edit/:gameId" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
+
         </>)
     }
     if (role === "OWNER") {
@@ -115,6 +125,10 @@ function App() {
           <Route path="/consultations" exact={true} element={<PrivateRoute><OwnerConsultationList /></PrivateRoute>} />
           <Route path="/consultations/:consultationId" exact={true} element={<PrivateRoute><OwnerConsultationEdit /></PrivateRoute>} />
           <Route path="/consultations/:consultationId/tickets" exact={true} element={<PrivateRoute><OwnerConsultationTickets /></PrivateRoute>} />
+          <Route path="/game/" exact={true} element={<PrivateRoute><GameJoin/></PrivateRoute>} />
+          <Route path="/game/:gameId" exact={true} element={<PrivateRoute><GamePlay/></PrivateRoute>} />
+          
+
         </>)
     }
     if (role === "VET") {
@@ -153,6 +167,7 @@ function App() {
         {/* <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> */}        
         <Route path="/logout" element={<Logout />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/games" element={<GameList />} />
       </>
     )
   }

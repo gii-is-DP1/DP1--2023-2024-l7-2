@@ -23,59 +23,59 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/card")
-@Tag(name = "Cards", description = "The Cards management API")
+@RequestMapping("/api/v1/specialcard")
+@Tag(name = "Special Cards", description = "The Special Cards management API")
 @SecurityRequirement(name = "bearerAuth")
-public class CardRestController {
+public class SpecialCardRestController {
     
-    private final CardService cardService;
+    private final SpecialCardService specialCardService;
 
     @Autowired
-	public CardRestController(CardService cardService) {
-		this.cardService = cardService;
+	public SpecialCardRestController(SpecialCardService specialCardService) {
+		this.specialCardService = specialCardService;
 	}
 
     @GetMapping
-	public ResponseEntity<List<Card>> findAll() {
-		return new ResponseEntity<>((List<Card>) cardService.getCards(), HttpStatus.OK);
+	public ResponseEntity<List<SpecialCard>> findAll() {
+		return new ResponseEntity<>((List<SpecialCard>) specialCardService.getSpecialCards(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Card> findCard(@PathVariable("id") int id){
-		Card cardToGet=cardService.getById(id);
-		if(cardToGet==null)
+	public ResponseEntity<SpecialCard> findSpecialCard(@PathVariable("id") int id){
+		SpecialCard specialCardToGet=specialCardService.getById(id);
+		if(specialCardToGet==null)
 			throw new ResourceNotFoundException("Card with id "+id+" not found!");
-		return new ResponseEntity<Card>(cardToGet, HttpStatus.OK);
+		return new ResponseEntity<SpecialCard>(specialCardToGet, HttpStatus.OK);
 	}
 
 	@PostMapping
-	public ResponseEntity<Card> createCard(@RequestBody @Valid Card newCard, BindingResult br){ 
-		Card result=null;
+	public ResponseEntity<SpecialCard> createSpecialCard(@RequestBody @Valid SpecialCard newSpecialCard, BindingResult br){ 
+		SpecialCard result=null;
 		if(!br.hasErrors())
-			result=cardService.saveCard(newCard);
+			result=specialCardService.saveSpecialCard(newSpecialCard);
 		else
 			throw new BadRequestException(br.getAllErrors());
 		return new ResponseEntity<>(result,HttpStatus.CREATED);	
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Void> modifyCard(@RequestBody @Valid Card newCard, BindingResult br,@PathVariable("id") int id) {
-		Card cardToUpdate=this.findCard(id).getBody();
+	public ResponseEntity<Void> modifySpecialCard(@RequestBody @Valid SpecialCard newSpecialCard, BindingResult br,@PathVariable("id") int id) {
+		SpecialCard specialCardToUpdate=this.findSpecialCard(id).getBody();
 		if(br.hasErrors())
 			throw new BadRequestException(br.getAllErrors());	
-		else if(newCard.getId()==null || !newCard.getId().equals(id))
-			throw new BadRequestException("Card id is not consistent with resource URL:"+id);
+		else if(newSpecialCard.getId()==null || !newSpecialCard.getId().equals(id))
+			throw new BadRequestException("Special Card id is not consistent with resource URL:"+id);
 		else{
-			BeanUtils.copyProperties(newCard, cardToUpdate, "id");
-			cardService.saveCard(cardToUpdate);
+			BeanUtils.copyProperties(newSpecialCard, specialCardToUpdate, "id");
+			specialCardService.saveSpecialCard(specialCardToUpdate);
 		}			
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteCard(@PathVariable("id") int id){
-		findCard(id);
-		cardService.deleteCardById(id);
+	public ResponseEntity<Void> deleteSpecialCard(@PathVariable("id") int id){
+		findSpecialCard(id);
+		specialCardService.deleteSpecialCardById(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
