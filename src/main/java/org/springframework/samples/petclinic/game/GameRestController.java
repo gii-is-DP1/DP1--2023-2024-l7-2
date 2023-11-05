@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
@@ -81,6 +80,17 @@ public class GameRestController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/play/{code}")
+    public ResponseEntity<Void> playGame(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+
+        if (g == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/listPlayers/{id}")
     public ResponseEntity<List<Player>> getPlayers(@PathVariable("id") Integer id) {
         Optional<List<Player>> g = gs.getPlayers(id);
@@ -102,8 +112,10 @@ public class GameRestController {
         }
 
         Player p = new Player();
+        p.setColor("blank");
         p.setName(u.getUsername());
         p.setGame(g);
+        p.setUser(u);
         ps.savePlayer(p);
 
         return ResponseEntity.ok(g);
