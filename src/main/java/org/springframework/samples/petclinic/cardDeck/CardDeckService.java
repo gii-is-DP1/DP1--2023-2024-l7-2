@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Collections;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.card.CardRepository;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +19,13 @@ import jakarta.validation.Valid;
 public class CardDeckService {
 
     CardDeckRepository cdr;
+    CardRepository cardrepo;
+
 
     @Autowired
-    public CardDeckService(CardDeckRepository cdr) {
+    public CardDeckService(CardDeckRepository cdr, CardRepository cardrepo) {
         this.cdr = cdr;
+        this.cardrepo = cardrepo;
     }
 
     @Transactional(readOnly = true)
@@ -33,16 +39,37 @@ public class CardDeckService {
     }
 
     @Transactional
+    public CardDeck initialiate() throws DataAccessException {
+        // Not tested
+        CardDeck cd = new CardDeck();
+
+        List<Card> cards = cardrepo.findAll();
+        Collections.shuffle(cards);
+
+        cd.setCards(cards);
+        cd.setLastCard(cards.get(0));
+
+        cdr.save(cd);
+        return cd;
+    }
+
+    @Transactional
+    public CardDeck saveCardDeck(@Valid CardDeck cd) throws DataAccessException {
+        cdr.save(cd);
+        return cd;
+    }
+
+    @Transactional
     public CardDeck updateCardDeck(@Valid CardDeck cd, int cardDeckId) {
-        return cdr.updateCardDeck(cd, cardDeckId);
+        CardDeck carddeck = getCardDeckById(cardDeckId);
+        BeanUtils.copyProperties(cd, carddeck);
+        return saveCardDeck(carddeck);
     }
 
     @Transactional(readOnly = true)
     public List<Card> getTwoCards(Integer id) {
 
         List<Card> cards = getCardDeckById(id).getCards();
-
-        Collections.shuffle(cards);
 
         Card lastCard = getCardDeckById(id).getLastCard();
         Integer lastCardIndex = cards.indexOf(lastCard);

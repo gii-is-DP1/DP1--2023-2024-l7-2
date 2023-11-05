@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/specailCardDeck")
+@RequestMapping("/api/v1/specialCardDeck")
 @Tag(name = "SpecialCardDeck", description = "The management API for the Special Card Decks")
 @SecurityRequirement(name = "bearerAuth")
 
@@ -37,11 +37,11 @@ public class SpecialCardDeckController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SpecialCardDeck> getCardDeckById(@PathVariable("id") Integer id) {
+    public ResponseEntity<SpecialCardDeck> getSpecialCardDeckById(@PathVariable("id") Integer id) {
         SpecialCardDeck scd = scds.getSpecialCardDeckById(id);
         return new ResponseEntity<>(scd, HttpStatus.OK);
     }
-
+/*
     @GetMapping("/{id}")
     public ResponseEntity<SpecialCard> getSpecialCard(@PathVariable("id") Integer id) {
         SpecialCard sc = scds.getSpecialCard(id);
@@ -54,5 +54,5 @@ public class SpecialCardDeckController {
         SpecialCardDeck updatedCardDeck = scds.updateSpecialCardDeck(cardDeck, id);
         return new ResponseEntity<>(updatedCardDeck, HttpStatus.OK);
     }
-
+ */
 }

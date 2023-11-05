@@ -15,8 +15,8 @@ public interface CardDeckRepository extends CrudRepository<CardDeck, Integer> {
 
     CardDeck getCardDeckById(Integer id);
 
-    CardDeck updateCardDeck(@Valid CardDeck cd, int cardDeckId);
+    //CardDeck updateCardDeck(@Valid CardDeck cd, int cardDeckId);
 
-    List<Card> getTwoCards(Integer id);
+    //List<Card> getTwoCards(Integer id);
 
 }

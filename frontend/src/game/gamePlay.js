@@ -9,27 +9,19 @@ import getIdFromUrl from "./../util/getIdFromUrl";
 const jwt = tokenService.getLocalAccessToken();
 
 export default function GamePlay() {
-  const id = getIdFromUrl(2);
+  const code = getIdFromUrl(2);
 
-  const emptyGame = {
-    id: id==="new"?null:id,
-    name: "",
-    code: id,
-    start: null,
-    finish: null,
-    winner_id: null,
-    round: 0
-  };
+  const emptyGame = {};
 
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
   const [game, setGame] = useFetchState(
       emptyGame,
-      `/api/v1/game/${id}`,
+      `/api/v1/game/play/${code}`,
       jwt,
       setMessage,
       setVisible,
-      id
+      code
   );
 
   const modal = getErrorModal(setVisible, visible, message);

@@ -33,6 +33,7 @@ public class SpecialCardDeckService {
         return scdr.findById(id).orElseThrow(() -> new ResourceNotFoundException("CardDeck", "Id", id));
     }
 
+    /* 
     @Transactional
     public SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck scd, int specialCardDeckId) {
         return scdr.updateSpecialCardDeck(scd, specialCardDeckId);
@@ -53,6 +54,6 @@ public class SpecialCardDeckService {
         updateSpecialCardDeck(newScd, id);
 
         return cards.get(lastCardIndex);
-    }
+    }*/
 
 }

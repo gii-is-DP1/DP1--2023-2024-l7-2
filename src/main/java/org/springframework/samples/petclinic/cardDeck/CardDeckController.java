@@ -50,7 +50,7 @@ public class CardDeckController {
         return new ResponseEntity<>(cd, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getTwoCards/{id}")
     public ResponseEntity<List<Card>> getTwoCards(@PathVariable("id") Integer id) {
         List<Card> cd = cds.getTwoCards(id);
         return new ResponseEntity<>(cd, HttpStatus.OK);
