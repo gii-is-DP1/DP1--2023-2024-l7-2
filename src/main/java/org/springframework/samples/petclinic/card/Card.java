@@ -17,14 +17,11 @@ public class Card extends NamedEntity {
     private String description;
     private Integer position;
     private String badgeImage;
-   
-
 
     private Integer totalIron;
     private Integer totalGold;
     private Integer totalSteal;
     private Integer totalMedals;
     private Boolean helpCard;
-    
-    
+
 }

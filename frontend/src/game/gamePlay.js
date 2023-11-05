@@ -9,21 +9,23 @@ import getIdFromUrl from "./../util/getIdFromUrl";
 const jwt = tokenService.getLocalAccessToken();
 
 export default function GamePlay() {
-    const id = getIdFromUrl(2);
-    const emptyGame = {
-      id: id==="new"?null:id,
-      name: "",
-      code: id,
-      start: null,
-      finish: null,
-      winner_id: null,
-      round: 0
+  const id = getIdFromUrl(2);
+
+  const emptyGame = {
+    id: id==="new"?null:id,
+    name: "",
+    code: id,
+    start: null,
+    finish: null,
+    winner_id: null,
+    round: 0
   };
+
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
   const [game, setGame] = useFetchState(
       emptyGame,
-      `/api/v1/game/check/${id}`,
+      `/api/v1/game/${id}`,
       jwt,
       setMessage,
       setVisible,
@@ -31,20 +33,30 @@ export default function GamePlay() {
   );
 
   const modal = getErrorModal(setVisible, visible, message);
+ 
 
   return (
     <div>
       <div className="admin-page-container">
-        <h1 className="text-center">Here we are playing</h1>        
-        {modal}
-        <div>
-          <h3 className="text-center">{game.name}</h3>
-          <h3 className="text-center">{game.code?"private":"public"}</h3>
-          <h3 className="text-center">{game.start?'waiting':game.start}</h3>
-          <h3 className="text-center">{game.finish?game.finish:''}</h3>
-          <h3 className="text-center">{game.finish?game.winer_id:''}</h3>
-          <h3 className="text-center">{game.finish?'':game.round}</h3>
-        </div>
+        <h1 className="text-center">Dward - </h1>        
+        <section className="generalLayout">
+          <section className="cardDeckLayout">
+            <div><h2 className="text-center">Card</h2></div>
+            <div><h2 className="text-center">Card</h2></div>
+            <div><h2 className="text-center">Card</h2></div>
+            <div><h2 className="text-center">Card</h2></div>
+            <div><h2 className="text-center">Card</h2></div>
+            <div><h2 className="text-center">Card</h2></div>
+            <div><h2 className="text-center">Card</h2></div>
+            <div><h2 className="text-center">Card</h2></div>
+            <div><h2 className="text-center">Card</h2></div>
+          </section>
+          <section className="specialCardDeckLayout">
+            <div><h2 className="text-center">Special Card</h2></div>
+            <div><h2 className="text-center">Special Card</h2></div>
+            <div><h2 className="text-center">Special Card</h2></div>
+          </section>
+        </section>
       </div>
     </div>
   );
