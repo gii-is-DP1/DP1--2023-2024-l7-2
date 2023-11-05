@@ -25,9 +25,9 @@ export default function GameList() {
             <td className="text-center">{game.name}</td>
             <td className="text-center">{game.code?"private":"public"}</td>
             <td className="text-center">{game.start?'waiting':game.start}</td>
-            <td className="text-center">{game.finish?game.finish:''}</td>
-            <td className="text-center">{game.finish?game.winer_id:''}</td>
-            <td className="text-center">{game.finish?'':game.round}</td>
+            <td className="text-center">{game.finish?game.finish:'not finished'}</td>
+            <td className="text-center">{game.finish?game.winer_id:'not finished'}</td>
+            <td className="text-center">{game.finish?'ongoing':game.round}</td>
             <td className="text-center">
               <ButtonGroup>
                 <Button
@@ -94,6 +94,11 @@ export default function GameList() {
             <thead>
               <tr>
                 <th width="15%" className="text-center">Name</th>
+                <th width="15%" className="text-center">Type</th>
+                <th width="15%" className="text-center">State</th>
+                <th width="15%" className="text-center">Finished</th>
+                <th width="15%" className="text-center">Winner</th>
+                <th width="15%" className="text-center">Round</th>
               </tr>
             </thead>
             <tbody>{gamesList}</tbody>

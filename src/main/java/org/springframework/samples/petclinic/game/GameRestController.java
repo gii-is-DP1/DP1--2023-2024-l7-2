@@ -8,6 +8,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
+import org.springframework.samples.petclinic.player.PlayereService;
+import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.user.User;
+import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
@@ -29,10 +34,14 @@ import jakarta.validation.Valid;
 public class GameRestController {
 
     private final GameService gs;
+    private final UserService us;
+    private final PlayereService ps;
 
     @Autowired
-    public GameRestController(GameService gs) {
+    public GameRestController(GameService gs, UserService us, PlayereService ps) {
         this.gs = gs;
+        this.us = us;
+        this.ps = ps;
     }
 
     @GetMapping
@@ -62,10 +71,43 @@ public class GameRestController {
     }
 
     @GetMapping("/check/{code}")
-    public Game getGameByCode(@PathVariable("code") String code) {
+    public ResponseEntity<Void> getGameByCode(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
-        System.out.println(g);
-        return g;
+
+        if (g == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/listPlayers/{id}")
+    public ResponseEntity<List<Player>> getPlayers(@PathVariable("id") Integer id) {
+        Optional<List<Player>> g = gs.getPlayers(id);
+
+        if (g.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(g.get());
+    }
+
+    @PostMapping("/join/{code}/{id}")
+    public ResponseEntity<Game> joinGame(@PathVariable("code") String code, @PathVariable("id") Integer id) {
+        Game g = gs.getGameByCode(code);
+        User u = us.findUser(id);
+
+        if (g == null || u == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Player p = new Player();
+        p.setName(u.getUsername());
+        p.setGame(g);
+        ps.savePlayer(p);
+
+        return ResponseEntity.ok(g);
+
     }
 
     @PostMapping

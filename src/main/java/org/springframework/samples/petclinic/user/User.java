@@ -7,6 +7,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
+
 import org.springframework.samples.petclinic.model.BaseEntity;
 
 import lombok.Getter;

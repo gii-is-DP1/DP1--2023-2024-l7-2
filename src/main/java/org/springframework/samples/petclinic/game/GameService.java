@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,11 @@ public class GameService {
     @Transactional
     public Optional<Game> getGameById(Integer id) {
         return gr.findById(id);
+    }
+
+    @Transactional
+    public Optional<List<Player>> getPlayers(Integer id) {
+        return gr.getPlayersByGameId(id);
     }
 
     @Transactional(readOnly = true)

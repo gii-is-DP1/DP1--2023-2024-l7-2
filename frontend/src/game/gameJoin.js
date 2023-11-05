@@ -7,6 +7,7 @@ import getIdFromUrl from "../util/getIdFromUrl";
 import useFetchState from "../util/useFetchState";
 
 const jwt = tokenService.getLocalAccessToken();
+const user = tokenService.getUser()
 
 export default function GameJoin() {
 
@@ -42,7 +43,28 @@ export default function GameJoin() {
                 }
             }
         )
-        .then((response) => response.text())
+        .then((response) => {
+            if (response.ok) {
+                fetch(
+                    "/api/v1/game/join" + (game ? "/" + game : "") + (user.id ? "/" + user.id : ""),
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${jwt}`,
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                        }
+                    }
+                ).then((response) => {
+                    console.log(response.text)
+                    if (response.ok) {
+                        window.location.href = `/game/${game}`
+                    } else {
+                        console.log("error")
+                    }
+                })
+            }
+        })/*
         .then((data) => {
             console.log(data);
             if(data==="")
@@ -56,7 +78,7 @@ export default function GameJoin() {
                     //window.location.href = "/game";
                     console.log("error in json format")
             }
-        })
+        })*/
 
         .catch((message) => alert(message));
 

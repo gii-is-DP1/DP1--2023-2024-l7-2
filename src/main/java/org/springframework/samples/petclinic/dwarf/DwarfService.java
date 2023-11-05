@@ -37,10 +37,11 @@ public class DwarfService {
         return result.isPresent() ? result.get() : null;
     }
 
+    /* 
     @Transactional(readOnly = true)
     public Dwarf getDwarfsByColor(String color) {
         return repo.findByColor(color);
-    }
+    }*/
 
     
 }
