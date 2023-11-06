@@ -55,6 +55,9 @@ import GameEdit from "./game/gameEdit";
 import GameJoin from "./game/gameJoin";
 import GamePlay from "./game/gamePlay";
 
+import CardViewer from "./cards/cardViewer";
+import CardList from "./cards/cardList";
+
 
 
 function ErrorFallback({ error, resetErrorBoundary }) {
@@ -111,7 +114,8 @@ function App() {
           <Route path="/achievements/:achievementId" exact={true} element={<PrivateRoute><AchievementEdit/></PrivateRoute>} />
           <Route path="/game/" exact={true} element={<PrivateRoute><GameList/></PrivateRoute>} />
           <Route path="/game/edit/:gameId" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
-
+          <Route path="/card" exact={true} element={<PrivateRoute><CardViewer/></PrivateRoute>} />
+          <Route path="/cards" exact={true} element={<PrivateRoute><CardList/></PrivateRoute>}/>
         </>)
     }
     if (role === "OWNER") {
