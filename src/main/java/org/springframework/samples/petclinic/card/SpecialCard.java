@@ -15,7 +15,6 @@ import lombok.Setter;
 public class SpecialCard extends NamedEntity {
     @NotBlank
     private String description;
-    private Integer position;
     private String badgeImage;
    
 
