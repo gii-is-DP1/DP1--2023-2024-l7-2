@@ -3,8 +3,8 @@ package org.springframework.samples.petclinic.card;
 import org.springframework.samples.petclinic.model.NamedEntity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -19,22 +19,15 @@ public class Card extends NamedEntity {
     private String description;
     @NotBlank
     private Integer position;
-    private String badgeImage;
+    // private String badgeImage;
 
-    @Enumerated(EnumType.STRING)
-    private String cardType;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "card_type_id")
+    private CardType cardType;
 
     private Integer totalIron;
     private Integer totalGold;
     private Integer totalSteal;
     private Integer totalMedals;
-
-    public enum cardType {
-        HelpCard,
-        OrcCard,
-        ObjectCard,
-        Other
-    }
-    
 
 }

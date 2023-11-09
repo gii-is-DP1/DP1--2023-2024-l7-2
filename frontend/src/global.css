@@ -8,12 +8,12 @@
 }
 
 @font-face {
-    font-family: 'american-typewriter'; /*a name to be used later*/
-    src: url('./static/fonts/American\ Typewriter\ Bold.ttf'); /*URL to font*/
+    font-family: 'KhazadDumExpanded-ow8eq'; /*a name to be used later*/
+    src: url('./static/fonts/KhazadDumExpanded-ow8eq.ttf'); /*URL to font*/
 }
 
 * {
-    font-family: 'american-typewriter';
+    font-family: 'KhazadDumExpanded-ow8eq';
 }
 
 /* div {
