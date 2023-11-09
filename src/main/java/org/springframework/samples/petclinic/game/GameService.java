@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +14,12 @@ public class GameService {
 
     GameRepository gr;
 
+   
+
     @Autowired
     public GameService(GameRepository gr) {
         this.gr = gr;
+        
     }
 
     @Transactional(readOnly = true)
