@@ -1,13 +1,20 @@
 package org.springframework.samples.petclinic.game;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
+import org.springframework.samples.petclinic.dwarf.Dwarf;
+import org.springframework.samples.petclinic.mainboard.MainBoard;
 import org.springframework.samples.petclinic.model.NamedEntity;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.user.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,4 +40,13 @@ public class Game extends NamedEntity {
     
     Integer winner_id;
     Integer round;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Collection<MainBoard> mainBoard;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Collection<Dwarf> dwarfs; 
+    
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Collection<Player> players;
 }
