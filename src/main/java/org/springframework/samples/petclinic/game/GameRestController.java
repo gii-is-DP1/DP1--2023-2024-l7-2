@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
 import org.springframework.samples.petclinic.player.PlayereService;
@@ -81,14 +82,14 @@ public class GameRestController {
     }
 
     @GetMapping("/play/{code}")
-    public ResponseEntity<Void> playGame(@PathVariable("code") String code) {
+    public ResponseEntity<Game> playGame(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
 
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(g,HttpStatus.OK);
     }
 
     @GetMapping("/listPlayers/{id}")
