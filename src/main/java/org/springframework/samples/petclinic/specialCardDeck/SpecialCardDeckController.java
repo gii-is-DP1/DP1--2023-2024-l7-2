@@ -5,10 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.SpecialCard;
-
+import org.springframework.samples.petclinic.cardDeck.CardDeck;
+import org.springframework.samples.petclinic.exceptions.BadRequestException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,18 +45,29 @@ public class SpecialCardDeckController {
         SpecialCardDeck scd = scds.getSpecialCardDeckById(id);
         return new ResponseEntity<>(scd, HttpStatus.OK);
     }
-/*
-    @GetMapping("/{id}")
+
+    @GetMapping("/getSpecialCard/{id}")
     public ResponseEntity<SpecialCard> getSpecialCard(@PathVariable("id") Integer id) {
-        SpecialCard sc = scds.getSpecialCard(id);
-        return new ResponseEntity<>(sc, HttpStatus.OK);
+        SpecialCard scd = scds.getSpecialCard(id);
+        return new ResponseEntity<>(scd, HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<SpecialCardDeck> createSpecialCardDeck(@RequestBody @Valid SpecialCardDeck newSpecialCardDeck,
+            BindingResult br) {
+        SpecialCardDeck result = null;
+        if (!br.hasErrors())
+            result = scds.saveSpecialCardDeck(newSpecialCardDeck);
+        else
+            throw new BadRequestException(br.getAllErrors());
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SpecialCardDeck> updateCardDeck(@PathVariable("id") int id,
-            @Valid @RequestBody SpecialCardDeck cardDeck) {
-        SpecialCardDeck updatedCardDeck = scds.updateSpecialCardDeck(cardDeck, id);
-        return new ResponseEntity<>(updatedCardDeck, HttpStatus.OK);
+    public ResponseEntity<SpecialCardDeck> updateSpecialCardDeck(@PathVariable("id") int id,
+            @Valid @RequestBody SpecialCardDeck specialcardDeck) {
+        SpecialCardDeck updatedSpecialCardDeck = scds.updateSpecialCardDeck(specialcardDeck, id);
+        return new ResponseEntity<>(updatedSpecialCardDeck, HttpStatus.OK);
     }
- */
+
 }

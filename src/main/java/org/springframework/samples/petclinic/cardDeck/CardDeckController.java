@@ -9,9 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.exceptions.BadRequestException;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
 import org.springframework.samples.petclinic.pet.Pet;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.user.User;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +57,17 @@ public class CardDeckController {
     public ResponseEntity<List<Card>> getTwoCards(@PathVariable("id") Integer id) {
         List<Card> cd = cds.getTwoCards(id);
         return new ResponseEntity<>(cd, HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<CardDeck> createCardDeck(@RequestBody @Valid CardDeck newCardDeck,
+            BindingResult br) {
+        CardDeck result = null;
+        if (!br.hasErrors())
+            result = cds.saveCardDeck(newCardDeck);
+        else
+            throw new BadRequestException(br.getAllErrors());
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

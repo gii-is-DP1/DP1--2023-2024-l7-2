@@ -16,9 +16,10 @@ public interface SpecialCardDeckRepository extends CrudRepository<SpecialCardDec
 
     Optional<SpecialCardDeck> findById(Integer id);
 
-    //SpecialCardDeck getSpecialCardDeckById(Integer id);
+    // SpecialCardDeck getSpecialCardDeckById(Integer id);
 
-    //SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck scd, int specialCardDeckId);
+    // SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck scd, int
+    // specialCardDeckId);
 
-    //SpecialCard getSpecialCard(Integer id);
+    // SpecialCard getSpecialCard(Integer id);
 }

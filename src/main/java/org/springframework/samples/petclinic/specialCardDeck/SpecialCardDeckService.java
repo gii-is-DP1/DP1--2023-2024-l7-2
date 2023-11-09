@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.SpecialCard;
+import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,15 +35,7 @@ public class SpecialCardDeckService {
         return scdr.findById(id).orElseThrow(() -> new ResourceNotFoundException("CardDeck", "Id", id));
     }
 
-    /* 
-    @Transactional
-    public SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck scd, int specialCardDeckId) {
-        return scdr.updateSpecialCardDeck(scd, specialCardDeckId);
-    }
-
-    @Transactional(readOnly = true)
     public SpecialCard getSpecialCard(Integer id) {
-
         List<SpecialCard> cards = getSpecialCardDeckById(id).getSpecialCards();
 
         Collections.shuffle(cards);
@@ -54,6 +48,17 @@ public class SpecialCardDeckService {
         updateSpecialCardDeck(newScd, id);
 
         return cards.get(lastCardIndex);
-    }*/
+    }
+
+    public SpecialCardDeck saveSpecialCardDeck(@Valid SpecialCardDeck newSpecialCardDeck) {
+        scdr.save(newSpecialCardDeck);
+        return newSpecialCardDeck;
+    }
+
+    public SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck specialcardDeck, int id) {
+        SpecialCardDeck scd = getSpecialCardDeckById(id);
+        BeanUtils.copyProperties(scd, specialcardDeck);
+        return saveSpecialCardDeck(scd);
+    }
 
 }
