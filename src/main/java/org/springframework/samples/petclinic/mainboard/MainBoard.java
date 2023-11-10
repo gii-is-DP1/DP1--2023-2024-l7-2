@@ -1,15 +1,15 @@
 package org.springframework.samples.petclinic.mainboard;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.model.NamedEntity;
+import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeck;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,10 +18,10 @@ import lombok.Setter;
 @Setter
 @Table(name = "MainBoard")
 public class MainBoard extends NamedEntity{
-    @NotBlank
-    private Integer x;
-    private Integer y;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Collection<CardDeck> cardDecks;
+    @OneToOne
+    private CardDeck cardDeck;
+
+    @OneToMany
+    private List<SpecialCardDeck> specialCardDecks;
 }

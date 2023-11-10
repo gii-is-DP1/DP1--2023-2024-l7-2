@@ -25,7 +25,7 @@ public class SpecialCardDeck extends BaseEntity {
     List<SpecialCard> specialCards;
 
     @OneToOne
-    @Transient
+    //@Transient
     @JoinColumn(name = "card_id")
     SpecialCard lastSpecialCard;
 
