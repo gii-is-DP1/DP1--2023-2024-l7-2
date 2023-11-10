@@ -3,11 +3,13 @@ package org.springframework.samples.petclinic.game;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.cardDeck.CardDeckService;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
@@ -103,6 +105,17 @@ public class GameRestController {
         }
 
         return new ResponseEntity<>(g,HttpStatus.OK);
+    }
+
+    @GetMapping("/play/{code}/cards")
+    public ResponseEntity<List<Card>> getCardsFromMainBoardFromGame(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+
+        if (g == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return new ResponseEntity<>(g.getMainBoard().getCardDeck().getCards(),HttpStatus.OK);
     }
 
     @GetMapping("/listPlayers/{id}")

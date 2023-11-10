@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Button } from "react";
+import React, { useState, useEffect } from "react";
 import tokenService from "../services/token.service";
 
 import getIdFromUrl from "./../util/getIdFromUrl";
@@ -12,7 +12,6 @@ const Card = (props) => {
   const emptyCard = {};
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
-  const [select, setSelect] = useState(false);
   const [card, setCard] = useFetchState(
       emptyCard,
       `/api/v1/card/${id}`,
@@ -22,66 +21,28 @@ const Card = (props) => {
       id);
 
     const rectanguloStyle = {
-      width: '300px',
-      height: '400px',
+      width: '200px',
+      height: '300px',
       backgroundColor: 'white',
-      border: '3px solid black',
+      border: '7px solid black',
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      flexDirection: 'column' 
     };
 
-    const rectanguloStyle2 = {
-      width: '300px',
-      height: '400px',
-      backgroundColor: 'grey',
-      border: '3px solid black',
-    };
 
-    const renderCardNormal = () => {
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-        <div style={rectanguloStyle}>
-          <h1 style={{ textAlign: 'center' }}> {card.name} </h1>
-          <p style={{ textAlign: 'center', marginTop: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{card.description}</p>
-          <div style={{ display: 'flex', marginTop: 'auto', justifyContent: 'space-between', padding: '0 25px' }}>
-            <p>Hierro: {card.totalIron}</p>
-            <p>Oro: {card.totalGold}</p>
-            <p>Acero: {card.totalSteal}</p> 
-          </div>
-          <Button
-            onPress={setSelect}
-            title="SelectCard"
-            color="#008000"
-          />
-        </div>
-      </div>
-    }
-
-    const renderCardSelected = () => {
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-      <div style={rectanguloStyle2}>
-        <h1 style={{ textAlign: 'center' }}> {card.name} </h1>
-        <p style={{ textAlign: 'center', marginTop: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{card.description}</p>
-        <div style={{ display: 'flex', marginTop: 'auto', justifyContent: 'space-between', padding: '0 25px' }}>
-          <p>Hierro: {card.totalIron}</p>
-          <p>Oro: {card.totalGold}</p>
-          <p>Acero: {card.totalSteal}</p> 
-        </div>
-        <Button
-          onPress={setSelect}
-          title="SelectCard"
-          color="#008000"
-        />
+  return (
+    <div style={rectanguloStyle}>
+      <h3 style={{ textAlign: 'center', marginTop: '30px' }}> {card.name} </h3>
+      <p style={{ textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{card.description}</p>
+      <div style={{ display: 'flex', marginTop: 'auto', justifyContent: 'space-between', padding: '0 25px', flexDirection:"column" }}>
+        <p>Hierro: {card.totalIron}</p>
+        <p>Oro: {card.totalGold}</p>
+        <p>Acero: {card.totalSteal}</p> 
       </div>
     </div>
-  }
-  if(select === true){
-    return renderCardSelected
-  }else{
-    return renderCardNormal
-   } 
-  ;
+   );
   }
 
 export default Card;
-
-
-
-

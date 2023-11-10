@@ -7,7 +7,7 @@ import org.springframework.samples.petclinic.model.BaseEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -20,12 +20,12 @@ import lombok.Setter;
 @Table(name = "cardDeck")
 public class CardDeck extends BaseEntity {
 
-    @OneToMany()
+    @ManyToMany()
     @JoinColumn(name = "card")
     List<Card> cards;
 
     @OneToOne
-    @Transient
+    //@Transient
     @JoinColumn(name = "card_id")
     Card lastCard;
 
