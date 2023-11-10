@@ -20,7 +20,7 @@ public class SpecialCardService {
     }
 
     @Transactional(readOnly = true)    
-    List<SpecialCard> getSpecialCards(){
+    public List<SpecialCard> getSpecialCards(){
         return repo.findAll();
     }
     
