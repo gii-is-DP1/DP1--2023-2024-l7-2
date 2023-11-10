@@ -45,17 +45,17 @@ public class GameRestController {
     private final UserService us;
     private final PlayereService ps;
     private final MainBoardService mbs;
-    //private final CardDeckService cds;
+    private final CardDeckService cds;
     //private final SpecialCardDeckService scds;
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayereService ps,
-        MainBoardService mbs) {
+        MainBoardService mbs, CardDeckService cds) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
         this.mbs = mbs;
-        //this.cds = cds;
+        this.cds = cds;
         //this.scds = scds;
     }
 
@@ -115,7 +115,23 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        return new ResponseEntity<>(g.getMainBoard().getCardDeck().getCards(),HttpStatus.OK);
+        List<Card> cards = g.getMainBoard().getCardDeck().getCards();
+
+        cards = cards.stream().sorted((c1,c2) -> c1.getPosition().compareTo(c2.getPosition())).toList();
+
+        return new ResponseEntity<>(cards,HttpStatus.OK);
+    }
+
+    @GetMapping("/play/{code}/getCards")
+    public ResponseEntity<List<Card>> getTwoCards(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+
+        if (g == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<Card> cd = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
+        return new ResponseEntity<>(cd, HttpStatus.OK);
     }
 
     @GetMapping("/listPlayers/{id}")

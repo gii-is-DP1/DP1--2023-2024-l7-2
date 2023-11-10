@@ -222,7 +222,8 @@ INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,nul
 
 INSERT INTO card_deck(id, card_id) VALUES (1,1);
 
-INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10);
+INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,22),(1,33),(1,14),(1,25),(1,36),(1,37),(1,38),(1,9),(1,10),
+                                                        (1,11),(1,12),(1,13),(1,24),(1,15),(1,26),(1,27),(1,28),(1,19);
 
 
 INSERT INTO special_card_deck(id,card_id) VALUES (1,1),(2,4),(3,7);
