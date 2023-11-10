@@ -8,8 +8,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.cardDeck.CardDeck;
+import org.springframework.samples.petclinic.cardDeck.CardDeckService;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
+import org.springframework.samples.petclinic.mainboard.MainBoard;
+import org.springframework.samples.petclinic.mainboard.MainBoardService;
 import org.springframework.samples.petclinic.player.PlayereService;
+import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeck;
+import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.user.UserService;
@@ -21,8 +27,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -36,12 +42,19 @@ public class GameRestController {
     private final GameService gs;
     private final UserService us;
     private final PlayereService ps;
+    private final MainBoardService mbs;
+    //private final CardDeckService cds;
+    //private final SpecialCardDeckService scds;
 
     @Autowired
-    public GameRestController(GameService gs, UserService us, PlayereService ps) {
+    public GameRestController(GameService gs, UserService us, PlayereService ps,
+        MainBoardService mbs) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
+        this.mbs = mbs;
+        //this.cds = cds;
+        //this.scds = scds;
     }
 
     @GetMapping
@@ -124,14 +137,24 @@ public class GameRestController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
-        g = gs.saveGame(g);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(g.getId())
-                .toUri();
-        return ResponseEntity.created(location).body(g);
+
+        /* To use this function in the frontend 
+         * first the game has to be created and then 
+         * the user needs to join the game
+        */
+
+
+        // TODO: REFACTORIZE
+
+        MainBoard mb = mbs.initialize();
+
+        g.setMainBoard(mb);
+
+        gs.saveGame(g);
+        
+        return new ResponseEntity<>(g,HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

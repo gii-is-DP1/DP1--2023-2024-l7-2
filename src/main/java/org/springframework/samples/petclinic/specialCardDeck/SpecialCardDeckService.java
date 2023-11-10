@@ -2,13 +2,12 @@ package org.springframework.samples.petclinic.specialCardDeck;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.SpecialCard;
-import org.springframework.samples.petclinic.cardDeck.CardDeck;
+import org.springframework.samples.petclinic.card.SpecialCardRepository;
+import org.springframework.samples.petclinic.card.SpecialCardService;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +18,12 @@ import jakarta.validation.Valid;
 public class SpecialCardDeckService {
 
     SpecialCardDeckRepository scdr;
+    SpecialCardService scs;
 
     @Autowired
-    public SpecialCardDeckService(SpecialCardDeckRepository scdr) {
+    public SpecialCardDeckService(SpecialCardDeckRepository scdr, SpecialCardService scs) {
         this.scdr = scdr;
+        this.scs = scs;
     }
 
     @Transactional(readOnly = true)
@@ -35,10 +36,40 @@ public class SpecialCardDeckService {
         return scdr.findById(id).orElseThrow(() -> new ResourceNotFoundException("CardDeck", "Id", id));
     }
 
+    @Transactional()
+    public List<SpecialCardDeck> initialize() {
+
+        // We shuffle all special cards
+        List<SpecialCard> specCards = scs.getSpecialCards();
+        Collections.shuffle(specCards);
+
+        // We split them into three decks and we create three special card deck
+        List<SpecialCard> specCardList1 = List.of(specCards.get(1),specCards.get(2));
+        List<SpecialCard> specCardList2 = List.of(specCards.get(2),specCards.get(3));
+        List<SpecialCard> specCardList3 = List.of(specCards.get(4),specCards.get(5));
+
+        SpecialCardDeck scd1 = new SpecialCardDeck();
+        SpecialCardDeck scd2 = new SpecialCardDeck();
+        SpecialCardDeck scd3 = new SpecialCardDeck();
+
+        scd1.setSpecialCards(specCardList1);
+        scd1.setLastSpecialCard(specCardList1.get(0));
+
+        scd2.setSpecialCards(specCardList2);
+        scd2.setLastSpecialCard(specCardList2.get(0));
+
+        scd3.setSpecialCards(specCardList3);
+        scd3.setLastSpecialCard(specCardList3.get(0));
+
+        return List.of(scd1, scd2, scd3);
+    }
+
+
+    @Transactional()
     public SpecialCard getSpecialCard(Integer id) {
         List<SpecialCard> cards = getSpecialCardDeckById(id).getSpecialCards();
 
-        Collections.shuffle(cards);
+        //Collections.shuffle(cards);
 
         SpecialCard lastCard = getSpecialCardDeckById(id).getLastSpecialCard();
         Integer lastCardIndex = cards.indexOf(lastCard);
@@ -50,11 +81,13 @@ public class SpecialCardDeckService {
         return cards.get(lastCardIndex);
     }
 
+    @Transactional()
     public SpecialCardDeck saveSpecialCardDeck(@Valid SpecialCardDeck newSpecialCardDeck) {
         scdr.save(newSpecialCardDeck);
         return newSpecialCardDeck;
     }
 
+    @Transactional()
     public SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck specialcardDeck, int id) {
         SpecialCardDeck scd = getSpecialCardDeckById(id);
         BeanUtils.copyProperties(scd, specialcardDeck);
