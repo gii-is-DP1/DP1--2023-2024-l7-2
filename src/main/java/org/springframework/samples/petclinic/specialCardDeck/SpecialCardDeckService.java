@@ -44,9 +44,9 @@ public class SpecialCardDeckService {
         Collections.shuffle(specCards);
 
         // We split them into three decks and we create three special card deck
-        List<SpecialCard> specCardList1 = List.of(specCards.get(1),specCards.get(2));
-        List<SpecialCard> specCardList2 = List.of(specCards.get(2),specCards.get(3));
-        List<SpecialCard> specCardList3 = List.of(specCards.get(4),specCards.get(5));
+        List<SpecialCard> specCardList1 = List.of(specCards.get(0),specCards.get(1),specCards.get(2));
+        List<SpecialCard> specCardList2 = List.of(specCards.get(3),specCards.get(4),specCards.get(5));
+        List<SpecialCard> specCardList3 = List.of(specCards.get(6),specCards.get(7),specCards.get(8));
 
         SpecialCardDeck scd1 = new SpecialCardDeck();
         SpecialCardDeck scd2 = new SpecialCardDeck();

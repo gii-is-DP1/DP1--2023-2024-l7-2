@@ -5,25 +5,33 @@ import getErrorModal from "../util/getErrorModal";
 import { Button, ButtonGroup, Table } from "reactstrap";
 import { Link } from "react-router-dom";
 import getIdFromUrl from "./../util/getIdFromUrl";
+import Card from "./../cards/card"
 
 const jwt = tokenService.getLocalAccessToken();
 
 export default function GamePlay() {
   const code = getIdFromUrl(2);
 
-  const emptyGame = {
-  };
 
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [cards, setCards] = useFetchState(
+    [],
+    `/api/v1/game/play/${code}/cards`,
+    jwt,
+    setMessage,
+    setVisible,
+    code
+);
   const [game, setGame] = useFetchState(
-      emptyGame,
+      {},
       `/api/v1/game/play/${code}`,
       jwt,
       setMessage,
       setVisible,
       code
   );
+
 
   function faseExtraccionMinerales() {
 
@@ -44,6 +52,7 @@ export default function GamePlay() {
   }
 
   function gameLogic() {
+
     /*
       Aqui se pondra la logica del juego.
     */
@@ -63,26 +72,43 @@ export default function GamePlay() {
     faseResolucionAcciones()
   }
 
+  
+  console.log(cards);
   gameLogic()
 
   const modal = getErrorModal(setVisible, visible, message);
  
 
+  /*
+  let cardList =
+  cards.map((card) => {
+    return (
+      <Card id={card.id}/>
+    )
+  })*/
+
+
   return (
     <div>
       <div className="admin-page-container">
         <h1 className="text-center">Dward - </h1>        
-        <section className="generalLayout">
+        <section className="generalLayout" style={{display:"flex", flexDirection:"column"}}>
           <section className="cardDeckLayout">
-            <div><h2 className="text-center">Card</h2></div>
-            <div><h2 className="text-center">Card</h2></div>
-            <div><h2 className="text-center">Card</h2></div>
-            <div><h2 className="text-center">Card</h2></div>
-            <div><h2 className="text-center">Card</h2></div>
-            <div><h2 className="text-center">Card</h2></div>
-            <div><h2 className="text-center">Card</h2></div>
-            <div><h2 className="text-center">Card</h2></div>
-            <div><h2 className="text-center">Card</h2></div>
+            <section className="cardDeckLayoutRow1" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
+              <Card id={cards[0].id} />
+              <Card id={cards[1].id} />
+              <Card id={cards[2].id} />
+            </section>
+            <section className="cardDeckLayoutRow2" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
+              <Card id={cards[3].id} />
+              <Card id={cards[4].id} />
+              <Card id={cards[5].id} />
+            </section>
+            <section className="cardDeckLayoutRow3" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
+              <Card id={cards[6].id} />
+              <Card id={cards[7].id} />
+              <Card id={cards[8].id} />
+            </section>
           </section>
           <section className="specialCardDeckLayout">
             <div><h2 className="text-center">Special Card</h2></div>

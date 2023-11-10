@@ -132,10 +132,6 @@ INSERT INTO achievement(id,name,description,total_iron,total_gold,total_steal,to
 INSERT INTO achievement(id,name,description,total_iron,total_gold,total_steal,total_objects,total_matches,total_victories) 
                         VALUES (2,'well come','You won your first match',0,0,0,0,1,1);
 
-INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,null,null,null,null,null),
-                                                    (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1),
-                                                    (3,'super cool game', null,'2023-04-11 18:20','2023-04-11 19:20', 2, null); 
-
 /*CARD TYPE*/
 INSERT INTO card_type(id, name) VALUES (1, 'HelpCard'),
         (2, 'OrcCard'),
@@ -218,3 +214,29 @@ INSERT INTO special_card(id, name, description)
                         VALUES (8,'Collapse the Shafts ','Remove the top card from each location and place it on the bottom of that stack.');
 INSERT INTO special_card(id, name, description) 
                         VALUES (9,'Run Amok','Collect all of the cards from each location, in turn, shuffle them and return them to that location.');                                                
+
+
+INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,null,null,null,null,null),
+        (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1),
+        (3,'super cool game', null,'2023-04-11 18:20','2023-04-11 19:20', 2, null); 
+
+INSERT INTO card_deck(id, card_id) VALUES (1,1);
+
+INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10);
+
+
+INSERT INTO special_card_deck(id,card_id) VALUES (1,1),(2,4),(3,7);
+
+INSERT INTO special_card_deck_special_cards(special_card_deck_id, special_cards_id) VALUES 
+                (1,1),(1,2),(1,3),(2,4),(2,5),(2,6),(3,7),(3,8),(3,9);
+
+
+INSERT INTO main_board(id, card_deck_id) VALUES (1, 1);
+
+INSERT INTO main_board_special_card_decks(main_board_id, special_card_decks_id) VALUES (1,1),(1,3),(1,2);
+
+INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1);
+
+
+
+

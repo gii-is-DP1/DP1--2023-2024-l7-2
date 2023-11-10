@@ -3,7 +3,7 @@ package org.springframework.samples.petclinic.mainboard;
 import java.util.List;
 
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
-import org.springframework.samples.petclinic.model.NamedEntity;
+import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeck;
 
 import jakarta.persistence.Entity;
@@ -17,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "MainBoard")
-public class MainBoard extends NamedEntity{
+public class MainBoard extends BaseEntity{
 
     @OneToOne
     private CardDeck cardDeck;
