@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.card.SpecialCard;
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.cardDeck.CardDeckService;
 import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeck;
@@ -56,4 +57,18 @@ public class MainBoardService {
 
         return mb;
     }
+    @Transactional
+    public MainBoard numberOfSpecialCards(@Valid MainBoard mb, @Valid SpecialCardDeck sc) {
+        if (mb.getSpecialCardDecks().size()== 3) {
+           return mb; 
+        }else{
+            SpecialCard lastSpecialCard = sc.getLastSpecialCard();
+        for (SpecialCardDeck specialCardDeck : mb.getSpecialCardDecks()) {
+            specialCardDeck.getSpecialCards().add(lastSpecialCard);
+        
+        }
+        return mb;
+        }
+    }
 }
+
