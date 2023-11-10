@@ -53,12 +53,6 @@ public class CardDeckController {
         return new ResponseEntity<>(cd, HttpStatus.OK);
     }
 
-    @GetMapping("/getTwoCards/{id}")
-    public ResponseEntity<List<Card>> getTwoCards(@PathVariable("id") Integer id) {
-        List<Card> cd = cds.getTwoCards(id);
-        return new ResponseEntity<>(cd, HttpStatus.OK);
-    }
-
     @PostMapping
     public ResponseEntity<CardDeck> createCardDeck(@RequestBody @Valid CardDeck newCardDeck,
             BindingResult br) {
