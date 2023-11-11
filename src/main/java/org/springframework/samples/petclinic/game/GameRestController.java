@@ -146,26 +146,16 @@ public class GameRestController {
         return new ResponseEntity<>(cd, HttpStatus.OK);
     }
 
-    @GetMapping("/listPlayers/{id}")
-    public ResponseEntity<List<Player>> getPlayers(@PathVariable("id") Integer id) {
-        Optional<List<Player>> g = gs.getPlayers(id);
-
-        if (g.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(g.get());
-    }
-
-    @PostMapping("/join/{code}/{id}")
-    public ResponseEntity<Game> joinGame(@PathVariable("code") String code, @PathVariable("id") Integer id) {
+    @PostMapping("/join/{code}")
+    public ResponseEntity<Game> joinGame(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
-        User u = us.findUser(id);
+        User u = us.findCurrentUser();
 
         // if a player already exists in a game he can just join the game :)
         Player p = ps.getPlayerByUserAndGame(u, g);
-        if (p != null) {
+        System.out.println(p);
+        if (p == null) {
             // We choose a random color
             ArrayList<String> colours = new ArrayList<String>();
             colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
@@ -183,6 +173,11 @@ public class GameRestController {
             p.setGame(g);
             p.setUser(u);
             ps.savePlayer(p);
+        } else {
+            System.out.println("This player already in game");
+            System.out.println(g);
+            System.out.println(u);
+            System.out.println(p);
         }
 
         return ResponseEntity.ok(g);
@@ -243,9 +238,9 @@ public class GameRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/play/{code}/dwarves")
-    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("round") Integer round,
-            @PathVariable("id") String code) {
+    @GetMapping("/play/{code}/dwarves/{round}")
+    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("code") String code,
+            @PathVariable("round") Integer round) {
 
         Game g = gs.getGameByCode(code);
 
@@ -255,6 +250,21 @@ public class GameRestController {
         List<Dwarf> dwarves = g.getDwarves();
         dwarves = dwarves.stream().filter(d -> d.getRound() == round).toList();
         return new ResponseEntity<>(dwarves, HttpStatus.OK);
+    }
+
+    @GetMapping("/play/{code}/players")
+    public ResponseEntity<List<Player>> getPlayersFromGame(@PathVariable("code") String code) {
+
+        Game g = gs.getGameByCode(code);
+        if (g != null) {
+            Optional<List<Player>> plys = gs.getPlayers(g.getId());
+            if (plys.isPresent()) {
+                return new ResponseEntity<>(plys.get(), HttpStatus.OK);
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
 
     @PostMapping("/play/{code}/dwarves/{user_id}")

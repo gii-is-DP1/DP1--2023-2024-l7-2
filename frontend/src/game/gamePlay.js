@@ -55,6 +55,27 @@ export default function GamePlay() {
       code
   );
 
+  const [players, setPlayers] = useFetchState(
+    {},
+    `/api/v1/game/play/${code}/players`,
+    jwt,
+    setMessage,
+    setVisible,
+    code
+);
+
+
+  function fetchPlayers() {
+    fetch(`/api/v1/game/play/${code}/players`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/json',
+      }
+    }).then(response => response.json()).then(response => setPlayers(response))
+    console.log(players)
+  }
 
   function faseExtraccionMinerales() {
 
@@ -210,6 +231,17 @@ export default function GamePlay() {
               Send Cards
             </Button>
           )}
+
+            <Button
+              onClick={() => {
+                fetchPlayers();
+              }}
+              title="Fetch Players"
+              color="#008000"
+              style={{ border: "3px solid black", padding: "3px" }}
+            >
+              Fetch players
+            </Button>
 
         </section>
         <section className="generalLayout" style={{display:"flex", flexDirection:"column"}}>
