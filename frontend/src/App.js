@@ -50,6 +50,9 @@ import VetEditClinicOwner from "./clinicOwner/vets/VetEditClinicOwner";
 import AchievementList from "./achievements/achievementList";
 import AchievementEdit from "./achievements/achievementEdit";
 
+import RulesText from "./rules/rulesText";
+
+
 import GameList from "./game/gameList";
 import GameEdit from "./game/gameEdit";
 import GameJoin from "./game/gameJoin";
@@ -57,6 +60,7 @@ import GamePlay from "./game/gamePlay";
 
 import CardViewer from "./cards/cardViewer";
 import CardList from "./cards/cardList";
+
 
 
 
@@ -116,6 +120,10 @@ function App() {
           <Route path="/game/edit/:gameId" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
           <Route path="/card" exact={true} element={<PrivateRoute><CardViewer/></PrivateRoute>} />
           <Route path="/cards" exact={true} element={<PrivateRoute><CardList/></PrivateRoute>}/>
+          <Route path="/rules" exact={true} element={<PrivateRoute><RulesText/></PrivateRoute>}/>
+          
+          
+          
         </>)
     }
     if (role === "OWNER") {
@@ -131,6 +139,7 @@ function App() {
           <Route path="/consultations/:consultationId/tickets" exact={true} element={<PrivateRoute><OwnerConsultationTickets /></PrivateRoute>} />
           <Route path="/game/" exact={true} element={<PrivateRoute><GameJoin/></PrivateRoute>} />
           <Route path="/game/:gameId" exact={true} element={<PrivateRoute><GamePlay/></PrivateRoute>} />
+         
           
 
         </>)
