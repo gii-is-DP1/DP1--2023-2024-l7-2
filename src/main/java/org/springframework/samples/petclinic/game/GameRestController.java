@@ -223,6 +223,22 @@ public class GameRestController {
         return new ResponseEntity<>(dwarves, HttpStatus.OK);
     }
 
+         
+    @GetMapping("/play/{code}/startGame")
+    public ResponseEntity<Player> getPlayerCreator(@PathVariable("code") String code, Integer id) {
+        Player p = g.getPlayerCreator();
+
+        if(p.equals(ps.getById(id))){
+            return new ResponseEntity<>(p, HttpStatus.OK);
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    
+}
+    
     @PostMapping("/play/{code}/dwarves/{player_id}")
     public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code,
             @PathVariable("player_id") Integer player_id) {
@@ -241,3 +257,4 @@ public class GameRestController {
     }
 
 }
+
