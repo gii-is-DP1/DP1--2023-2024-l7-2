@@ -95,23 +95,13 @@ export default function GameEdit() {
                         />
                     </div>
                     <div  className="custom-form-input">
-                        <Label for="name" className="custom-form-input-label"> Code </Label>
+                        <Label for="code" className="custom-form-input-label"> Code </Label>
                         <Input
                             type="text"
                             required
                             name="code"
                             id="code"
                             value={game.code || ""}
-                            onChange={handleChange}
-                            className="custom-input"
-                        />
-                    </div>
-                    <div className="custom-form-input">
-                        <Label for="badgeImage" className="custom-form-input-label"> Badge Image Url: </Label>
-                        <Input type="text"
-                            name="badgeImage"
-                            id="badgeImage"
-                            value={game.badgeImage || ""}
                             onChange={handleChange}
                             className="custom-input"
                         />
