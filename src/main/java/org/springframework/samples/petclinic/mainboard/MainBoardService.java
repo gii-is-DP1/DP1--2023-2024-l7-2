@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.mainboard;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,11 +49,11 @@ public class MainBoardService {
     public MainBoard initialize() {
 
         CardDeck cardDecks = cds.initialiate();
-        List<SpecialCardDeck> specCardDecks = scds.initialize();
+        //ArrayList<SpecialCardDeck> specCardDecks = scds.initialize();
         
         MainBoard mb = new MainBoard();
         mb.setCardDeck(cardDecks);
-        mb.setSpecialCardDecks(specCardDecks);
+        //mb.setSpecialCardDecks(specCardDecks);
         saveMainBoard(mb);
 
         return mb;

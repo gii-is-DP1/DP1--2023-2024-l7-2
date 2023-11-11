@@ -160,24 +160,30 @@ public class GameRestController {
     @PostMapping("/join/{code}/{id}")
     public ResponseEntity<Game> joinGame(@PathVariable("code") String code, @PathVariable("id") Integer id) {
 
-        // We choose a random color
-        ArrayList<String> colours = new ArrayList<String>();
-        colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
-        Collections.shuffle(colours);
-
         Game g = gs.getGameByCode(code);
         User u = us.findUser(id);
 
-        if (g == null || u == null) {
-            return ResponseEntity.notFound().build();
-        }
+        // if a player already exists in a game he can just join the game :)
+        Player p = ps.getPlayerByUserAndGame(u, g);
+        if (p != null) {
+            // We choose a random color
+            ArrayList<String> colours = new ArrayList<String>();
+            colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
+            Collections.shuffle(colours);
 
-        Player p = new Player();
-        p.setColor(colours.get(0));
-        p.setName(u.getUsername());
-        p.setGame(g);
-        p.setUser(u);
-        ps.savePlayer(p);
+            
+
+            if (g == null || u == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            p = new Player();
+            p.setColor(colours.get(0));
+            p.setName(u.getUsername());
+            p.setGame(g);
+            p.setUser(u);
+            ps.savePlayer(p);
+        }
 
         return ResponseEntity.ok(g);
 
@@ -186,11 +192,39 @@ public class GameRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
+        try {
+        ArrayList<String> colours = new ArrayList<String>();
+        colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
+        Collections.shuffle(colours);
+
+        User u = us.findCurrentUser();
 
         MainBoard mb = mbs.initialize();
         g.setMainBoard(mb);
 
+        Player p = new Player();
+        p.setColor(colours.get(0));
+        p.setName(u.getUsername());
+        //p.setGame(g);
+        p.setUser(u);
+        ps.savePlayer(p);
+
+        // Si no se hace asi da error porque
+        // al guardarse el game en player, el game todavia no existe
+        // y si se asigna a game el player, el player todavia no existe
+
+        g.setPlayerCreator(p);
         gs.saveGame(g);
+
+        p.setGame(g);
+        ps.savePlayer(p);
+        } catch(Exception e) {
+            System.out.println("Exception =>"+e);
+            System.out.println("Exception =>"+e.getMessage());
+        }
+    
+        g.setMainBoard(null);
+
         return new ResponseEntity<>(g, HttpStatus.CREATED);
     }
 

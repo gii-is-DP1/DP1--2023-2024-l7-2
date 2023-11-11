@@ -127,7 +127,7 @@ export default function GameJoin() {
                             </h1>
                             <div className="custom-button-row">
                                 <Button className="btn btn-dark btn-lg" outline color="warning" size="lg">
-                                    <Link to={`/game/edit`} style={{ color: 'rgb(238, 191, 47)'}}> Create </Link>
+                                    <Link to={`/game/edit/new`} style={{ color: 'rgb(238, 191, 47)'}}> Create </Link>
                                 </Button>
                             </div>
                     </div>

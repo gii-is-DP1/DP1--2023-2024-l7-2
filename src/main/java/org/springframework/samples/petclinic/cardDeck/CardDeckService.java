@@ -57,7 +57,7 @@ public class CardDeckService {
         cd.setCards(cards);
         cd.setLastCard(cards.get(0));
 
-        cdr.save(cd);
+        saveCardDeck(cd);
         return cd;
     }
 
