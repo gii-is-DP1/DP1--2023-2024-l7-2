@@ -15,6 +15,7 @@ export default function GamePlay() {
 
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [choosedCards, setChoosedCards] = useState([]);
   const [cards, setCards] = useState([ 
     {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 1,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
@@ -134,6 +135,21 @@ export default function GamePlay() {
     )
   })*/
 
+  function selectCard(card) {
+
+    
+    if (choosedCards.includes(card)) {
+      console.log("we are filtering")
+      setChoosedCards(choosedCards.filter((c) => c.position !== card.position))
+    } else {
+      if (choosedCards.length <2) {
+        setChoosedCards([...choosedCards,card])
+      } else {
+        console.log("You cant choose that many cads :(")
+      }
+    }
+    console.log(choosedCards)
+  }
 
   return (
     <div>
@@ -151,35 +167,44 @@ export default function GamePlay() {
             <section className="cardDeckLayoutRow1" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[0].id} name={cards[0].name} 
                     description={cards[0].description} totalIron={cards[0].totalIron}  
-                    totalGold={cards[0].totalGold} totalSteal={cards[0].totalIron} />
+                    totalGold={cards[0].totalGold} totalSteal={cards[0].totalIron} 
+                    onClick={() => selectCard(cards[0])} color={choosedCards.includes(cards[0]) ? "green" : "white"}/>
               <Card id={cards[1].id} name={cards[1].name} 
                     description={cards[1].description} totalIron={cards[1].totalIron}  
-                    totalGold={cards[1].totalGold} totalSteal={cards[1].totalIron} />
+                    totalGold={cards[1].totalGold} totalSteal={cards[1].totalIron} 
+                    onClick={() => selectCard(cards[1])} color={choosedCards.includes(cards[1]) ? "green" : "white"}/>
               <Card id={cards[2].id} name={cards[2].name} 
                     description={cards[2].description} totalIron={cards[2].totalIron}  
-                    totalGold={cards[2].totalGold} totalSteal={cards[2].totalIron} />
+                    totalGold={cards[2].totalGold} totalSteal={cards[2].totalIron} 
+                    onClick={() => selectCard(cards[2])} color={choosedCards.includes(cards[2]) ? "green" : "white"}/>
             </section>
             <section className="cardDeckLayoutRow2" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[3].id} name={cards[3].name} 
                     description={cards[3].description} totalIron={cards[3].totalIron}  
-                    totalGold={cards[3].totalGold} totalSteal={cards[3].totalIron} />
+                    totalGold={cards[3].totalGold} totalSteal={cards[3].totalIron} 
+                    onClick={() => selectCard(cards[3])} color={choosedCards.includes(cards[3]) ? "green" : "white"}/>
               <Card id={cards[4].id} name={cards[4].name} 
                     description={cards[4].description} totalIron={cards[4].totalIron}  
-                    totalGold={cards[4].totalGold} totalSteal={cards[4].totalIron} />
+                    totalGold={cards[4].totalGold} totalSteal={cards[4].totalIron} 
+                    onClick={() => selectCard(cards[4])} color={choosedCards.includes(cards[4]) ? "green" : "white"}/>
               <Card id={cards[5].id} name={cards[5].name} 
                     description={cards[5].description} totalIron={cards[5].totalIron}  
-                    totalGold={cards[5].totalGold} totalSteal={cards[5].totalIron} />
+                    totalGold={cards[5].totalGold} totalSteal={cards[5].totalIron} 
+                    onClick={() => selectCard(cards[5])} color={choosedCards.includes(cards[5]) ? "green" : "white"}/>
             </section>
             <section className="cardDeckLayoutRow3" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[6].id} name={cards[6].name} 
                     description={cards[6].description} totalIron={cards[6].totalIron}  
-                    totalGold={cards[6].totalGold} totalSteal={cards[6].totalIron} />
+                    totalGold={cards[6].totalGold} totalSteal={cards[6].totalIron} 
+                    onClick={() => selectCard(cards[6])} color={choosedCards.includes(cards[6]) ? "green" : "white"}/>
               <Card id={cards[7].id} name={cards[7].name} 
                     description={cards[7].description} totalIron={cards[7].totalIron}  
-                    totalGold={cards[7].totalGold} totalSteal={cards[7].totalIron} />
+                    totalGold={cards[7].totalGold} totalSteal={cards[7].totalIron} 
+                    onClick={() => selectCard(cards[7])} color={choosedCards.includes(cards[7]) ? "green" : "white"}/>
               <Card id={cards[8].id} name={cards[8].name} 
                     description={cards[8].description} totalIron={cards[8].totalIron}  
-                    totalGold={cards[8].totalGold} totalSteal={cards[8].totalIron} />
+                    totalGold={cards[8].totalGold} totalSteal={cards[8].totalIron} 
+                    onClick={() => selectCard(cards[8])} color={choosedCards.includes(cards[8]) ? "green" : "white"}/>
             </section>
           </section>
           }
