@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.game;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.cardDeck.CardDeckService;
+import org.springframework.samples.petclinic.dwarf.Dwarf;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
 import org.springframework.samples.petclinic.mainboard.MainBoard;
 import org.springframework.samples.petclinic.mainboard.MainBoardService;
@@ -46,17 +48,17 @@ public class GameRestController {
     private final PlayereService ps;
     private final MainBoardService mbs;
     private final CardDeckService cds;
-    //private final SpecialCardDeckService scds;
+    // private final SpecialCardDeckService scds;
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayereService ps,
-        MainBoardService mbs, CardDeckService cds) {
+            MainBoardService mbs, CardDeckService cds) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
         this.mbs = mbs;
         this.cds = cds;
-        //this.scds = scds;
+        // this.scds = scds;
     }
 
     @GetMapping
@@ -98,13 +100,14 @@ public class GameRestController {
 
     @GetMapping("/play/{code}")
     public ResponseEntity<Game> playGame(@PathVariable("code") String code) {
+        // comprobar que usuario esta metido en el juego
         Game g = gs.getGameByCode(code);
 
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return new ResponseEntity<>(g,HttpStatus.OK);
+        return new ResponseEntity<>(g, HttpStatus.OK);
     }
 
     @GetMapping("/play/{code}/cards")
@@ -117,9 +120,9 @@ public class GameRestController {
 
         List<Card> cards = g.getMainBoard().getCardDeck().getCards();
 
-        cards = cards.stream().sorted((c1,c2) -> c1.getPosition().compareTo(c2.getPosition())).toList();
+        cards = cards.stream().sorted((c1, c2) -> c1.getPosition().compareTo(c2.getPosition())).toList();
 
-        return new ResponseEntity<>(cards,HttpStatus.OK);
+        return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
     @GetMapping("/play/{code}/getCards")
@@ -147,7 +150,12 @@ public class GameRestController {
 
     @PostMapping("/join/{code}/{id}")
     public ResponseEntity<Game> joinGame(@PathVariable("code") String code, @PathVariable("id") Integer id) {
-        Game g = gs.getGameByCode(code);
+        Game g = null;
+
+        List<String> colours = List.of("red", "blue", "green", "yellow", "orange", "pink", "purple");
+        Collections.shuffle(colours);
+
+        g = gs.getGameByCode(code);
         User u = us.findUser(id);
 
         if (g == null || u == null) {
@@ -155,7 +163,7 @@ public class GameRestController {
         }
 
         Player p = new Player();
-        p.setColor("blank");
+        p.setColor(colours.get(0));
         p.setName(u.getUsername());
         p.setGame(g);
         p.setUser(u);
@@ -169,11 +177,11 @@ public class GameRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
 
-        /* To use this function in the frontend 
-         * first the game has to be created and then 
+        /*
+         * To use this function in the frontend
+         * first the game has to be created and then
          * the user needs to join the game
-        */
-
+         */
 
         // TODO: REFACTORIZE
 
@@ -182,8 +190,8 @@ public class GameRestController {
         g.setMainBoard(mb);
 
         gs.saveGame(g);
-        
-        return new ResponseEntity<>(g,HttpStatus.CREATED);
+
+        return new ResponseEntity<>(g, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -201,15 +209,23 @@ public class GameRestController {
         return ResponseEntity.noContent().build();
     }
 
-     
-    @GetMapping("/play/{code}/startGame")
-    public ResponseEntity<Player> getPlayerCreator(@PathVariable("code") String code, Integer id) {
+    @GetMapping("/play/{code}/dwarves")
+    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("round") Integer round,
+            @PathVariable("id") String code) {
+
         Game g = gs.getGameByCode(code);
 
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
-        
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == round).toList();
+        return new ResponseEntity<>(dwarves, HttpStatus.OK);
+    }
+
+         
+    @GetMapping("/play/{code}/startGame")
+    public ResponseEntity<Player> getPlayerCreator(@PathVariable("code") String code, Integer id) {
         Player p = g.getPlayerCreator();
 
         if(p.equals(ps.getById(id))){
@@ -222,5 +238,23 @@ public class GameRestController {
 
     
 }
+    
+    @PostMapping("/play/{code}/dwarves/{player_id}")
+    public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code,
+            @PathVariable("player_id") Integer player_id) {
 
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Dwarf dwarf = new Dwarf();
+        dwarf.setPlayer(ps.getById(player_id));
+        dwarf.setRound(g.getRound());
+        dwarf.setCards(cards);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+}
 
