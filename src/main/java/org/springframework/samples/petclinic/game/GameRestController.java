@@ -187,20 +187,10 @@ public class GameRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
 
-        /*
-         * To use this function in the frontend
-         * first the game has to be created and then
-         * the user needs to join the game
-         */
-
-        // TODO: REFACTORIZE
-
         MainBoard mb = mbs.initialize();
-
         g.setMainBoard(mb);
 
         gs.saveGame(g);
-
         return new ResponseEntity<>(g, HttpStatus.CREATED);
     }
 

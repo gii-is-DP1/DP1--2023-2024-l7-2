@@ -1,10 +1,12 @@
 import {useState} from "react";
 import tokenService from "../services/token.service";
 import { Link } from "react-router-dom";
-import { Form, Input, Label } from "reactstrap";
+import { Form, Input, Label, Button} from "reactstrap";
 import getErrorModal from "../util/getErrorModal";
 import getIdFromUrl from "../util/getIdFromUrl";
 import useFetchState from "../util/useFetchState";
+import '../static/css/game/gameJoin.css'; 
+
 
 const jwt = tokenService.getLocalAccessToken();
 const user = tokenService.getUser()
@@ -93,29 +95,42 @@ export default function GameJoin() {
 
 
     return (
-        <div className="auth-page-container">
-            <h2 className="text-center">
-                Join game
-            </h2>
-            <div className="auth-form-container">
-                {modal}
-                <Form onSubmit={handleSubmit}>
-                    <div  className="custom-form-input">
-                        <Label for="name" className="custom-form-input-label"> code </Label>
-                        <Input
-                            type="text"
-                            required
-                            name="name"
-                            id="name"
-                            value={game || ""}
-                            onChange={handleChange}
-                            className="custom-input"
-                        />
+        <div className="center-container" style={{height: "100vh"}}>
+                <div className="row" style={{height: "100vh", width: "100vw"}}>
+                    <div className="col game-join-container" style={{height: "100vh", width: "100vw"}}>
+                                <h1 className="text-center" style={{ color: 'white'}}>
+                                    Join game
+                                </h1>
+                                <Form onSubmit={handleSubmit}>
+                                    <div  className="custom-form-input">
+                                        <Label for="name" className="custom-form-input-label"> code </Label>
+                                        <Input
+                                            type="text"
+                                            required
+                                            name="name"
+                                            id="name"
+                                            value={game || ""}
+                                            onChange={handleChange}
+                                            className="custom-input"
+                                        />
+                                    </div>
+                                    <div className="custom-button-row">
+                                        <Button className="btn btn-dark btn-lg" outline color="warning" size="lg">
+                                            Join
+                                        </Button>
+                                    </div>
+                                </Form>
                     </div>
-                    <div className="custom-button-row">
-                        <button className="auth-button">Join</button>
+                    <div className="col game-create-container">
+                            <h1 className="text-center" style={{ color: 'white'}}>
+                                Or create <br></br> your owm game...
+                            </h1>
+                            <div className="custom-button-row">
+                                <Button className="btn btn-dark btn-lg" outline color="warning" size="lg">
+                                    <Link to={`/game/edit`} style={{ color: 'rgb(238, 191, 47)'}}> Create </Link>
+                                </Button>
+                            </div>
                     </div>
-                </Form>
             </div>
         </div>
     );

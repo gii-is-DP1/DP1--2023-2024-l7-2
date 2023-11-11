@@ -138,6 +138,8 @@ function App() {
           <Route path="/consultations/:consultationId" exact={true} element={<PrivateRoute><OwnerConsultationEdit /></PrivateRoute>} />
           <Route path="/consultations/:consultationId/tickets" exact={true} element={<PrivateRoute><OwnerConsultationTickets /></PrivateRoute>} />
           <Route path="/game/" exact={true} element={<PrivateRoute><GameJoin/></PrivateRoute>} />
+          <Route path="/game/edit/:gameId" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
+          <Route path="/game/edit/" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
           <Route path="/game/:gameId" exact={true} element={<PrivateRoute><GamePlay/></PrivateRoute>} />
          
           
