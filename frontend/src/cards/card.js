@@ -35,12 +35,13 @@ const Card = (props) => {
       display: 'flex', 
       justifyContent: 'center', 
       alignItems: 'center', 
-      flexDirection: 'column' 
+      flexDirection: 'column',
+      backgroundColor: props.color
     };
 
 
   return (
-    <div style={rectanguloStyle}>
+    <div style={rectanguloStyle} onClick={props.onClick}>
       <h3 style={{ textAlign: 'center', marginTop: '30px' }}> {name} </h3>
       <p style={{ textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{description}</p>
       <div style={{ display: 'flex', marginTop: 'auto', justifyContent: 'space-between', padding: '0 25px', flexDirection:"column" }}>
