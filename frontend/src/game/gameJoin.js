@@ -62,7 +62,7 @@ export default function GameJoin() {
                     if (response.ok) {
                         window.location.href = `/game/${game}`
                     } else {
-                        console.log("error")
+                        console.log("error", response)
                     }
                 })
             }

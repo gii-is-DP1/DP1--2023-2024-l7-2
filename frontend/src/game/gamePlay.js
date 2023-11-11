@@ -8,6 +8,7 @@ import getIdFromUrl from "./../util/getIdFromUrl";
 import Card from "./../cards/card"
 
 const jwt = tokenService.getLocalAccessToken();
+const user = tokenService.getUser()
 
 export default function GamePlay() {
   const code = getIdFromUrl(2);
@@ -17,23 +18,23 @@ export default function GamePlay() {
   const [visible, setVisible] = useState(false);
   const [choosedCards, setChoosedCards] = useState([]);
   const [cards, setCards] = useState([ 
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 1,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 1,name: "Iron Seam",position: 1,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 2,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 2,name: "Iron Seam",position: 2,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 3,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 3,name: "Iron Seam",position: 3,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 4,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 4,name: "Iron Seam",position: 4,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 5,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 5,name: "Iron Seam",position: 5,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 6,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 6,name: "Iron Seam",position: 6,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 7,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 7,name: "Iron Seam",position: 7,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 8,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 8,name: "Iron Seam",position: 8,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
-    {cardType: "StarterCard",description: "Take 3 iron from the supply",id: null,name: "Iron Seam",position: 9,
+    {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 9,name: "Iron Seam",position: 9,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
   ])
   
@@ -103,6 +104,9 @@ export default function GamePlay() {
 
   function gameLogic() {
 
+
+
+
     /*
       Aqui se pondra la logica del juego.
     */
@@ -151,59 +155,92 @@ export default function GamePlay() {
     console.log(choosedCards)
   }
 
+  function sendCards() {
+    fetch(
+      "/api/v1/game/play/" + code + "/dwarves/" + user.id,
+      {
+          method:  "POST",
+          headers: {
+              Authorization: `Bearer ${jwt}`,
+              Accept: "application/json",
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify(choosedCards),
+      }
+    ).then((response) => response.text())
+    .then((data) => {
+        console.log(data);
+    }).catch((message) => alert(message));
+  }
+
+  console.log(game)
+  if (game != {}) {
+    game.playerCreator = user;
+  }
   return (
     <div>
       <div className="admin-page-container">
-        <h1 className="text-center">Dward - </h1>
+        <h1 className="text-center">Dwarf - </h1>
+        <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
         <Button
           onClick={() => {faseExtraccionMinerales()}}
           title="Get Cards"
           color="#008000"
           style={{border: '3px solid black',padding: "3px"}}
-        >Get Cards</Button>        
+        >Get Cards</Button>
+        
+        {game != {} && game.playerCreator && game.playerCreator.username === user.username && (
+            <Button
+              onClick={() => {
+                gameLogic();
+              }}
+              title="Start Game"
+              color="#008000"
+              style={{ border: "3px solid black", padding: "3px" }}
+            >
+              Start Game
+            </Button>
+          )}
+
+          {choosedCards.length === 2 && (
+            <Button
+              onClick={() => {
+                sendCards();
+              }}
+              title="Send Cards"
+              color="#008000"
+              style={{ border: "3px solid black", padding: "3px" }}
+            >
+              Send Cards
+            </Button>
+          )}
+
+        </section>
         <section className="generalLayout" style={{display:"flex", flexDirection:"column"}}>
           {cards.length != 0 && 
           <section className="cardDeckLayout">
             <section className="cardDeckLayoutRow1" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
-              <Card id={cards[0].id} name={cards[0].name} 
-                    description={cards[0].description} totalIron={cards[0].totalIron}  
-                    totalGold={cards[0].totalGold} totalSteal={cards[0].totalIron} 
+              <Card id={cards[0].id} 
                     onClick={() => selectCard(cards[0])} color={choosedCards.includes(cards[0]) ? "green" : "white"}/>
-              <Card id={cards[1].id} name={cards[1].name} 
-                    description={cards[1].description} totalIron={cards[1].totalIron}  
-                    totalGold={cards[1].totalGold} totalSteal={cards[1].totalIron} 
+              <Card id={cards[1].id}
                     onClick={() => selectCard(cards[1])} color={choosedCards.includes(cards[1]) ? "green" : "white"}/>
-              <Card id={cards[2].id} name={cards[2].name} 
-                    description={cards[2].description} totalIron={cards[2].totalIron}  
-                    totalGold={cards[2].totalGold} totalSteal={cards[2].totalIron} 
+              <Card id={cards[2].id} 
                     onClick={() => selectCard(cards[2])} color={choosedCards.includes(cards[2]) ? "green" : "white"}/>
             </section>
             <section className="cardDeckLayoutRow2" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
-              <Card id={cards[3].id} name={cards[3].name} 
-                    description={cards[3].description} totalIron={cards[3].totalIron}  
-                    totalGold={cards[3].totalGold} totalSteal={cards[3].totalIron} 
+              <Card id={cards[3].id}
                     onClick={() => selectCard(cards[3])} color={choosedCards.includes(cards[3]) ? "green" : "white"}/>
-              <Card id={cards[4].id} name={cards[4].name} 
-                    description={cards[4].description} totalIron={cards[4].totalIron}  
-                    totalGold={cards[4].totalGold} totalSteal={cards[4].totalIron} 
+              <Card id={cards[4].id} 
                     onClick={() => selectCard(cards[4])} color={choosedCards.includes(cards[4]) ? "green" : "white"}/>
-              <Card id={cards[5].id} name={cards[5].name} 
-                    description={cards[5].description} totalIron={cards[5].totalIron}  
-                    totalGold={cards[5].totalGold} totalSteal={cards[5].totalIron} 
+              <Card id={cards[5].id} 
                     onClick={() => selectCard(cards[5])} color={choosedCards.includes(cards[5]) ? "green" : "white"}/>
             </section>
             <section className="cardDeckLayoutRow3" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
-              <Card id={cards[6].id} name={cards[6].name} 
-                    description={cards[6].description} totalIron={cards[6].totalIron}  
-                    totalGold={cards[6].totalGold} totalSteal={cards[6].totalIron} 
+              <Card id={cards[6].id} 
                     onClick={() => selectCard(cards[6])} color={choosedCards.includes(cards[6]) ? "green" : "white"}/>
-              <Card id={cards[7].id} name={cards[7].name} 
-                    description={cards[7].description} totalIron={cards[7].totalIron}  
-                    totalGold={cards[7].totalGold} totalSteal={cards[7].totalIron} 
+              <Card id={cards[7].id} 
                     onClick={() => selectCard(cards[7])} color={choosedCards.includes(cards[7]) ? "green" : "white"}/>
-              <Card id={cards[8].id} name={cards[8].name} 
-                    description={cards[8].description} totalIron={cards[8].totalIron}  
-                    totalGold={cards[8].totalGold} totalSteal={cards[8].totalIron} 
+              <Card id={cards[8].id} 
                     onClick={() => selectCard(cards[8])} color={choosedCards.includes(cards[8]) ? "green" : "white"}/>
             </section>
           </section>

@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
+import org.springframework.samples.petclinic.game.Game;
+import org.springframework.samples.petclinic.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +26,13 @@ public class PlayereService {
     }
 
     @Transactional(readOnly = true)
-    List<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return repo.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Player getPlayerByUserAndGame(User u, Game g) {
+        return repo.findByUserAndGame(u, g);
     }
 
     @Transactional
