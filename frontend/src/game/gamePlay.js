@@ -173,10 +173,6 @@ export default function GamePlay() {
     }).catch((message) => alert(message));
   }
 
-  console.log(game)
-  if (game != {}) {
-    game.playerCreator = user;
-  }
   return (
     <div>
       <div className="admin-page-container">
@@ -189,7 +185,7 @@ export default function GamePlay() {
           style={{border: '3px solid black',padding: "3px"}}
         >Get Cards</Button>
         
-        {game != {} && game.playerCreator && game.playerCreator.username === user.username && (
+        {game != {} && game.playerCreator && game.playerCreator.name === user.username && (
             <Button
               onClick={() => {
                 gameLogic();
