@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.specialCardDeck;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,7 +41,8 @@ public class SpecialCardDeckService {
     public List<SpecialCardDeck> initialize() {
 
         // We shuffle all special cards
-        List<SpecialCard> specCards = scs.getSpecialCards();
+        ArrayList<SpecialCard> specCards = new ArrayList<SpecialCard>();
+        specCards.addAll(scs.getSpecialCards());
         Collections.shuffle(specCards);
 
         // We split them into three decks and we create three special card deck

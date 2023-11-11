@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.cardDeck;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 import java.util.Collections;
 
 import org.springframework.beans.BeanUtils;
@@ -43,7 +44,14 @@ public class CardDeckService {
         // Not tested
         CardDeck cd = new CardDeck();
 
-        List<Card> cards = cardrepo.findAll();
+        ArrayList<Card> cards = new ArrayList<Card>();
+        cards.addAll(cardrepo.findAll());
+
+        // TODO: test this
+        for (int i = 1; i<10; i++) {
+            cards.remove(0);
+        }
+
         Collections.shuffle(cards);
 
         cd.setCards(cards);

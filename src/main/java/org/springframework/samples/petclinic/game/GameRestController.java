@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.game;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.cardDeck.CardDeckService;
 import org.springframework.samples.petclinic.dwarf.Dwarf;
+import org.springframework.samples.petclinic.dwarf.DwarfService;
 import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
 import org.springframework.samples.petclinic.mainboard.MainBoard;
 import org.springframework.samples.petclinic.mainboard.MainBoardService;
@@ -49,16 +51,18 @@ public class GameRestController {
     private final MainBoardService mbs;
     private final CardDeckService cds;
     // private final SpecialCardDeckService scds;
+    private final DwarfService ds;
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayereService ps,
-            MainBoardService mbs, CardDeckService cds) {
+            MainBoardService mbs, CardDeckService cds, DwarfService ds) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
         this.mbs = mbs;
         this.cds = cds;
         // this.scds = scds;
+        this.ds = ds;
     }
 
     @GetMapping
@@ -89,11 +93,16 @@ public class GameRestController {
 
     @GetMapping("/check/{code}")
     public ResponseEntity<Void> getGameByCode(@PathVariable("code") String code) {
-        Game g = gs.getGameByCode(code);
+        Game g = null;
+        try {
+         g = gs.getGameByCode(code);
 
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
+        } catch(Exception e) {
+            System.out.println("Exception =>"+e);
+        } 
 
         return ResponseEntity.ok().build();
     }
@@ -150,12 +159,13 @@ public class GameRestController {
 
     @PostMapping("/join/{code}/{id}")
     public ResponseEntity<Game> joinGame(@PathVariable("code") String code, @PathVariable("id") Integer id) {
-        Game g = null;
 
-        List<String> colours = List.of("red", "blue", "green", "yellow", "orange", "pink", "purple");
+        // We choose a random color
+        ArrayList<String> colours = new ArrayList<String>();
+        colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
         Collections.shuffle(colours);
 
-        g = gs.getGameByCode(code);
+        Game g = gs.getGameByCode(code);
         User u = us.findUser(id);
 
         if (g == null || u == null) {
@@ -223,25 +233,9 @@ public class GameRestController {
         return new ResponseEntity<>(dwarves, HttpStatus.OK);
     }
 
-         
-    @GetMapping("/play/{code}/startGame")
-    public ResponseEntity<Player> getPlayerCreator(@PathVariable("code") String code, Integer id) {
-        Player p = g.getPlayerCreator();
-
-        if(p.equals(ps.getById(id))){
-            return new ResponseEntity<>(p, HttpStatus.OK);
-        }else{
-            return ResponseEntity.notFound().build();
-        }
-
-    }
-
-    
-}
-    
-    @PostMapping("/play/{code}/dwarves/{player_id}")
+    @PostMapping("/play/{code}/dwarves/{user_id}")
     public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code,
-            @PathVariable("player_id") Integer player_id) {
+            @PathVariable("user_id") Integer user_id) {
 
         Game g = gs.getGameByCode(code);
         if (g == null) {
@@ -249,9 +243,12 @@ public class GameRestController {
         }
 
         Dwarf dwarf = new Dwarf();
-        dwarf.setPlayer(ps.getById(player_id));
+        dwarf.setPlayer(ps.getPlayerByUserAndGame(us.findUser(user_id), g));
         dwarf.setRound(g.getRound());
         dwarf.setCards(cards);
+
+        ds.saveDwarf(dwarf);
+
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
