@@ -8,6 +8,7 @@ import getIdFromUrl from "./../util/getIdFromUrl";
 import Card from "./../cards/card"
 
 const jwt = tokenService.getLocalAccessToken();
+const user = tokenService.getUser()
 
 export default function GamePlay() {
   const code = getIdFromUrl(2);
@@ -103,6 +104,9 @@ export default function GamePlay() {
 
   function gameLogic() {
 
+
+
+
     /*
       Aqui se pondra la logica del juego.
     */
@@ -154,13 +158,29 @@ export default function GamePlay() {
   return (
     <div>
       <div className="admin-page-container">
-        <h1 className="text-center">Dward - </h1>
+        <h1 className="text-center">Dwarf - </h1>
+        <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
         <Button
           onClick={() => {faseExtraccionMinerales()}}
           title="Get Cards"
           color="#008000"
           style={{border: '3px solid black',padding: "3px"}}
-        >Get Cards</Button>        
+        >Get Cards</Button>
+        
+        {game.playerCreator.username === user.username && (
+            <Button
+              onClick={() => {
+                gameLogic();
+              }}
+              title="Start Game"
+              color="#008000"
+              style={{ border: "3px solid black", padding: "3px" }}
+            >
+              Start Game
+            </Button>
+          )}
+
+        </section>
         <section className="generalLayout" style={{display:"flex", flexDirection:"column"}}>
           {cards.length != 0 && 
           <section className="cardDeckLayout">

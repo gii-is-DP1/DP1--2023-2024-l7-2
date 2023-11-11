@@ -200,4 +200,27 @@ public class GameRestController {
             gs.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+     
+    @GetMapping("/play/{code}/startGame")
+    public ResponseEntity<Player> getPlayerCreator(@PathVariable("code") String code, Integer id) {
+        Game g = gs.getGameByCode(code);
+
+        if (g == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        Player p = g.getPlayerCreator();
+
+        if(p.equals(ps.getById(id))){
+            return new ResponseEntity<>(p, HttpStatus.OK);
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    
 }
+
+

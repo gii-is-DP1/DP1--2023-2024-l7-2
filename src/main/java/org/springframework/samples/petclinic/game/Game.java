@@ -44,4 +44,7 @@ public class Game extends NamedEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Dwarf> dwarfs; 
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Player playerCreator;
 }
