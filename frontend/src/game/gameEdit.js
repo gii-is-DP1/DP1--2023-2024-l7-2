@@ -99,8 +99,8 @@ export default function GameEdit() {
                         <Input
                             type="text"
                             required
-                            name="name"
-                            id="name"
+                            name="code"
+                            id="code"
                             value={game.code || ""}
                             onChange={handleChange}
                             className="custom-input"
