@@ -27,15 +27,14 @@ public class Game extends NamedEntity {
     @Column(unique = true)
     String code;
 
-
     LocalDateTime start;
     LocalDateTime finish;
 
-    /* 
-    @ManyToOne(optional=true)
-    private User winner_id;
-    */
-    
+    /*
+     * @ManyToOne(optional=true)
+     * private User winner_id;
+     */
+
     Integer winner_id;
     Integer round;
 
@@ -43,5 +42,5 @@ public class Game extends NamedEntity {
     private MainBoard mainBoard;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Dwarf> dwarfs; 
+    private List<Dwarf> dwarves;
 }
