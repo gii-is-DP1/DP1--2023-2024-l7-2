@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import { Alert } from "reactstrap";
 import FormGenerator from "../../components/formGenerator/formGenerator";
 import tokenService from "../../services/token.service";
@@ -32,7 +33,6 @@ export default function Login() {
         setMessage(error);
       });            
   }
-
   
     return (
       <div className="auth-page-container">
@@ -54,6 +54,13 @@ export default function Login() {
             buttonText="Login"
             buttonClassName="auth-button"
           />
+       <li>
+        <Link to="/register"><button className="auth-page-container">
+          ¿No tienes cuenta? Regístrate aquí
+        </button></Link>
+              
+            </li>
+        
         </div>
       </div>
     );  
