@@ -27,11 +27,11 @@ public class Player extends NamedEntity {
     private Integer iron;
     private Integer medal;
 
-    @ManyToOne(optional=true)
+    @ManyToOne(optional = true)
     private User user;
 
     @JsonSerialize(using = gameSerializer.class)
     @JsonDeserialize(using = gameDeserializer.class)
-    @ManyToOne(optional=true)
+    @ManyToOne(optional = true)
     private Game game;
 }

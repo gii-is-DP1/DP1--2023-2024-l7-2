@@ -148,6 +148,7 @@ export default function GamePlay() {
     console.log(isMyTurn)
     console.log(dwarves)
   }
+
   function faseExtraccionMinerales() {
 
     fetch(`/api/v1/game/play/${code}/getCards`, {
@@ -193,6 +194,32 @@ export default function GamePlay() {
     */
   }
 
+  function isFinished() {
+    fetch(`api/v1/game/play/${code}/isFinished`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/json',
+      }
+    }).then(response => response.json()).then(response => {if (response === true) {finDelJuego()}})
+  }
+
+  function finDelJuego() {
+    fetch(`/api/v1/game/play/${code}/finish`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/json',
+      }
+    })
+    .then(() => {
+      window.location.href = `/api/v1/game/play/finish`;
+    })
+  }
+
+
   function waitTillIsMyTurn() {
     if (isMyTurn === false) {
       fetchDwarves();
@@ -230,6 +257,8 @@ export default function GamePlay() {
     //faseExtraccionMinerales()
     faseSeleccionAcciones()
     faseResolucionAcciones()
+    // if (isFinished)
+    //   finDelJuego();
   }
 
   
@@ -310,6 +339,13 @@ export default function GamePlay() {
                 Get Cards
               </Button>
           }
+          <Button
+              onClick={() => {isFinished()}}
+              title="Finish?"
+              color="#008000"
+              style={{border: '3px solid black',padding: "3px"}}>
+                Finish?
+          </Button>
         
         {game != {} && game.playerCreator && game.playerCreator.name === user.username && (
             <Button
