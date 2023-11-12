@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import tokenService from "../services/token.service";
 import useFetchState from "../util/useFetchState";
 import getErrorModal from "../util/getErrorModal";
@@ -12,6 +12,7 @@ const user = tokenService.getUser()
 
 export default function GamePlay() {
   const code = getIdFromUrl(2);
+  console.log(jwt)
 
 
   const [message, setMessage] = useState(null);
@@ -37,6 +38,11 @@ export default function GamePlay() {
     {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 9,name: "Iron Seam",position: 9,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
   ])
+  const [selectedCards,setSelectedCards] = useState(
+    {1: null,2: null,3: null,
+      4: null,5: null,6: null,
+      7: null,8: null,9: null}
+  )
   
   /*useFetchState(
     [],
@@ -56,13 +62,60 @@ export default function GamePlay() {
   );
 
   const [players, setPlayers] = useFetchState(
-    {},
+    [],
     `/api/v1/game/play/${code}/players`,
     jwt,
     setMessage,
     setVisible,
     code
-);
+  );
+  const [isMyTurn, setIsMyTurn] = useFetchState(
+    false,
+    `/api/v1/game/play/${code}/isMyTurn`,
+    jwt,
+    setMessage,
+    setVisible,
+    code
+  );
+
+  const [dwarves, setDwarves] = useFetchState([]);
+  let player = players.filter(p => p.name === user.username)[0]
+  useEffect(() => {
+    gameLogic()
+  },[])
+
+
+  function setAlreadySelectedCardByPlayers() {
+    dwarves.map(d => {
+      let dwacards = d.cards;
+      let pacolor = d.player.color;
+
+      let updated = selectedCards
+      for ( const c of dwacards) {
+        console.log(c.id + " to color => " + pacolor);
+        updated[c.id] = pacolor;
+      }
+      setSelectedCards(updated)
+    })
+  }
+
+  function fetchDwarves(){
+    if (game.round !== undefined) {
+
+      fetch(`/api/v1/game/play/${code}/dwarves/${game.round}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+          Accept: 'application/json',
+        }
+      }).then(response => response.json()).then(response => setDwarves(response))
+    } else {
+      console.log("not entering to fetch dwarves")
+      console.log(game.round)
+    }
+    console.log(dwarves)
+  }
 
 
   function fetchPlayers() {
@@ -74,9 +127,27 @@ export default function GamePlay() {
         Accept: 'application/json',
       }
     }).then(response => response.json()).then(response => setPlayers(response))
-    console.log(players)
+    player = players.filter(p => p.name === user.username)[0]
   }
 
+  function startGame() {
+    faseExtraccionMinerales()
+  }
+
+  function fetchIsMyTurn() {
+    fetch(`/api/v1/game/play/${code}/isMyTurn`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/json',
+      }
+    }).then(response => response.json()).then(response => setIsMyTurn(response))
+    fetchDwarves()
+    setAlreadySelectedCardByPlayers()
+    console.log(isMyTurn)
+    console.log(dwarves)
+  }
   function faseExtraccionMinerales() {
 
     fetch(`/api/v1/game/play/${code}/getCards`, {
@@ -104,9 +175,8 @@ export default function GamePlay() {
           
       setCards(oldCardDisplay)
 
-    }
-      
-    )
+    })
+
   }
 
   function faseSeleccionAcciones() {
@@ -123,8 +193,23 @@ export default function GamePlay() {
     */
   }
 
+  function waitTillIsMyTurn() {
+    if (isMyTurn === false) {
+      fetchDwarves();
+      fetchIsMyTurn();
+      //window.setTimeout(waitTillIsMyTurn, 1000);
+    } 
+  }
+
   function gameLogic() {
 
+    if (game != {} && game.playerCreator && game.playerCreator.name !== user.username) {
+      fetchDwarves()
+    }
+
+    if(isMyTurn === false) {
+      waitTillIsMyTurn()
+    }
 
 
 
@@ -147,21 +232,23 @@ export default function GamePlay() {
     faseResolucionAcciones()
   }
 
-  gameLogic()
+  
 
   const modal = getErrorModal(setVisible, visible, message);
- 
-
-  /*
-  let cardList =
-  cards.map((card) => {
-    return (
-      <Card id={card.id}/>
-    )
-  })*/
 
   function selectCard(card) {
+    if (isMyTurn === false) {
+      console.log("is not your turn")
+      return false; // Just a random return to ensure that function exits
+    }
 
+    let id = card.id
+    if (selectedCards[id] !== null) {
+      // Card is already selected, you can't select it
+      console.log(id);
+      console.log(selectedCards[id])
+      return false;
+    }
     
     if (choosedCards.includes(card)) {
       console.log("we are filtering")
@@ -176,9 +263,23 @@ export default function GamePlay() {
     console.log(choosedCards)
   }
 
+  function getCardColor(card) {
+    // If card was already selected by another player, card's color is other player's color
+    console.log(selectedCards)
+    let id = card.id
+    let color = selectedCards[id] !== null ? selectedCards[id] : "white"
+
+    // Else it is checked if the card has been selected
+    if ( color === "white") {
+      color = choosedCards.includes(card) ? player.color : "white"
+    }
+
+    return color
+  }
+
   function sendCards() {
     fetch(
-      "/api/v1/game/play/" + code + "/dwarves/" + user.id,
+      "/api/v1/game/play/" + code + "/dwarves",
       {
           method:  "POST",
           headers: {
@@ -199,12 +300,16 @@ export default function GamePlay() {
       <div className="admin-page-container">
         <h1 className="text-center">Dwarf - </h1>
         <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
-        <Button
-          onClick={() => {faseExtraccionMinerales()}}
-          title="Get Cards"
-          color="#008000"
-          style={{border: '3px solid black',padding: "3px"}}
-        >Get Cards</Button>
+          { players && players.length > 1 &&
+
+            <Button
+              onClick={() => {startGame()}}
+              title="Get Cards"
+              color="#008000"
+              style={{border: '3px solid black',padding: "3px"}}>
+                Get Cards
+              </Button>
+          }
         
         {game != {} && game.playerCreator && game.playerCreator.name === user.username && (
             <Button
@@ -218,7 +323,17 @@ export default function GamePlay() {
               Start Game
             </Button>
           )}
-
+            <Button
+              onClick={() => {
+                fetchIsMyTurn();
+              }}
+              title="Start Game"
+              color="#008000"
+              style={{ border: "3px solid black", padding: "3px" }}
+            >
+              checkTurn
+            </Button>
+          { isMyTurn && <h2>Is your turn!</h2>}
           {choosedCards.length === 2 && (
             <Button
               onClick={() => {
@@ -245,31 +360,31 @@ export default function GamePlay() {
 
         </section>
         <section className="generalLayout" style={{display:"flex", flexDirection:"column"}}>
-          {cards.length != 0 && 
+          {cards.length != 0 && player && player.color &&
           <section className="cardDeckLayout">
             <section className="cardDeckLayoutRow1" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[0].id} 
-                    onClick={() => selectCard(cards[0])} color={choosedCards.includes(cards[0]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[0])} color={getCardColor(cards[0])}/>
               <Card id={cards[1].id}
-                    onClick={() => selectCard(cards[1])} color={choosedCards.includes(cards[1]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[1])} color={getCardColor(cards[1])}/>
               <Card id={cards[2].id} 
-                    onClick={() => selectCard(cards[2])} color={choosedCards.includes(cards[2]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[2])} color={getCardColor(cards[2])}/>
             </section>
             <section className="cardDeckLayoutRow2" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[3].id}
-                    onClick={() => selectCard(cards[3])} color={choosedCards.includes(cards[3]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[3])} color={getCardColor(cards[3])}/>
               <Card id={cards[4].id} 
-                    onClick={() => selectCard(cards[4])} color={choosedCards.includes(cards[4]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[4])} color={getCardColor(cards[4])}/>
               <Card id={cards[5].id} 
-                    onClick={() => selectCard(cards[5])} color={choosedCards.includes(cards[5]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[5])} color={getCardColor(cards[5])}/>
             </section>
             <section className="cardDeckLayoutRow3" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[6].id} 
-                    onClick={() => selectCard(cards[6])} color={choosedCards.includes(cards[6]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[6])} color={getCardColor(cards[6])}/>
               <Card id={cards[7].id} 
-                    onClick={() => selectCard(cards[7])} color={choosedCards.includes(cards[7]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[7])} color={getCardColor(cards[7])}/>
               <Card id={cards[8].id} 
-                    onClick={() => selectCard(cards[8])} color={choosedCards.includes(cards[8]) ? "green" : "white"}/>
+                    onClick={() => selectCard(cards[8])} color={getCardColor(cards[8])}/>
             </section>
           </section>
           }

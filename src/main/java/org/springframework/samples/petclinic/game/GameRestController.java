@@ -184,13 +184,25 @@ public class GameRestController {
 
     }
 
+    private String getRandomColor(Integer id) {
+
+        ArrayList<String> colours = new ArrayList<String>();
+        colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
+        Collections.shuffle(colours);
+
+        Optional<List<Player>> players = gs.getPlayers(id);
+        if (players.isEmpty()){
+            return colours.get(0);
+        }
+
+        players.get().forEach(p -> colours.remove(p.getColor()));
+        return colours.get(0);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
         try {
-        ArrayList<String> colours = new ArrayList<String>();
-        colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
-        Collections.shuffle(colours);
 
         User u = us.findCurrentUser();
 
@@ -198,7 +210,7 @@ public class GameRestController {
         g.setMainBoard(mb);
 
         Player p = new Player();
-        p.setColor(colours.get(0));
+        p.setColor(getRandomColor(g.getId()));
         p.setName(u.getUsername());
         //p.setGame(g);
         p.setUser(u);
@@ -247,6 +259,7 @@ public class GameRestController {
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
+
         List<Dwarf> dwarves = g.getDwarves();
         dwarves = dwarves.stream().filter(d -> d.getRound() == round).toList();
         return new ResponseEntity<>(dwarves, HttpStatus.OK);
@@ -264,12 +277,57 @@ public class GameRestController {
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
     }
 
-    @PostMapping("/play/{code}/dwarves/{user_id}")
-    public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code,
-            @PathVariable("user_id") Integer user_id) {
+    @GetMapping("/play/{code}/isMyTurn")
+    public ResponseEntity<Boolean> getTurn(@PathVariable("code") String code) {
+        // Gets the lists of players and dwarfs. Turn is the next player
+        Boolean res = false;
+
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            System.out.println("No game");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
+        if (plys_optional.isEmpty()) {
+            System.out.println("No players");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        List<Player> plys = plys_optional.get();
+
+        User u = us.findCurrentUser();
+        Player p = ps.getPlayerByUserAndGame(u, g);
+        if (p == null) {
+            System.out.println("no player");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
+
+        List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
+        System.out.println(dwarves_players);
+
+        ArrayList<Player> players_mutable = new ArrayList<Player>();
+        players_mutable.addAll(plys);
+
+
+        players_mutable.removeAll(dwarves_players);
+
+        if (players_mutable.size() > 0) {
+            if (players_mutable.get(0).equals(p)) {
+                res = true;
+            }
+        }
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @PostMapping("/play/{code}/dwarves")
+    public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
         if (g == null) {
@@ -277,11 +335,15 @@ public class GameRestController {
         }
 
         Dwarf dwarf = new Dwarf();
-        dwarf.setPlayer(ps.getPlayerByUserAndGame(us.findUser(user_id), g));
+        dwarf.setPlayer(ps.getPlayerByUserAndGame(us.findCurrentUser(), g));
         dwarf.setRound(g.getRound());
         dwarf.setCards(cards);
 
         ds.saveDwarf(dwarf);
+
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves.add(dwarf);
+        gs.saveGame(g);
 
         return new ResponseEntity<>(HttpStatus.OK);
 
