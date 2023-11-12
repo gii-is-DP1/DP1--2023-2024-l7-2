@@ -37,8 +37,17 @@ public class SpecialCardDeckService {
         return scdr.findById(id).orElseThrow(() -> new ResourceNotFoundException("CardDeck", "Id", id));
     }
 
+    @Transactional
+    public SpecialCardDeck initializeOneCardDeck(ArrayList<SpecialCard> cards) {
+        SpecialCardDeck scd = new SpecialCardDeck();
+        scd.setLastSpecialCard(cards.get(0));
+        scd.setSpecialCards(cards);
+        saveSpecialCardDeck(scd);
+        return scd;
+    }
+
     @Transactional()
-    public List<SpecialCardDeck> initialize() {
+    public ArrayList<SpecialCardDeck> initialize() {
 
         // We shuffle all special cards
         ArrayList<SpecialCard> specCards = new ArrayList<SpecialCard>();
@@ -46,24 +55,46 @@ public class SpecialCardDeckService {
         Collections.shuffle(specCards);
 
         // We split them into three decks and we create three special card deck
-        List<SpecialCard> specCardList1 = List.of(specCards.get(0),specCards.get(1),specCards.get(2));
-        List<SpecialCard> specCardList2 = List.of(specCards.get(3),specCards.get(4),specCards.get(5));
-        List<SpecialCard> specCardList3 = List.of(specCards.get(6),specCards.get(7),specCards.get(8));
+        //List<SpecialCard> specCardList1 = List.of(specCards.get(0),specCards.get(1),specCards.get(2));
+        // Por alguna razon si se hace con List no funciona el saveSpecialCardDeck :)
+        ArrayList<SpecialCard> specCardList1 = new ArrayList<SpecialCard>();
+        specCardList1.add(specCards.get(0));
+        specCardList1.add(specCards.get(1));
+        specCardList1.add(specCards.get(2));
 
-        SpecialCardDeck scd1 = new SpecialCardDeck();
-        SpecialCardDeck scd2 = new SpecialCardDeck();
-        SpecialCardDeck scd3 = new SpecialCardDeck();
+        ArrayList<SpecialCard> specCardList2 = new ArrayList<SpecialCard>();
+        specCardList2.add(specCards.get(3));
+        specCardList2.add(specCards.get(4));
+        specCardList2.add(specCards.get(5));
 
-        scd1.setSpecialCards(specCardList1);
+        ArrayList<SpecialCard> specCardList3 = new ArrayList<SpecialCard>();
+        specCardList3.add(specCards.get(6));
+        specCardList3.add(specCards.get(7));
+        specCardList3.add(specCards.get(8));
+
+        
+        SpecialCardDeck scd1 = initializeOneCardDeck(specCardList1);//new SpecialCardDeck();
+        SpecialCardDeck scd2 = initializeOneCardDeck(specCardList2);
+        SpecialCardDeck scd3 = initializeOneCardDeck(specCardList3);
+/*
         scd1.setLastSpecialCard(specCardList1.get(0));
+        scd1.setSpecialCards(specCardList1);
+        saveSpecialCardDeck(scd1);
 
-        scd2.setSpecialCards(specCardList2);
         scd2.setLastSpecialCard(specCardList2.get(0));
+        scd2.setSpecialCards(specCardList2);
+        saveSpecialCardDeck(scd2);
 
-        scd3.setSpecialCards(specCardList3);
         scd3.setLastSpecialCard(specCardList3.get(0));
+        scd3.setSpecialCards(specCardList3);
+        saveSpecialCardDeck(scd3);
+*/
+        ArrayList<SpecialCardDeck> res = new ArrayList<SpecialCardDeck>();
+        res.add(scd1);
+        res.add(scd2);
+        res.add(scd3);
 
-        return List.of(scd1, scd2, scd3);
+        return res;
     }
 
 

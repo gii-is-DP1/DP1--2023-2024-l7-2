@@ -29,6 +29,7 @@ import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerDTO;
 import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.user.UserService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -146,55 +147,101 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
+        // Si se ha acabado el mazo, se caba el juego
+        Card c = g.getMainBoard().getCardDeck().getLastCard();
+        Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
+        if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
+            endGame(code);
+        }
+
         List<Card> cd = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
         return new ResponseEntity<>(cd, HttpStatus.OK);
     }
 
-    @GetMapping("/listPlayers/{id}")
-    public ResponseEntity<List<Player>> getPlayers(@PathVariable("id") Integer id) {
-        Optional<List<Player>> g = gs.getPlayers(id);
-
-        if (g.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(g.get());
-    }
-
-    @PostMapping("/join/{code}/{id}")
-    public ResponseEntity<Game> joinGame(@PathVariable("code") String code, @PathVariable("id") Integer id) {
-
-        // We choose a random color
-        ArrayList<String> colours = new ArrayList<String>();
-        colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
-        Collections.shuffle(colours);
+    @PostMapping("/join/{code}")
+    public ResponseEntity<Game> joinGame(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
-        User u = us.findUser(id);
+        User u = us.findCurrentUser();
 
-        if (g == null || u == null) {
-            return ResponseEntity.notFound().build();
+        // if a player already exists in a game he can just join the game :)
+        Player p = ps.getPlayerByUserAndGame(u, g);
+        System.out.println(p);
+        if (p == null) {
+            // We choose a random color
+            ArrayList<String> colours = new ArrayList<String>();
+            colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
+            Collections.shuffle(colours);
+
+            if (g == null || u == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            p = new Player();
+            p.setColor(colours.get(0));
+            p.setName(u.getUsername());
+            p.setGame(g);
+            p.setUser(u);
+            ps.savePlayer(p);
+        } else {
+            System.out.println("This player already in game");
+            System.out.println(g);
+            System.out.println(u);
+            System.out.println(p);
         }
-
-        Player p = new Player();
-        p.setColor(colours.get(0));
-        p.setName(u.getUsername());
-        p.setGame(g);
-        p.setUser(u);
-        ps.savePlayer(p);
 
         return ResponseEntity.ok(g);
 
     }
 
+    private String getRandomColor(Integer id) {
+
+        ArrayList<String> colours = new ArrayList<String>();
+        colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
+        Collections.shuffle(colours);
+
+        Optional<List<Player>> players = gs.getPlayers(id);
+        if (players.isEmpty()) {
+            return colours.get(0);
+        }
+
+        players.get().forEach(p -> colours.remove(p.getColor()));
+        return colours.get(0);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
+        try {
 
-        MainBoard mb = mbs.initialize();
-        g.setMainBoard(mb);
+            User u = us.findCurrentUser();
 
-        gs.saveGame(g);
+            MainBoard mb = mbs.initialize();
+            g.setMainBoard(mb);
+
+            Player p = new Player();
+            p.setColor(getRandomColor(g.getId()));
+            p.setName(u.getUsername());
+            // p.setGame(g);
+            p.setUser(u);
+            ps.savePlayer(p);
+
+            // Si no se hace asi da error porque
+            // al guardarse el game en player, el game todavia no existe
+            // y si se asigna a game el player, el player todavia no existe
+
+            g.setPlayerCreator(p);
+            gs.saveGame(g);
+
+            p.setGame(g);
+            ps.savePlayer(p);
+        } catch (Exception e) {
+            System.out.println("Exception =>" + e);
+            System.out.println("Exception =>" + e.getMessage());
+        }
+
+        g.setMainBoard(null);
+
         return new ResponseEntity<>(g, HttpStatus.CREATED);
     }
 
@@ -213,65 +260,143 @@ public class GameRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/play/{code}/dwarves")
-    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("round") Integer round,
-            @PathVariable("id") String code) {
+    @GetMapping("/play/{code}/dwarves/{round}")
+    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("code") String code,
+            @PathVariable("round") Integer round) {
 
         Game g = gs.getGameByCode(code);
 
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
+
         List<Dwarf> dwarves = g.getDwarves();
         dwarves = dwarves.stream().filter(d -> d.getRound() == round).toList();
         return new ResponseEntity<>(dwarves, HttpStatus.OK);
     }
 
-    @PostMapping("/play/{code}/dwarves/{user_id}")
-    public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code,
-            @PathVariable("user_id") Integer user_id) {
+    @GetMapping("/play/{code}/players")
+    public ResponseEntity<List<Player>> getPlayersFromGame(@PathVariable("code") String code) {
+
+        Game g = gs.getGameByCode(code);
+        if (g != null) {
+            Optional<List<Player>> plys = gs.getPlayers(g.getId());
+            if (plys.isPresent()) {
+                return new ResponseEntity<>(plys.get(), HttpStatus.OK);
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/play/{code}/isMyTurn")
+    public ResponseEntity<Boolean> getTurn(@PathVariable("code") String code) {
+        // Gets the lists of players and dwarfs. Turn is the next player
+        Boolean res = false;
+
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            System.out.println("No game");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
+        if (plys_optional.isEmpty()) {
+            System.out.println("No players");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        List<Player> plys = plys_optional.get();
+
+        User u = us.findCurrentUser();
+        Player p = ps.getPlayerByUserAndGame(u, g);
+        if (p == null) {
+            System.out.println("no player");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
+
+        List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
+        System.out.println(dwarves_players);
+
+        ArrayList<Player> players_mutable = new ArrayList<Player>();
+        players_mutable.addAll(plys);
+
+        players_mutable.removeAll(dwarves_players);
+
+        if (players_mutable.size() > 0) {
+            if (players_mutable.get(0).equals(p)) {
+                res = true;
+            }
+        }
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @GetMapping("/play/{code}/isFinished")
+    public ResponseEntity<Boolean> endGame(@PathVariable("code") String code) {
+        // FALTA CONDICIÓN DE OBJETOS
+        Boolean finished = false;
+        Game g = gs.getGameByCode(code);
+
+        // tiene que terminar en 6 rondas
+        if (g.getRound() >= 1)
+            finished = true;
+
+        return new ResponseEntity<>(finished, HttpStatus.OK);
+    }
+
+    @PostMapping("/play/{code}/dwarves")
+    public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
 
-        Dwarf dwarf = new Dwarf();
-        dwarf.setPlayer(ps.getPlayerByUserAndGame(us.findUser(user_id), g));
-        dwarf.setRound(g.getRound());
-        dwarf.setCards(cards);
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
 
-        ds.saveDwarf(dwarf);
+        Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
+        List<Player> plys = plys_optional.get();
+
+        if (dwarves.size() == plys.size()) {
+            Dwarf dwarf = new Dwarf();
+            dwarf.setPlayer(ps.getPlayerByUserAndGame(us.findCurrentUser(), g));
+            dwarf.setRound(g.getRound());
+            dwarf.setCards(cards);
+
+            ds.saveDwarf(dwarf);
+
+            dwarves.add(dwarf);
+            gs.saveGame(g);
+        }
 
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
-    private Integer getGameWinner(Game game) {
-
-        // POR HACER
-        return game.getPlayers().get(1).getId();
-
-    }
-
     @PutMapping("/play/{code}/finish")
     public ResponseEntity<Void> endGame(@Valid @RequestBody Game g, @PathVariable("id") Integer id) {
-        // FALTA CONDICIÓN DE OBJETOS
-        Boolean finished = false;
-        if (g.getRound() >= 6)
-            finished = true;
+        Game gToUpdate = getGameById(id);
+        BeanUtils.copyProperties(g, gToUpdate, "id");
 
-        if (finished) {
-            Game gToUpdate = getGameById(id);
-            BeanUtils.copyProperties(g, gToUpdate, "id");
+        gToUpdate.setFinish(LocalDateTime.now());
 
-            gToUpdate.setFinish(LocalDateTime.now());
+        gToUpdate.setWinner_id(gs.getGameWinner(g).getId());
 
-            gToUpdate.setWinner_id(getGameWinner(g));
-
-            gs.saveGame(gToUpdate);
-        }
+        gs.saveGame(gToUpdate);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/play/{code}/winner")
+    public ResponseEntity<String> getWinner(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(gs.getGameWinner(g).getName(), HttpStatus.OK);
     }
 
 }

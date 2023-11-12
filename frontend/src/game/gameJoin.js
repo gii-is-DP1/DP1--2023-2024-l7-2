@@ -48,7 +48,7 @@ export default function GameJoin() {
         .then((response) => {
             if (response.ok) {
                 fetch(
-                    "/api/v1/game/join" + (game ? "/" + game : "") + (user.id ? "/" + user.id : ""),
+                    "/api/v1/game/join" + (game ? "/" + game : ""),
                     {
                         method: "POST",
                         headers: {
@@ -102,7 +102,7 @@ export default function GameJoin() {
                                     Join game
                                 </h1>
                                 <Form onSubmit={handleSubmit}>
-                                    <div  className="custom-form-input">
+                                    <div  className="custom-form-input" style={{backgroundColor:'white'}}>
                                         <Label for="name" className="custom-form-input-label"> code </Label>
                                         <Input
                                             type="text"
@@ -112,6 +112,7 @@ export default function GameJoin() {
                                             value={game || ""}
                                             onChange={handleChange}
                                             className="custom-input"
+                                            
                                         />
                                     </div>
                                     <div className="custom-button-row">
@@ -127,7 +128,7 @@ export default function GameJoin() {
                             </h1>
                             <div className="custom-button-row">
                                 <Button className="btn btn-dark btn-lg" outline color="warning" size="lg">
-                                    <Link to={`/game/edit`} style={{ color: 'rgb(238, 191, 47)'}}> Create </Link>
+                                    <Link to={`/game/edit/new`} style={{ color: 'rgb(238, 191, 47)'}}> Create </Link>
                                 </Button>
                             </div>
                     </div>

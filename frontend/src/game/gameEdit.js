@@ -13,7 +13,7 @@ export default function GameEdit() {
     const emptyGame = {
         id: id==="new"?null:id,
         name: "",
-        code: id,
+        code: null,
         start: null,
         finish: null,
         winner_id: null,
@@ -21,14 +21,19 @@ export default function GameEdit() {
     };
     const [message, setMessage] = useState(null);
     const [visible, setVisible] = useState(false);
-    const [game, setGame] = useFetchState(
-        emptyGame,
-        `/api/v1/game/${id}`,
-        jwt,
-        setMessage,
-        setVisible,
-        id
-    );
+    
+    const [game, setGame] = useState(emptyGame)
+
+    if (id !== "new") {
+        fetch(`/api/v1/game/${id}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${jwt}`,
+              Accept: 'application/json',
+            }
+          }).then(response => response.json()).then(response => setGame(response))
+    } 
 
     const modal = getErrorModal(setVisible, visible, message);
 
@@ -50,15 +55,17 @@ export default function GameEdit() {
         )
         .then((response) => response.text())
         .then((data) => {
+            console.log(data);
             if(data==="")
-                window.location.href = "/game";
+                console.log("error at creating game")
             else{
                 let json = JSON.parse(data);
                 if(json.message){
                     setMessage(JSON.parse(data).message);
                     setVisible(true);
-                }else
-                    window.location.href = "/game";
+                }else{
+                    window.location.href = `/game/${json.code}`;
+                }
             }
         })
 

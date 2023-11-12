@@ -1,6 +1,10 @@
 package org.springframework.samples.petclinic.player;
 
 import org.springframework.samples.petclinic.user.User;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.model.NamedEntity;
 
@@ -26,6 +30,8 @@ public class Player extends NamedEntity {
     @ManyToOne(optional = true)
     private User user;
 
-    @ManyToOne(optional = false)
+    @JsonSerialize(using = gameSerializer.class)
+    @JsonDeserialize(using = gameDeserializer.class)
+    @ManyToOne(optional = true)
     private Game game;
 }

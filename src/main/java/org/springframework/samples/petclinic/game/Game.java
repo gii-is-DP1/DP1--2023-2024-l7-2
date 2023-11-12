@@ -46,7 +46,4 @@ public class Game extends NamedEntity {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Player playerCreator;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "players")
-    List<Player> players;
 }
