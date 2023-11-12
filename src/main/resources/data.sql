@@ -178,7 +178,8 @@ INSERT INTO card(id, name, description, position, card_type_id, total_iron, tota
                         (51,'Forge Armour','Return 2 steel and 1 gold to the supply then take 1 item.',6, 3,0,-1,-2,0),
                         (52,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',7, 1,0,0,0,0),
                         (53,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',8, 2,0,0,0,1),
-                        (54,'Alloy Steel','Return 3 to the iron supply then take 2 steel',9, 4,-3,0,2,0);
+                        (54,'Alloy Steel','Return 3 to the iron supply then take 2 steel',9, 4,-3,0,2,0),
+                        (55,'Test Card','Test Description',10,4,2,4,5,1);
 
 
 INSERT INTO special_card(id, name, description) 
