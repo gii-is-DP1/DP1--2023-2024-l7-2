@@ -15,6 +15,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "card")
 public class Card extends NamedEntity {
+    
     @NotBlank
     private String description;
     @NotBlank
