@@ -23,9 +23,9 @@ public class Player extends NamedEntity {
     private Integer iron;
     private Integer medal;
 
-    @ManyToOne(optional=true)
+    @ManyToOne(optional = true)
     private User user;
 
-    @ManyToOne(optional=false)
+    @ManyToOne(optional = false)
     private Game game;
 }

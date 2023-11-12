@@ -201,9 +201,9 @@ INSERT INTO special_card(id, name, description)
                         VALUES (9,'Run Amok','Collect all of the cards from each location, in turn, shuffle them and return them to that location.');                                                
 
 
-INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,null,null,null,null,null),
-        (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1),
-        (3,'super cool game', null,'2023-04-11 18:20','2023-04-11 19:20', 2, null); 
+INSERT INTO game(id,name,code,start,finish, winner_id, round, players) VALUES (1,null,null,null,null,null,null, null),
+        (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1, null),
+        (3,'super cool game', null,'2023-04-11 18:20','2023-04-11 19:20', 2, null, null); 
 
 INSERT INTO card_deck(id, card_id) VALUES (1,1);
 
@@ -221,7 +221,7 @@ INSERT INTO main_board(id, card_deck_id) VALUES (1, 1);
 
 INSERT INTO main_board_special_card_decks(main_board_id, special_card_decks_id) VALUES (1,1),(1,3),(1,2);
 
-INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1);
+INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id, players) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1, null);
 
 
 

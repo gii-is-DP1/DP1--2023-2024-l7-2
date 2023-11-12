@@ -102,6 +102,23 @@ export default function GamePlay() {
     */
   }
 
+  function finDelJuego() {
+
+    fetch(`/api/v1/game/play/${code}/finish`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/json',
+      }
+    }).then(response => response.json())
+    .then(() => {
+      window.location.href = "/api/v1/game/play/finish";
+    }
+      
+    )
+  }
+
   function gameLogic() {
 
 
@@ -124,6 +141,7 @@ export default function GamePlay() {
     //faseExtraccionMinerales()
     faseSeleccionAcciones()
     faseResolucionAcciones()
+    // finDelJuego();
   }
 
   gameLogic()

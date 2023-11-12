@@ -1,9 +1,12 @@
 package org.springframework.samples.petclinic.game;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -23,6 +26,7 @@ import org.springframework.samples.petclinic.player.PlayereService;
 import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeck;
 import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.player.PlayerDTO;
 import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -95,14 +99,14 @@ public class GameRestController {
     public ResponseEntity<Void> getGameByCode(@PathVariable("code") String code) {
         Game g = null;
         try {
-         g = gs.getGameByCode(code);
+            g = gs.getGameByCode(code);
 
-        if (g == null) {
-            return ResponseEntity.notFound().build();
+            if (g == null) {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            System.out.println("Exception =>" + e);
         }
-        } catch(Exception e) {
-            System.out.println("Exception =>"+e);
-        } 
 
         return ResponseEntity.ok().build();
     }
@@ -243,5 +247,31 @@ public class GameRestController {
 
     }
 
-}
+    private Integer getGameWinner(Game game) {
 
+        // POR HACER
+        return game.getPlayers().get(1).getId();
+
+    }
+
+    @PutMapping("/play/{code}/finish")
+    public ResponseEntity<Void> endGame(@Valid @RequestBody Game g, @PathVariable("id") Integer id) {
+        // FALTA CONDICIÓN DE OBJETOS
+        Boolean finished = false;
+        if (g.getRound() >= 6)
+            finished = true;
+
+        if (finished) {
+            Game gToUpdate = getGameById(id);
+            BeanUtils.copyProperties(g, gToUpdate, "id");
+
+            gToUpdate.setFinish(LocalDateTime.now());
+
+            gToUpdate.setWinner_id(getGameWinner(g));
+
+            gs.saveGame(gToUpdate);
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+}
