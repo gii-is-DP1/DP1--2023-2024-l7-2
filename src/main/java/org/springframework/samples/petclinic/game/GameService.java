@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.game;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,8 +30,9 @@ public class GameService {
     PlayerRepository pr;
 
     @Autowired
-    public GameService(GameRepository gr) {
+    public GameService(GameRepository gr, PlayerRepository pr) {
         this.gr = gr;
+        this.pr = pr;
 
     }
 
@@ -85,51 +87,79 @@ public class GameService {
         gr.deleteById(id);
     }
 
+    @Transactional
     public Player getGameWinner(Game g) {
 
         // Hacemos que la lista de players cambie de Optional<List<Player>> a
         // List<Player>
+
         Optional<List<Player>> plys_optional = getPlayers(g.getId());
         List<Player> plys = plys_optional.get();
 
-        Map<Player, Integer> totalScore = Map.of();
+        Map<Player, Integer> totalScore = new HashMap<Player,Integer>();
         plys.stream().forEach(p -> totalScore.put(p, 0));
 
         // steal
-        Map<Player, Integer> totalSteal = Map.of();
-        plys.stream().forEach(p -> totalScore.put(p, p.getSteal()));
-        Player playerWithMoreSteal = totalSteal.entrySet().stream()
-                .max(Comparator.comparingInt(Map.Entry::getValue))
-                .map(Map.Entry::getKey).orElse(null);
+        Player playerWithMoreSteal = null ;
+
+        for (Player p: plys) {
+            if (playerWithMoreSteal == null) {
+                playerWithMoreSteal = p;
+                continue;
+            }
+            if (p.getSteal() > playerWithMoreSteal.getSteal()) {
+                playerWithMoreSteal = p;
+            }
+        }
         totalScore.put(playerWithMoreSteal, totalScore.get(playerWithMoreSteal) + 1);
 
         // gold
-        Map<Player, Integer> totalGold = Map.of();
-        plys.stream().forEach(p -> totalScore.put(p, p.getGold()));
-        Player playerWithMoreGold = totalGold.entrySet().stream()
-                .max(Comparator.comparingInt(Map.Entry::getValue))
-                .map(Map.Entry::getKey).orElse(null);
+
+        Player playerWithMoreGold = null;
+        for (Player p: plys) {
+            if (playerWithMoreGold == null) {
+                playerWithMoreGold = p;
+                continue;
+            }
+            if (p.getGold() > playerWithMoreGold.getGold()) {
+                playerWithMoreGold = p;
+            }
+        }
         totalScore.put(playerWithMoreGold, totalScore.get(playerWithMoreGold) + 1);
 
         // iron
-        Map<Player, Integer> totalIron = Map.of();
-        plys.stream().forEach(p -> totalScore.put(p, p.getIron()));
-        Player playerWithMoreIron = totalIron.entrySet().stream()
-                .max(Comparator.comparingInt(Map.Entry::getValue))
-                .map(Map.Entry::getKey).orElse(null);
+        
+        Player playerWithMoreIron = null;
+        for (Player p: plys) {
+            if (playerWithMoreIron == null) {
+                playerWithMoreIron = p;
+                continue;
+            }
+            if (p.getIron() > playerWithMoreIron.getIron()) {
+                playerWithMoreIron = p;
+            }
+        }
         totalScore.put(playerWithMoreIron, totalScore.get(playerWithMoreIron) + 1);
 
         // medal
-        Map<Player, Integer> totalMedal = Map.of();
-        plys.stream().forEach(p -> totalScore.put(p, p.getMedal()));
-        Player playerWithMoreMedal = totalMedal.entrySet().stream()
-                .max(Comparator.comparingInt(Map.Entry::getValue))
-                .map(Map.Entry::getKey).orElse(null);
+        
+        Player playerWithMoreMedal = null;
+        for (Player p: plys) {
+            if (playerWithMoreMedal == null) {
+                playerWithMoreMedal = p;
+                continue;
+            }
+            if (p.getIron() > playerWithMoreMedal.getIron()) {
+                playerWithMoreMedal = p;
+            }
+        }
         totalScore.put(playerWithMoreMedal, totalScore.get(playerWithMoreMedal) + 1);
 
-        return totalScore.entrySet().stream()
+        Player p = totalScore.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey).orElse(null);
+
+        return p;
     }
 
     @Transactional
@@ -150,13 +180,17 @@ public class GameService {
 
                 for (int j = 0; j < c.size(); j++) {
                     Card card = c.get(j);
-                    if (card.getCardType().toString() == "Other") {
+                    System.out.println(card.getTotalIron());
+                    System.out.println(card.getCardType());
+                    if (card.getCardType().getName().equals("Other")) {
                         p.setGold(p.getGold() + card.getTotalGold());
                         p.setIron(p.getIron() + card.getTotalIron());
                         p.setSteal(p.getSteal() + card.getTotalSteal());
                         p.setMedal(p.getMedal() + card.getTotalMedals());
                     }
                 }
+                System.out.println(p.getIron());
+                pr.save(p);
             }
 
         }

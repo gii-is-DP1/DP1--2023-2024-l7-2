@@ -31,6 +31,11 @@ public class PlayereService {
     }
 
     @Transactional(readOnly = true)
+    public Player getByName(String name) {
+        return repo.findByName(name);
+    }
+
+    @Transactional(readOnly = true)
     public Player getPlayerByUserAndGame(User u, Game g) {
         return repo.findByUserAndGame(u, g);
     }

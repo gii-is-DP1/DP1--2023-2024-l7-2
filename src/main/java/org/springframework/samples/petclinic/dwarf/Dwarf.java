@@ -6,6 +6,10 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.model.NamedEntity;
 import org.springframework.samples.petclinic.player.Player;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -21,7 +25,9 @@ public class Dwarf extends NamedEntity {
 
     Integer round;
 
-    @OneToOne
+    //@JsonSerialize(using = PlayerSerializer.class)
+    //@JsonDeserialize(using = PlayerDeserializer.class)
+    @OneToOne(optional = true)
     Player player;
 
     @OneToMany
