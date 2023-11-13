@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface CardRepository extends CrudRepository<Card, Integer> {
     List<Card> findAll();
 
-    public Card findByName(String name);
+    public List<Card> findByName(String name);
 }
