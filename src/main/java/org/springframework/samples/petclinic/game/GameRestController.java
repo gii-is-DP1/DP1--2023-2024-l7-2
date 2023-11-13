@@ -474,19 +474,22 @@ public class GameRestController {
 
     }
 
-    @PutMapping("/play/{code}/finish")
-    public ResponseEntity<Void> endGame(@Valid @RequestBody Game g, @PathVariable("id") Integer id) {
-        Game gToUpdate = getGameById(id);
-        BeanUtils.copyProperties(g, gToUpdate, "id");
+    @PostMapping("/play/{code}/finish")
+    public ResponseEntity<Void> finishGameSetWinner(@PathVariable("code") String code) {
+        
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-        gToUpdate.setFinish(LocalDateTime.now());
+        g.setFinish(LocalDateTime.now());
 
         Player p = gs.getGameWinner(g);
         System.out.println(p);
 
-        gToUpdate.setWinner_id(p.getId());
+        g.setWinner_id(p.getId());
 
-        gs.saveGame(gToUpdate);
+        gs.saveGame(g);
         return ResponseEntity.noContent().build();
     }
 
@@ -496,7 +499,7 @@ public class GameRestController {
         if (g == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(gs.getGameWinner(g), HttpStatus.OK);
+        return new ResponseEntity<>(ps.getById(g.getWinner_id()), HttpStatus.OK);
     }
 
 }

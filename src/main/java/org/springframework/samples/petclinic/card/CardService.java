@@ -43,6 +43,6 @@ public class CardService {
 
     @Transactional(readOnly = true)
     public Card getCardByName(String name){
-        return repo.findByName(name);
+        return repo.findByName(name).get(0);
     }
 }
