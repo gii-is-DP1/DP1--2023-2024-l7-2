@@ -121,6 +121,8 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
+        g.setDwarves(null);
+
         return new ResponseEntity<>(g, HttpStatus.OK);
     }
 
@@ -140,22 +142,27 @@ public class GameRestController {
     }
 
     @GetMapping("/play/{code}/getCards")
-    public ResponseEntity<List<Card>> getTwoCards(@PathVariable("code") String code) {
-        Game g = gs.getGameByCode(code);
+    public ResponseEntity<List<Card>> getMainBoardCards(@PathVariable("code") String code) {
 
+        Game g = gs.getGameByCode(code);
+        
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
+        List<Card> cd = g.getMainBoard().getCards();
 
+        return new ResponseEntity<>(cd, HttpStatus.OK);
+        /* 
         // Si se ha acabado el mazo, se caba el juego
         Card c = g.getMainBoard().getCardDeck().getLastCard();
         Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
         if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-            endGame(code);
+            // Returns an empty list
+            return new ResponseEntity<>(List.of(), HttpStatus.OK);
         }
 
         List<Card> cd = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
-        return new ResponseEntity<>(cd, HttpStatus.OK);
+        */
     }
 
     @PostMapping("/join/{code}")
@@ -182,6 +189,10 @@ public class GameRestController {
             p.setName(u.getUsername());
             p.setGame(g);
             p.setUser(u);
+            p.setSteal(0);
+            p.setGold(0);
+            p.setIron(0);
+            p.setMedal(0);
             ps.savePlayer(p);
         } else {
             System.out.println("This player already in game");
@@ -224,6 +235,10 @@ public class GameRestController {
             p.setName(u.getUsername());
             // p.setGame(g);
             p.setUser(u);
+            p.setSteal(0);
+            p.setGold(0);
+            p.setIron(0);
+            p.setMedal(0);
             ps.savePlayer(p);
 
             // Si no se hace asi da error porque
@@ -260,9 +275,8 @@ public class GameRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/play/{code}/dwarves/{round}")
-    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("code") String code,
-            @PathVariable("round") Integer round) {
+    @GetMapping("/play/{code}/dwarves")
+    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
 
@@ -270,8 +284,31 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
+        Integer round = g.getRound();
+
         List<Dwarf> dwarves = g.getDwarves();
+        //ArrayList<Dwarf> res = new ArrayList<Dwarf>();
         dwarves = dwarves.stream().filter(d -> d.getRound() == round).toList();
+        /*dwarves.stream().forEach(d -> {
+            Player p = d.getPlayer();
+            /* 
+            if (p == null) {
+                List<Player> players = gs.getPlayers(g.getId()).get();
+               
+                for (Player tp: players){
+                    for (Dwarf td:tp.getDwarfs()) {
+                        if (td.getId() == d.getId()) {
+                            p = tp;
+                            break;
+                        }
+                    }
+                }
+            }
+            p.setGame(null);
+            //p.setDwarfs(null);
+            d.setPlayer(p);
+            res.add(d);
+        });*/
         return new ResponseEntity<>(dwarves, HttpStatus.OK);
     }
 
@@ -282,6 +319,14 @@ public class GameRestController {
         if (g != null) {
             Optional<List<Player>> plys = gs.getPlayers(g.getId());
             if (plys.isPresent()) {
+
+                /*
+                plys.get().forEach((p) -> {
+                    p.setDwarfs(null);
+                    p.setGame(null);
+                    res.add(p);
+                });*/
+
                 return new ResponseEntity<>(plys.get(), HttpStatus.OK);
             }
         }
@@ -341,8 +386,10 @@ public class GameRestController {
         Game g = gs.getGameByCode(code);
 
         // tiene que terminar en 6 rondas
-        if (g.getRound() >= 1)
+        if (g.getRound() >= 2)
             finished = true;
+        
+        
 
         return new ResponseEntity<>(finished, HttpStatus.OK);
     }
@@ -361,17 +408,75 @@ public class GameRestController {
         Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
         List<Player> plys = plys_optional.get();
 
+        Dwarf dwarf = new Dwarf();
+        Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
+        System.out.println(p);
+
+        dwarf.setPlayer(p);
+        dwarf.setRound(g.getRound());
+        dwarf.setCards(cards);
+        
+        System.out.println(cards);
+
+        ds.saveDwarf(dwarf);
+        /* 
+        ArrayList<Dwarf> dwarflist = new ArrayList<Dwarf>();
+        dwarflist.addAll(p.getDwarfs());
+        dwarflist.add(dwarf);
+        ps.savePlayer(p)*/
+
+        dwarves = g.getDwarves();
+        dwarves.add(dwarf);
         if (dwarves.size() == plys.size()) {
-            Dwarf dwarf = new Dwarf();
-            dwarf.setPlayer(ps.getPlayerByUserAndGame(us.findCurrentUser(), g));
-            dwarf.setRound(g.getRound());
-            dwarf.setCards(cards);
+            gs.updateMaterials(g);
 
-            ds.saveDwarf(dwarf);
+            for(Dwarf d: dwarves) {
+                d.setPlayer(null);
+                d.setCards(null);
+                ds.saveDwarf(d);
+                ds.deleteDwarf(d);
+            }
+            dwarves = null;
 
-            dwarves.add(dwarf);
-            gs.saveGame(g);
+            MainBoard mb = g.getMainBoard();
+            ArrayList<Card> mbCards = new ArrayList<Card>();
+            mbCards.addAll(mb.getCards());
+
+            Card c = g.getMainBoard().getCardDeck().getLastCard();
+            Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
+            ArrayList<Card> cd = new ArrayList<Card>();
+            if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
+                // Returns an empty list
+            } else {
+                List<Card> twoCards = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
+                cd.addAll(twoCards);
+            }
+
+
+            for(Card ca: cd) {
+                for ( int i = 0 ; i < mbCards.size() ; i ++) {
+                    if (ca.getPosition().equals(mbCards.get(i).getPosition())) {
+                        mbCards.set(i, ca);
+                    }
+                }
+            }
+
+            mb.setCards(mbCards);
+            mbs.saveMainBoard(mb);
+
+            g.setRound(g.getRound() + 1);
         }
+        g.setDwarves(dwarves);
+        
+        try {
+            gs.saveGame(g);
+        }catch (Exception e) {
+            System.out.println(e);
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println(g.getDwarves());
+
 
         return new ResponseEntity<>(HttpStatus.OK);
 
@@ -384,19 +489,22 @@ public class GameRestController {
 
         gToUpdate.setFinish(LocalDateTime.now());
 
-        gToUpdate.setWinner_id(gs.getGameWinner(g).getId());
+        Player p = gs.getGameWinner(g);
+        System.out.println(p);
+
+        gToUpdate.setWinner_id(p.getId());
 
         gs.saveGame(gToUpdate);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/play/{code}/winner")
-    public ResponseEntity<String> getWinner(@PathVariable("code") String code) {
+    public ResponseEntity<Player> getWinner(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
         if (g == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(gs.getGameWinner(g).getName(), HttpStatus.OK);
+        return new ResponseEntity<>(gs.getGameWinner(g), HttpStatus.OK);
     }
 
 }

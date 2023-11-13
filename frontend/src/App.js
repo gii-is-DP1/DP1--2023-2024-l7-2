@@ -142,7 +142,7 @@ function App() {
           <Route path="/game/edit/:gameId" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
           <Route path="/game/edit/" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
           <Route path="/game/:gameId" exact={true} element={<PrivateRoute><GamePlay/></PrivateRoute>} />
-          <Route path="/api/v1/game/play/finish" exact={true} element={<PrivateRoute><GameEnd/></PrivateRoute>} />
+          <Route path="/game/:gameId/finish" exact={true} element={<PrivateRoute><GameEnd/></PrivateRoute>} />
          
           
 

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.SpecialCard;
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.cardDeck.CardDeckService;
@@ -21,12 +23,14 @@ public class MainBoardService {
     MainBoardRepository repo;
     private final CardDeckService cds;
     private final SpecialCardDeckService scds;
+    private final CardService cs;
     
     @Autowired
-    public MainBoardService(MainBoardRepository repo, CardDeckService cds, SpecialCardDeckService scds) {
+    public MainBoardService(MainBoardRepository repo, CardDeckService cds, SpecialCardDeckService scds, CardService cs) {
         this.repo = repo;
         this.cds = cds;
         this.scds = scds;
+        this.cs = cs;
     }
 
     @Transactional(readOnly = true)
@@ -54,8 +58,19 @@ public class MainBoardService {
         MainBoard mb = new MainBoard();
         mb.setCardDeck(cardDecks);
         //mb.setSpecialCardDecks(specCardDecks);
-        saveMainBoard(mb);
+        
 
+
+        ArrayList<Card> cards = new ArrayList<Card>();
+        for (int i = 1; i <= 9 ; i++) {
+            Card a = cs.getById(i);
+            System.out.println(a);
+            cards.add(a);
+        }
+        mb.setCards(cards);
+        saveMainBoard(mb);
+        System.out.println(cards);
+        
         return mb;
     }
     @Transactional
