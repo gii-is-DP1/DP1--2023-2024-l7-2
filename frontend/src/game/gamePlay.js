@@ -12,9 +12,10 @@ const user = tokenService.getUser()
 
 export default function GamePlay() {
   const code = getIdFromUrl(2);
-  console.log(jwt)
+  //console.log(jwt)
 
 
+  const [gameStarted, setGameStarted] = useState(null);
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
   const [choosedCards, setChoosedCards] = useState([]);
@@ -26,7 +27,7 @@ export default function GamePlay() {
     setVisible,
     code
 );
-    console.log(cards)
+    //console.log(cards)
   /*useState([ 
     {cardType: {id: 4, name: "Other"},description: "Take 3 iron from the supply",id: 1,name: "Iron Seam",position: 1,
     totalGold: 0,totalIron: 3,totalMedals: 0,totalSteal: 0},
@@ -106,7 +107,7 @@ export default function GamePlay() {
       let updated = emptySelectedCards
       for ( const c of dwacards) {
         console.log(c.id + " to color => " + pacolor);
-        updated[c.id] = pacolor;
+        updated[c.position] = pacolor;
       }
       setSelectedCards(updated)
     })
@@ -129,6 +130,26 @@ export default function GamePlay() {
     }
     //console.log(dwarves)
   }
+
+  function fetchGame(){
+
+    fetch(`/api/v1/game/play/${code}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+       Authorization: `Bearer ${jwt}`,
+        Accept: 'application/json',
+      }
+    }).then(response => response.json()).then(response => {
+      if(response.round !== game.round) {
+        setSelectedCards(emptySelectedCards)
+        setChoosedCards([])
+        setGame(response)
+        console.log("changing round")
+      }
+    })
+  } 
+  
 
   function fetchCards() {
     fetch(`/api/v1/game/play/${code}/getCards`, {
@@ -155,9 +176,10 @@ export default function GamePlay() {
     player = players.filter(p => p.name === user.username)[0]
   }
 
+  /*
   function startGame() {
     faseExtraccionMinerales()
-  }
+  }*/
 
   function fetchIsMyTurn() {
     fetch(`/api/v1/game/play/${code}/isMyTurn`, {
@@ -168,12 +190,14 @@ export default function GamePlay() {
         Accept: 'application/json',
       }
     }).then(response => response.json()).then(response => setIsMyTurn(response))
+    fetchGame()
     fetchDwarves()
     setAlreadySelectedCardByPlayers()
+    console.log(game)
     console.log(isMyTurn)
-    //console.log(dwarves)
+    console.log(dwarves)
   }
-
+/*
   function faseExtraccionMinerales() {
 
     fetch(`/api/v1/game/play/${code}/getCards`, {
@@ -209,6 +233,7 @@ export default function GamePlay() {
 
   }
 
+  /*
   function faseSeleccionAcciones() {
 
   }
@@ -221,7 +246,7 @@ export default function GamePlay() {
       Se haria un for en las cartas y se iria viendo que tipo de cartas hay
       y aplicando las acciones necesarias
     */
-  }
+  
 
   function isFinished() {
     fetch(`/api/v1/game/play/${code}/isFinished`, {
@@ -236,7 +261,7 @@ export default function GamePlay() {
 
   function finDelJuego() {
     fetch(`/api/v1/game/play/${code}/finish`, {
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwt}`,
@@ -248,7 +273,7 @@ export default function GamePlay() {
     })
   }
 
-
+/*
   function waitTillIsMyTurn() {
     if (isMyTurn === false) {
       fetchDwarves();
@@ -268,27 +293,12 @@ export default function GamePlay() {
     }
 
 
-
-    /*
-      Aqui se pondra la logica del juego.
-    */
-
-    /* 
-      Antes de comprobar la ronda se deberan de hacer comprobaciones
-      sobre el numero de jugadores y si el jugador principal empieza la partida o no.
-      Lo de que si el jugador principal empieza la partida se puede hacer con un boton que cambie 
-      el estado de una variable aqui en el frontend a true y lo del numero de jugadores se puede
-      hacer con un while que haga un fetch a game cada 1 segundo y comprueba el numero de jugadores
-      y no sale del bucle hasta que el numero de jugadores sea 3 y este aceptado el que empiece la partida
-      SOLO DOY IDEAS :)
-    */
-
     //faseExtraccionMinerales()
-    faseSeleccionAcciones()
-    faseResolucionAcciones()
+    //faseSeleccionAcciones()
+    //faseResolucionAcciones()
     // if (isFinished)
     //   finDelJuego();
-  }
+  }*/
 
   
 
@@ -302,6 +312,7 @@ export default function GamePlay() {
 
     if (selectedCards[id] !== null && selectedCards[id] !== undefined) {
       // Card is already selected, you can't select it
+      console.log(selectedCards)
       console.log(id);
       console.log(selectedCards[id])
       return false;
@@ -317,10 +328,8 @@ export default function GamePlay() {
         console.log("You cant choose that many cads :(")
       }
     }
-    //console.log(choosedCards)
   }
 
-  console.log(choosedCards)
   function getCardColor(id,card) {
     // If card was already selected by another player, card's color is other player's color
     let color = selectedCards[id] !== null ? selectedCards[id] : "white"
@@ -347,11 +356,12 @@ export default function GamePlay() {
       }
     ).then((response) => response.text())
     .then((data) => {
+        fetchIsMyTurn()
         console.log(data);
     }).catch((message) => alert(message));
   }
 
-  console.log(players)
+  //console.log(players)
   const playerList = players.map((play) => {
     return (
       <tr key={play.id} style={{color:play.color}}>
@@ -364,65 +374,63 @@ export default function GamePlay() {
     )
   })
 
+  console.log(choosedCards)
   return (
     <div>
       <div className="admin-page-container">
         <h1 className="text-center">Dwarf - </h1>
+          { game != {} && game.playerCreator && game.playerCreator.name === user.username 
+          && players && players.length > 1 && !gameStarted &&
+          <Button
+            onClick={() => {setGameStarted(true)}}
+            title="Start game"
+            color="#008000"
+            style={{border: '3px solid black',padding: "3px"}}>
+              Start game
+            </Button>
+          }
+
+          { (gameStarted || game != {} && game.playerCreator && game.playerCreator.name !== user.username) &&
         <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
-          { players && players.length > 1 &&
 
             <Button
-              onClick={() => {fetchCards()}}
-              title="Get Cards"
-              color="#008000"
-              style={{border: '3px solid black',padding: "3px"}}>
-                Get Cards
-              </Button>
-          }
-          <Button
-              onClick={() => {isFinished()}}
-              title="Finish?"
-              color="#008000"
-              style={{border: '3px solid black',padding: "3px"}}>
-                Finish?
-          </Button>
-        
-        {game != {} && game.playerCreator && game.playerCreator.name === user.username && (
-            <Button
-              onClick={() => {
-                gameLogic();
-              }}
-              title="Start Game"
-              color="#008000"
-              style={{ border: "3px solid black", padding: "3px" }}
-            >
-              Start Game
+                onClick={() => {isFinished()}}
+                title="Finish?"
+                color="#008000"
+                style={{border: '3px solid black',padding: "3px"}}>
+                  Finish?
             </Button>
-          )}
+          
             <Button
-              onClick={() => {
-                fetchIsMyTurn();
-              }}
+                onClick={() => {fetchCards()}}
+                title="Finish?"
+                color="#008000"
+                style={{border: '3px solid black',padding: "3px"}}>
+                  Get Cards
+            </Button>
+
+            <Button
+              onClick={() => {fetchIsMyTurn();}}
               title="Start Game"
               color="#008000"
-              style={{ border: "3px solid black", padding: "3px" }}
-            >
+              style={{ border: "3px solid black", padding: "3px" }}>
               checkTurn
             </Button>
-          { isMyTurn && <h2>Is your turn!</h2>}
-          {choosedCards.length === 2 && (
-            <Button
+            {choosedCards.length === 2 && (
+              <Button
               onClick={() => {
                 sendCards();
               }}
               title="Send Cards"
               color="#008000"
-              style={{ border: "3px solid black", padding: "3px" }}
-            >
-              Send Cards
-            </Button>
-          )}
+              style={{ border: "3px solid black", padding: "3px" }}>
+                Send Cards
+              </Button>
+            )}
 
+          { isMyTurn && <h2>Is your turn!</h2>}
+        </section>
+          }
             <Button
               onClick={() => {
                 fetchPlayers();
@@ -433,8 +441,6 @@ export default function GamePlay() {
             >
               Fetch players
             </Button>
-
-        </section>
         <section className="generalLayout" style={{display:"flex", flexDirection:"column"}}>
           <section>
             <Table>
@@ -445,6 +451,7 @@ export default function GamePlay() {
           </section>
           {cards.length != 0 && player && player.color &&
           <section className="cardDeckLayout">
+            Ronda: {game.round}
             <section className="cardDeckLayoutRow1" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[0].id} 
                     onClick={() => selectCard(1,cards[0])} color={getCardColor(1,cards[0])}/>
