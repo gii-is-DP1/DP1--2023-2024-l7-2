@@ -1,12 +1,9 @@
 package org.springframework.samples.petclinic.game;
 
-import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -15,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.card.Card;
-import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.cardDeck.CardDeckService;
 import org.springframework.samples.petclinic.dwarf.Dwarf;
 import org.springframework.samples.petclinic.dwarf.DwarfService;
@@ -23,13 +19,9 @@ import org.springframework.samples.petclinic.exceptions.ResourceNotFoundExceptio
 import org.springframework.samples.petclinic.mainboard.MainBoard;
 import org.springframework.samples.petclinic.mainboard.MainBoardService;
 import org.springframework.samples.petclinic.player.PlayereService;
-import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeck;
-import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.petclinic.player.Player;
-import org.springframework.samples.petclinic.player.PlayerDTO;
 import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.user.UserService;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -145,24 +137,24 @@ public class GameRestController {
     public ResponseEntity<List<Card>> getMainBoardCards(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
-        
+
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
         List<Card> cd = g.getMainBoard().getCards();
 
         return new ResponseEntity<>(cd, HttpStatus.OK);
-        /* 
-        // Si se ha acabado el mazo, se caba el juego
-        Card c = g.getMainBoard().getCardDeck().getLastCard();
-        Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
-        if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-            // Returns an empty list
-            return new ResponseEntity<>(List.of(), HttpStatus.OK);
-        }
-
-        List<Card> cd = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
-        */
+        /*
+         * // Si se ha acabado el mazo, se caba el juego
+         * Card c = g.getMainBoard().getCardDeck().getLastCard();
+         * Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
+         * if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
+         * // Returns an empty list
+         * return new ResponseEntity<>(List.of(), HttpStatus.OK);
+         * }
+         * 
+         * List<Card> cd = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
+         */
     }
 
     @PostMapping("/join/{code}")
@@ -287,28 +279,30 @@ public class GameRestController {
         Integer round = g.getRound();
 
         List<Dwarf> dwarves = g.getDwarves();
-        //ArrayList<Dwarf> res = new ArrayList<Dwarf>();
+        // ArrayList<Dwarf> res = new ArrayList<Dwarf>();
         dwarves = dwarves.stream().filter(d -> d.getRound() == round).toList();
-        /*dwarves.stream().forEach(d -> {
-            Player p = d.getPlayer();
-            /* 
-            if (p == null) {
-                List<Player> players = gs.getPlayers(g.getId()).get();
-               
-                for (Player tp: players){
-                    for (Dwarf td:tp.getDwarfs()) {
-                        if (td.getId() == d.getId()) {
-                            p = tp;
-                            break;
-                        }
-                    }
-                }
-            }
-            p.setGame(null);
-            //p.setDwarfs(null);
-            d.setPlayer(p);
-            res.add(d);
-        });*/
+        /*
+         * dwarves.stream().forEach(d -> {
+         * Player p = d.getPlayer();
+         * /*
+         * if (p == null) {
+         * List<Player> players = gs.getPlayers(g.getId()).get();
+         * 
+         * for (Player tp: players){
+         * for (Dwarf td:tp.getDwarfs()) {
+         * if (td.getId() == d.getId()) {
+         * p = tp;
+         * break;
+         * }
+         * }
+         * }
+         * }
+         * p.setGame(null);
+         * //p.setDwarfs(null);
+         * d.setPlayer(p);
+         * res.add(d);
+         * });
+         */
         return new ResponseEntity<>(dwarves, HttpStatus.OK);
     }
 
@@ -321,11 +315,12 @@ public class GameRestController {
             if (plys.isPresent()) {
 
                 /*
-                plys.get().forEach((p) -> {
-                    p.setDwarfs(null);
-                    p.setGame(null);
-                    res.add(p);
-                });*/
+                 * plys.get().forEach((p) -> {
+                 * p.setDwarfs(null);
+                 * p.setGame(null);
+                 * res.add(p);
+                 * });
+                 */
 
                 return new ResponseEntity<>(plys.get(), HttpStatus.OK);
             }
@@ -388,8 +383,6 @@ public class GameRestController {
         // tiene que terminar en 6 rondas
         if (g.getRound() >= 2)
             finished = true;
-        
-        
 
         return new ResponseEntity<>(finished, HttpStatus.OK);
     }
@@ -415,22 +408,23 @@ public class GameRestController {
         dwarf.setPlayer(p);
         dwarf.setRound(g.getRound());
         dwarf.setCards(cards);
-        
+
         System.out.println(cards);
 
         ds.saveDwarf(dwarf);
-        /* 
-        ArrayList<Dwarf> dwarflist = new ArrayList<Dwarf>();
-        dwarflist.addAll(p.getDwarfs());
-        dwarflist.add(dwarf);
-        ps.savePlayer(p)*/
+        /*
+         * ArrayList<Dwarf> dwarflist = new ArrayList<Dwarf>();
+         * dwarflist.addAll(p.getDwarfs());
+         * dwarflist.add(dwarf);
+         * ps.savePlayer(p)
+         */
 
         dwarves = g.getDwarves();
         dwarves.add(dwarf);
         if (dwarves.size() == plys.size()) {
             gs.updateMaterials(g);
 
-            for(Dwarf d: dwarves) {
+            for (Dwarf d : dwarves) {
                 d.setPlayer(null);
                 d.setCards(null);
                 ds.saveDwarf(d);
@@ -452,9 +446,8 @@ public class GameRestController {
                 cd.addAll(twoCards);
             }
 
-
-            for(Card ca: cd) {
-                for ( int i = 0 ; i < mbCards.size() ; i ++) {
+            for (Card ca : cd) {
+                for (int i = 0; i < mbCards.size(); i++) {
                     if (ca.getPosition().equals(mbCards.get(i).getPosition())) {
                         mbCards.set(i, ca);
                     }
@@ -467,16 +460,15 @@ public class GameRestController {
             g.setRound(g.getRound() + 1);
         }
         g.setDwarves(dwarves);
-        
+
         try {
             gs.saveGame(g);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             System.out.println(e.getMessage());
         }
 
         System.out.println(g.getDwarves());
-
 
         return new ResponseEntity<>(HttpStatus.OK);
 
