@@ -476,7 +476,7 @@ public class GameRestController {
 
     @PostMapping("/play/{code}/finish")
     public ResponseEntity<Void> finishGameSetWinner(@PathVariable("code") String code) {
-        
+
         Game g = gs.getGameByCode(code);
         if (g == null) {
             return ResponseEntity.notFound().build();

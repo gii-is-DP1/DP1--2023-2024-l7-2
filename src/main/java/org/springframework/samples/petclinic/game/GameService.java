@@ -95,7 +95,11 @@ public class GameService {
         Player playerWithMoreSteal = null;
 
         for (Player p : plys) {
-            if (playerWithMoreSteal == null) {
+            if (p.getSteal() == 0) {
+                continue;
+            }
+
+            if (playerWithMoreSteal == null && p.getSteal() > 0) {
                 playerWithMoreSteal = p;
                 continue;
             }
@@ -103,13 +107,18 @@ public class GameService {
                 playerWithMoreSteal = p;
             }
         }
-        totalScore.put(playerWithMoreSteal, totalScore.get(playerWithMoreSteal) + 1);
+        if (playerWithMoreSteal != null) {
+            totalScore.put(playerWithMoreSteal, totalScore.get(playerWithMoreSteal) + 1);
+        }
 
         // gold
 
         Player playerWithMoreGold = null;
         for (Player p : plys) {
-            if (playerWithMoreGold == null) {
+            if (p.getGold() == 0) {
+                continue;
+            }
+            if (playerWithMoreGold == null && p.getGold() > 0) {
                 playerWithMoreGold = p;
                 continue;
             }
@@ -117,7 +126,8 @@ public class GameService {
                 playerWithMoreGold = p;
             }
         }
-        totalScore.put(playerWithMoreGold, totalScore.get(playerWithMoreGold) + 1);
+        if (playerWithMoreGold != null)
+            totalScore.put(playerWithMoreGold, totalScore.get(playerWithMoreGold) + 1);
 
         Integer mayor = totalScore.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue)).get().getValue();
@@ -129,7 +139,10 @@ public class GameService {
             List<Player> plys1 = totalScore.entrySet().stream().filter(i -> i.getValue() == m).map(i -> i.getKey())
                     .toList();
             for (Player p : plys1) {
-                if (playerWithMoreIron == null) {
+                if (p.getIron() == 0) {
+                    continue;
+                }
+                if (playerWithMoreIron == null && p.getIron() > 0) {
                     playerWithMoreIron = p;
                     continue;
                 }
@@ -137,7 +150,9 @@ public class GameService {
                     playerWithMoreIron = p;
                 }
             }
-            totalScore.put(playerWithMoreIron, totalScore.get(playerWithMoreIron) + 1);
+            if (playerWithMoreIron != null) {
+                totalScore.put(playerWithMoreIron, totalScore.get(playerWithMoreIron) + 1);
+            }
         }
 
         mayor = totalScore.entrySet().stream()
@@ -150,7 +165,10 @@ public class GameService {
             List<Player> plys2 = totalScore.entrySet().stream().filter(i -> i.getValue() == m).map(i -> i.getKey())
                     .toList();
             for (Player p : plys2) {
-                if (playerWithMoreMedal == null) {
+                if (p.getMedal() == 0) {
+                    continue;
+                }
+                if (playerWithMoreMedal == null && p.getMedal() > 0) {
                     playerWithMoreMedal = p;
                     continue;
                 }
@@ -158,7 +176,9 @@ public class GameService {
                     playerWithMoreMedal = p;
                 }
             }
-            totalScore.put(playerWithMoreMedal, totalScore.get(playerWithMoreMedal) + 1);
+            if (playerWithMoreMedal != null) {
+                totalScore.put(playerWithMoreMedal, totalScore.get(playerWithMoreMedal) + 1);
+            }
         }
 
         Player p = totalScore.entrySet().stream()
