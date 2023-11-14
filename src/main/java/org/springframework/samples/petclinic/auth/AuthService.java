@@ -88,11 +88,11 @@ public class AuthService {
 			userService.saveUser(user);
 			Owner owner = new Owner();
 			owner.setFirstName(request.getFirstName());
-			owner.setLastName(request.getLastName());
-			owner.setAddress(request.getAddress());
-			owner.setCity(request.getCity());
-			owner.setTelephone(request.getTelephone());
-			owner.setClinic(clinicService.findClinicById(request.getClinic().getId()));
+			//owner.setLastName(request.getLastName());
+			//owner.setAddress(request.getAddress());
+			//owner.setCity(request.getCity());
+			//owner.setTelephone(request.getTelephone());
+			//owner.setClinic(clinicService.findClinicById(request.getClinic().getId()));
 			owner.setUser(user);
 			ownerService.saveOwner(owner);
 
