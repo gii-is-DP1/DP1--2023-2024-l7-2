@@ -1,7 +1,5 @@
 package org.springframework.samples.petclinic.game;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +16,6 @@ import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import jakarta.validation.Valid;
 
 @Service
 public class GameService {
@@ -96,13 +90,13 @@ public class GameService {
         Optional<List<Player>> plys_optional = getPlayers(g.getId());
         List<Player> plys = plys_optional.get();
 
-        Map<Player, Integer> totalScore = new HashMap<Player,Integer>();
+        Map<Player, Integer> totalScore = new HashMap<Player, Integer>();
         plys.stream().forEach(p -> totalScore.put(p, 0));
 
         // steal
-        Player playerWithMoreSteal = null ;
+        Player playerWithMoreSteal = null;
 
-        for (Player p: plys) {
+        for (Player p : plys) {
             if (playerWithMoreSteal == null) {
                 playerWithMoreSteal = p;
                 continue;
@@ -116,7 +110,7 @@ public class GameService {
         // gold
 
         Player playerWithMoreGold = null;
-        for (Player p: plys) {
+        for (Player p : plys) {
             if (playerWithMoreGold == null) {
                 playerWithMoreGold = p;
                 continue;
@@ -128,9 +122,9 @@ public class GameService {
         totalScore.put(playerWithMoreGold, totalScore.get(playerWithMoreGold) + 1);
 
         // iron
-        
+
         Player playerWithMoreIron = null;
-        for (Player p: plys) {
+        for (Player p : plys) {
             if (playerWithMoreIron == null) {
                 playerWithMoreIron = p;
                 continue;
@@ -142,9 +136,9 @@ public class GameService {
         totalScore.put(playerWithMoreIron, totalScore.get(playerWithMoreIron) + 1);
 
         // medal
-        
+
         Player playerWithMoreMedal = null;
-        for (Player p: plys) {
+        for (Player p : plys) {
             if (playerWithMoreMedal == null) {
                 playerWithMoreMedal = p;
                 continue;
