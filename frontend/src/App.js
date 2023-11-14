@@ -120,6 +120,7 @@ function App() {
           <Route path="/achievements/:achievementId" exact={true} element={<PrivateRoute><AchievementEdit/></PrivateRoute>} />
           <Route path="/game/" exact={true} element={<PrivateRoute><GameList/></PrivateRoute>} />
           <Route path="/game/edit/:gameId" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
+          <Route path="/game/edit/" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
           <Route path="/card" exact={true} element={<PrivateRoute><CardViewer/></PrivateRoute>} />
           <Route path="/cards" exact={true} element={<PrivateRoute><CardList/></PrivateRoute>}/>
           <Route path="/rules" exact={true} element={<PrivateRoute><RulesText/></PrivateRoute>}/>

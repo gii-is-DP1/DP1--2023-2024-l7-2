@@ -7,7 +7,7 @@ import tokenService from "../services/token.service";
 
 const jwt = tokenService.getLocalAccessToken();
 
-export default function Home(){
+export default function EndGame(){
 
     const code = getIdFromUrl(2);
     console.log(code)

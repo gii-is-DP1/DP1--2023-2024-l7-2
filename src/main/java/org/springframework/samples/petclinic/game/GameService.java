@@ -5,11 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.dwarf.Dwarf;
 import org.springframework.samples.petclinic.player.Player;
@@ -121,39 +119,63 @@ public class GameService {
         }
         totalScore.put(playerWithMoreGold, totalScore.get(playerWithMoreGold) + 1);
 
-        // iron
+        Integer mayor = totalScore.entrySet().stream()
+                .max(Comparator.comparingInt(Map.Entry::getValue)).get().getValue();
 
-        Player playerWithMoreIron = null;
-        for (Player p : plys) {
-            if (playerWithMoreIron == null) {
-                playerWithMoreIron = p;
-                continue;
+        // iron
+        if (hayEmpate(totalScore.values().stream().toList(), mayor) == true) {
+            Player playerWithMoreIron = null;
+            Integer m = mayor;
+            List<Player> plys1 = totalScore.entrySet().stream().filter(i -> i.getValue() == m).map(i -> i.getKey())
+                    .toList();
+            for (Player p : plys1) {
+                if (playerWithMoreIron == null) {
+                    playerWithMoreIron = p;
+                    continue;
+                }
+                if (p.getIron() > playerWithMoreIron.getIron()) {
+                    playerWithMoreIron = p;
+                }
             }
-            if (p.getIron() > playerWithMoreIron.getIron()) {
-                playerWithMoreIron = p;
-            }
+            totalScore.put(playerWithMoreIron, totalScore.get(playerWithMoreIron) + 1);
         }
-        totalScore.put(playerWithMoreIron, totalScore.get(playerWithMoreIron) + 1);
+
+        mayor = totalScore.entrySet().stream()
+                .max(Comparator.comparingInt(Map.Entry::getValue)).get().getValue();
 
         // medal
-
-        Player playerWithMoreMedal = null;
-        for (Player p : plys) {
-            if (playerWithMoreMedal == null) {
-                playerWithMoreMedal = p;
-                continue;
+        if (hayEmpate(totalScore.values().stream().toList(), mayor) == true) {
+            Player playerWithMoreMedal = null;
+            Integer m = mayor;
+            List<Player> plys2 = totalScore.entrySet().stream().filter(i -> i.getValue() == m).map(i -> i.getKey())
+                    .toList();
+            for (Player p : plys2) {
+                if (playerWithMoreMedal == null) {
+                    playerWithMoreMedal = p;
+                    continue;
+                }
+                if (p.getIron() > playerWithMoreMedal.getIron()) {
+                    playerWithMoreMedal = p;
+                }
             }
-            if (p.getIron() > playerWithMoreMedal.getIron()) {
-                playerWithMoreMedal = p;
-            }
+            totalScore.put(playerWithMoreMedal, totalScore.get(playerWithMoreMedal) + 1);
         }
-        totalScore.put(playerWithMoreMedal, totalScore.get(playerWithMoreMedal) + 1);
 
         Player p = totalScore.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey).orElse(null);
 
         return p;
+    }
+
+    private Boolean hayEmpate(List<Integer> lista, Integer mayor) {
+        Integer cont = 0;
+        for (int i : lista) {
+            if (lista.get(i).equals(mayor)) {
+                cont++; // Hay elementos duplicados
+            }
+        }
+        return cont >= 2;
     }
 
     @Transactional
