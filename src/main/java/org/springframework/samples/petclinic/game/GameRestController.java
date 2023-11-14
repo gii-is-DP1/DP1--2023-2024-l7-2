@@ -1,9 +1,12 @@
 package org.springframework.samples.petclinic.game;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -23,8 +26,10 @@ import org.springframework.samples.petclinic.player.PlayereService;
 import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeck;
 import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.player.PlayerDTO;
 import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.user.UserService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,14 +100,14 @@ public class GameRestController {
     public ResponseEntity<Void> getGameByCode(@PathVariable("code") String code) {
         Game g = null;
         try {
-         g = gs.getGameByCode(code);
+            g = gs.getGameByCode(code);
 
-        if (g == null) {
-            return ResponseEntity.notFound().build();
+            if (g == null) {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            System.out.println("Exception =>" + e);
         }
-        } catch(Exception e) {
-            System.out.println("Exception =>"+e);
-        } 
 
         return ResponseEntity.ok().build();
     }
@@ -115,6 +120,8 @@ public class GameRestController {
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
+
+        g.setDwarves(null);
 
         return new ResponseEntity<>(g, HttpStatus.OK);
     }
@@ -135,15 +142,27 @@ public class GameRestController {
     }
 
     @GetMapping("/play/{code}/getCards")
-    public ResponseEntity<List<Card>> getTwoCards(@PathVariable("code") String code) {
-        Game g = gs.getGameByCode(code);
+    public ResponseEntity<List<Card>> getMainBoardCards(@PathVariable("code") String code) {
 
+        Game g = gs.getGameByCode(code);
+        
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
+        List<Card> cd = g.getMainBoard().getCards();
+
+        return new ResponseEntity<>(cd, HttpStatus.OK);
+        /* 
+        // Si se ha acabado el mazo, se caba el juego
+        Card c = g.getMainBoard().getCardDeck().getLastCard();
+        Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
+        if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
+            // Returns an empty list
+            return new ResponseEntity<>(List.of(), HttpStatus.OK);
+        }
 
         List<Card> cd = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
-        return new ResponseEntity<>(cd, HttpStatus.OK);
+        */
     }
 
     @PostMapping("/join/{code}")
@@ -161,8 +180,6 @@ public class GameRestController {
             colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
             Collections.shuffle(colours);
 
-            
-
             if (g == null || u == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -172,6 +189,10 @@ public class GameRestController {
             p.setName(u.getUsername());
             p.setGame(g);
             p.setUser(u);
+            p.setSteal(0);
+            p.setGold(0);
+            p.setIron(0);
+            p.setMedal(0);
             ps.savePlayer(p);
         } else {
             System.out.println("This player already in game");
@@ -191,7 +212,7 @@ public class GameRestController {
         Collections.shuffle(colours);
 
         Optional<List<Player>> players = gs.getPlayers(id);
-        if (players.isEmpty()){
+        if (players.isEmpty()) {
             return colours.get(0);
         }
 
@@ -204,32 +225,36 @@ public class GameRestController {
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
         try {
 
-        User u = us.findCurrentUser();
+            User u = us.findCurrentUser();
 
-        MainBoard mb = mbs.initialize();
-        g.setMainBoard(mb);
+            MainBoard mb = mbs.initialize();
+            g.setMainBoard(mb);
 
-        Player p = new Player();
-        p.setColor(getRandomColor(g.getId()));
-        p.setName(u.getUsername());
-        //p.setGame(g);
-        p.setUser(u);
-        ps.savePlayer(p);
+            Player p = new Player();
+            p.setColor(getRandomColor(g.getId()));
+            p.setName(u.getUsername());
+            // p.setGame(g);
+            p.setUser(u);
+            p.setSteal(0);
+            p.setGold(0);
+            p.setIron(0);
+            p.setMedal(0);
+            ps.savePlayer(p);
 
-        // Si no se hace asi da error porque
-        // al guardarse el game en player, el game todavia no existe
-        // y si se asigna a game el player, el player todavia no existe
+            // Si no se hace asi da error porque
+            // al guardarse el game en player, el game todavia no existe
+            // y si se asigna a game el player, el player todavia no existe
 
-        g.setPlayerCreator(p);
-        gs.saveGame(g);
+            g.setPlayerCreator(p);
+            gs.saveGame(g);
 
-        p.setGame(g);
-        ps.savePlayer(p);
-        } catch(Exception e) {
-            System.out.println("Exception =>"+e);
-            System.out.println("Exception =>"+e.getMessage());
+            p.setGame(g);
+            ps.savePlayer(p);
+        } catch (Exception e) {
+            System.out.println("Exception =>" + e);
+            System.out.println("Exception =>" + e.getMessage());
         }
-    
+
         g.setMainBoard(null);
 
         return new ResponseEntity<>(g, HttpStatus.CREATED);
@@ -250,9 +275,8 @@ public class GameRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/play/{code}/dwarves/{round}")
-    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("code") String code,
-            @PathVariable("round") Integer round) {
+    @GetMapping("/play/{code}/dwarves")
+    public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
 
@@ -260,8 +284,31 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
+        Integer round = g.getRound();
+
         List<Dwarf> dwarves = g.getDwarves();
+        //ArrayList<Dwarf> res = new ArrayList<Dwarf>();
         dwarves = dwarves.stream().filter(d -> d.getRound() == round).toList();
+        /*dwarves.stream().forEach(d -> {
+            Player p = d.getPlayer();
+            /* 
+            if (p == null) {
+                List<Player> players = gs.getPlayers(g.getId()).get();
+               
+                for (Player tp: players){
+                    for (Dwarf td:tp.getDwarfs()) {
+                        if (td.getId() == d.getId()) {
+                            p = tp;
+                            break;
+                        }
+                    }
+                }
+            }
+            p.setGame(null);
+            //p.setDwarfs(null);
+            d.setPlayer(p);
+            res.add(d);
+        });*/
         return new ResponseEntity<>(dwarves, HttpStatus.OK);
     }
 
@@ -272,6 +319,14 @@ public class GameRestController {
         if (g != null) {
             Optional<List<Player>> plys = gs.getPlayers(g.getId());
             if (plys.isPresent()) {
+
+                /*
+                plys.get().forEach((p) -> {
+                    p.setDwarfs(null);
+                    p.setGame(null);
+                    res.add(p);
+                });*/
+
                 return new ResponseEntity<>(plys.get(), HttpStatus.OK);
             }
         }
@@ -304,7 +359,6 @@ public class GameRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-
         List<Dwarf> dwarves = g.getDwarves();
         dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
 
@@ -313,7 +367,6 @@ public class GameRestController {
 
         ArrayList<Player> players_mutable = new ArrayList<Player>();
         players_mutable.addAll(plys);
-
 
         players_mutable.removeAll(dwarves_players);
 
@@ -326,6 +379,21 @@ public class GameRestController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    @GetMapping("/play/{code}/isFinished")
+    public ResponseEntity<Boolean> endGame(@PathVariable("code") String code) {
+        // FALTA CONDICIÓN DE OBJETOS
+        Boolean finished = false;
+        Game g = gs.getGameByCode(code);
+
+        // tiene que terminar en 6 rondas
+        if (g.getRound() >= 2)
+            finished = true;
+        
+        
+
+        return new ResponseEntity<>(finished, HttpStatus.OK);
+    }
+
     @PostMapping("/play/{code}/dwarves")
     public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code) {
 
@@ -334,20 +402,112 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
+
+        Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
+        List<Player> plys = plys_optional.get();
+
         Dwarf dwarf = new Dwarf();
-        dwarf.setPlayer(ps.getPlayerByUserAndGame(us.findCurrentUser(), g));
+        Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
+        System.out.println(p);
+
+        dwarf.setPlayer(p);
         dwarf.setRound(g.getRound());
         dwarf.setCards(cards);
+        
+        System.out.println(cards);
 
         ds.saveDwarf(dwarf);
+        /* 
+        ArrayList<Dwarf> dwarflist = new ArrayList<Dwarf>();
+        dwarflist.addAll(p.getDwarfs());
+        dwarflist.add(dwarf);
+        ps.savePlayer(p)*/
 
-        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = g.getDwarves();
         dwarves.add(dwarf);
-        gs.saveGame(g);
+        if (dwarves.size() == plys.size()) {
+            gs.updateMaterials(g);
+
+            for(Dwarf d: dwarves) {
+                d.setPlayer(null);
+                d.setCards(null);
+                ds.saveDwarf(d);
+                ds.deleteDwarf(d);
+            }
+            dwarves = null;
+
+            MainBoard mb = g.getMainBoard();
+            ArrayList<Card> mbCards = new ArrayList<Card>();
+            mbCards.addAll(mb.getCards());
+
+            Card c = g.getMainBoard().getCardDeck().getLastCard();
+            Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
+            ArrayList<Card> cd = new ArrayList<Card>();
+            if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
+                // Returns an empty list
+            } else {
+                List<Card> twoCards = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
+                cd.addAll(twoCards);
+            }
+
+
+            for(Card ca: cd) {
+                for ( int i = 0 ; i < mbCards.size() ; i ++) {
+                    if (ca.getPosition().equals(mbCards.get(i).getPosition())) {
+                        mbCards.set(i, ca);
+                    }
+                }
+            }
+
+            mb.setCards(mbCards);
+            mbs.saveMainBoard(mb);
+
+            g.setRound(g.getRound() + 1);
+        }
+        g.setDwarves(dwarves);
+        
+        try {
+            gs.saveGame(g);
+        }catch (Exception e) {
+            System.out.println(e);
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println(g.getDwarves());
+
 
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
-}
+    @PostMapping("/play/{code}/finish")
+    public ResponseEntity<Void> finishGameSetWinner(@PathVariable("code") String code) {
+        
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            return ResponseEntity.notFound().build();
+        }
 
+        g.setFinish(LocalDateTime.now());
+
+        Player p = gs.getGameWinner(g);
+        System.out.println(p);
+
+        g.setWinner_id(p.getId());
+
+        gs.saveGame(g);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/play/{code}/winner")
+    public ResponseEntity<Player> getWinner(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(ps.getById(g.getWinner_id()), HttpStatus.OK);
+    }
+
+}

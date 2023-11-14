@@ -24,14 +24,16 @@ public class CardRepositoryTest {
    public void testFindAll() {
        Card card = new Card();
        card.setName("Test Card");
-       card.setId(2);
+       card.setDescription("sample description");
+       card.setPosition(2);
+       cardRepository.save(card);
        List<Card> cards = cardRepository.findAll();
        assertThat(cards.size()).isGreaterThan(0);
    }
 
    @Test
    public void testFindByName() {
-       Card foundCard = cardRepository.findByName("Test Card");
-       assertThat(foundCard.getName()).isEqualTo("Test Card");
+       List<Card> foundCard = cardRepository.findByName("Alloy Steel");
+       assertThat(foundCard.size()).isGreaterThan(0);
    }
 }

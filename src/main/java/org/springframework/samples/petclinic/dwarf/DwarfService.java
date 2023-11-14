@@ -22,7 +22,7 @@ public class DwarfService {
     }
 
     @Transactional(readOnly = true)
-    List<Dwarf> getDwarfs() {
+    public List<Dwarf> getDwarfs() {
         return repo.findAll();
     }
 
@@ -43,5 +43,8 @@ public class DwarfService {
         return repo.findByColor(color);
     }*/
 
+    public void deleteDwarf(Dwarf d) {
+        repo.delete(d);
+    }
     
 }

@@ -3,10 +3,12 @@ package org.springframework.samples.petclinic.mainboard;
 import java.util.List;
 
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
+import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.samples.petclinic.specialCardDeck.SpecialCardDeck;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -24,4 +26,7 @@ public class MainBoard extends BaseEntity{
 
     @OneToMany
     private List<SpecialCardDeck> specialCardDecks;
+
+    @ManyToMany
+    private List<Card> cards;
 }

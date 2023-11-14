@@ -67,7 +67,7 @@ INSERT INTO types(id,name)  VALUES (5, 'bird');
 INSERT INTO types(id,name)  VALUES (6, 'hamster');
 INSERT INTO types(id,name)  VALUES (7, 'turtle');
 
-INSERT INTO owners(id, first_name, last_name, address, city, telephone, user_id, clinic) VALUES (1, 'George', 'Franklin', '110 W. Liberty St.', 'Sevilla', '608555103', 4, 1);
+INSERT INTO	owners(id, first_name, last_name, address, city, telephone, user_id, clinic) VALUES (1, 'George', 'Franklin', '110 W. Liberty St.', 'Sevilla', '608555103', 4, 1);
 INSERT INTO owners(id, first_name, last_name, address, city, telephone, user_id, clinic) VALUES (2, 'Betty', 'Davis', '638 Cardinal Ave.', 'Sevilla', '608555174', 5, 1);
 INSERT INTO owners(id, first_name, last_name, address, city, telephone, user_id, clinic) VALUES (3, 'Eduardo', 'Rodriquez', '2693 Commerce St.', 'Sevilla', '608558763', 6, 1);
 INSERT INTO owners(id, first_name, last_name, address, city, telephone, user_id, clinic) VALUES (4, 'Harold', 'Davis', '563 Friendly St.', 'Sevilla', '608555319', 7, 2);
@@ -110,6 +110,21 @@ INSERT INTO visits(id,pet_id,visit_date_time,description,vet_id) VALUES (6, 1, '
 INSERT INTO visits(id,pet_id,visit_date_time,description,vet_id) VALUES (7, 1, '2020-01-02 15:30', 'rabies shot', 1);
 INSERT INTO visits(id,pet_id,visit_date_time,description,vet_id) VALUES (8, 2, '2013-01-03 9:45', 'neutered', 2);
 INSERT INTO visits(id,pet_id,visit_date_time,description,vet_id) VALUES (9, 3, '2013-01-04 17:30', 'spayed', 3);
+
+INSERT INTO consultations(id,title, is_clinic_comment,status,owner_id,pet_id,creation_date) VALUES (1, 'Consultation about vaccines', 0, 'ANSWERED', 1, 1, '2023-01-04 17:30');
+INSERT INTO consultations(id,title, is_clinic_comment,status,owner_id,pet_id,creation_date) VALUES (2, 'My dog gets really nervous', 0, 'PENDING', 1, 1, '2022-01-02 19:30');
+INSERT INTO consultations(id,title, is_clinic_comment,status,owner_id,pet_id,creation_date) VALUES (3, 'My cat does not eat', 0, 'PENDING', 2, 2, '2023-04-11 11:20');
+INSERT INTO consultations(id,title, is_clinic_comment,status,owner_id,pet_id,creation_date) VALUES (4, 'My lovebird does not sing', 0, 'CLOSED', 2, 2, '2023-02-24 10:30');
+INSERT INTO consultations(id,title, is_clinic_comment,status,owner_id,pet_id,creation_date) VALUES (5, 'My snake has layed eggs', 0, 'PENDING', 10, 12, '2023-04-11 11:20');
+
+INSERT INTO consultation_tickets(id,description,creation_date, user_id, consultation_id) VALUES (1, 'What vaccine should my dog receive?', '2023-01-04 17:32', 4, 1);
+INSERT INTO consultation_tickets(id,description,creation_date, user_id, consultation_id) VALUES (2, 'Rabies'' one.', '2023-01-04 17:36', 14, 1);
+INSERT INTO consultation_tickets(id,description,creation_date, user_id, consultation_id) VALUES (3, 'My dog gets really nervous during football matches. What should I do?', '2022-01-02 19:31', 4, 2);
+INSERT INTO consultation_tickets(id,description,creation_date, user_id, consultation_id) VALUES (4, 'It also happens with tennis matches.', '2022-01-02 19:33', 4, 2);
+INSERT INTO consultation_tickets(id,description,creation_date, user_id, consultation_id) VALUES (5, 'My cat han''t been eating his fodder.', '2023-04-11 11:30', 5, 3);
+INSERT INTO consultation_tickets(id,description,creation_date, user_id, consultation_id) VALUES (6, 'Try to give him some tuna to check if he eats that.', '2023-04-11 15:20', 15, 3);
+INSERT INTO consultation_tickets(id,description,creation_date, user_id, consultation_id) VALUES (7, 'My lovebird doesn''t sing as my neighbour''s one.', '2023-02-24 12:30', 5, 4);
+INSERT INTO consultation_tickets(id,description,creation_date, user_id, consultation_id) VALUES (8, 'Lovebirds do not sing.', '2023-02-24 18:30', 16, 4);
 
 INSERT INTO achievement(id,name,description,total_iron,total_gold,total_steal,total_objects,total_matches,total_victories) 
                         VALUES (1,'sample','sample achievement',10,9,8,7,6,5);
@@ -178,8 +193,7 @@ INSERT INTO card(id, name, description, position, card_type_id, total_iron, tota
                         (51,'Forge Armour','Return 2 steel and 1 gold to the supply then take 1 item.',6, 3,0,-1,-2,0),
                         (52,'Get Help','You may place 2 additional workers this round. If you are 1st player, pass the 1st player marker to your left.',7, 1,0,0,0,0),
                         (53,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',8, 2,0,0,0,1),
-                        (54,'Alloy Steel','Return 3 to the iron supply then take 2 steel',9, 4,-3,0,2,0),
-                        (55,'Test Card','Test Description',10,4,2,4,5,1);
+                        (54,'Alloy Steel','Return 3 to the iron supply then take 2 steel',9, 4,-3,0,2,0);
 
 
 INSERT INTO special_card(id, name, description) 
@@ -205,7 +219,7 @@ INSERT INTO special_card(id, name, description)
 INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,null,null,null,null,null),
         (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1),
         (3,'super cool game', null,'2023-04-11 18:20','2023-04-11 19:20', 2, null); 
-
+/*
 INSERT INTO card_deck(id, card_id) VALUES (1,1);
 
 INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,22),(1,33),(1,14),(1,25),(1,36),(1,37),(1,38),(1,9),(1,10),
@@ -224,6 +238,6 @@ INSERT INTO main_board_special_card_decks(main_board_id, special_card_decks_id) 
 
 INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1);
 
-
+*/
 
 
