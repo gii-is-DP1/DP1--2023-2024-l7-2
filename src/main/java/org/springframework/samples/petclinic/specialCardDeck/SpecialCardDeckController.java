@@ -9,6 +9,7 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.SpecialCard;
 import org.springframework.samples.petclinic.cardDeck.CardDeck;
 import org.springframework.samples.petclinic.exceptions.BadRequestException;
+import org.springframework.samples.petclinic.exceptions.ResourceNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,12 +44,17 @@ public class SpecialCardDeckController {
     @GetMapping("/{id}")
     public ResponseEntity<SpecialCardDeck> getSpecialCardDeckById(@PathVariable("id") Integer id) {
         SpecialCardDeck scd = scds.getSpecialCardDeckById(id);
+        if(scd == null)
+            throw new ResourceNotFoundException("No encuentro el cardDeck que me has pedido con id:"+id);
         return new ResponseEntity<>(scd, HttpStatus.OK);
+
     }
 
     @GetMapping("/getSpecialCard/{id}")
     public ResponseEntity<SpecialCard> getSpecialCard(@PathVariable("id") Integer id) {
         SpecialCard scd = scds.getSpecialCard(id);
+        if(scd == null)
+            throw new ResourceNotFoundException("No encuentro el cardDeck que me has pedido con id:"+id);
         return new ResponseEntity<>(scd, HttpStatus.OK);
     }
 
@@ -65,7 +71,9 @@ public class SpecialCardDeckController {
 
     @PutMapping("/{id}")
     public ResponseEntity<SpecialCardDeck> updateSpecialCardDeck(@PathVariable("id") int id,
-            @Valid @RequestBody SpecialCardDeck specialcardDeck) {
+            @Valid @RequestBody SpecialCardDeck specialcardDeck, BindingResult br) {
+                if(br.hasErrors())
+                throw new BadRequestException(br.getAllErrors());
         SpecialCardDeck updatedSpecialCardDeck = scds.updateSpecialCardDeck(specialcardDeck, id);
         return new ResponseEntity<>(updatedSpecialCardDeck, HttpStatus.OK);
     }
