@@ -14,6 +14,8 @@ import org.springframework.samples.petclinic.exceptions.ResourceNotFoundExceptio
 import org.springframework.samples.petclinic.pet.Pet;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.user.User;
+import org.springframework.samples.petclinic.util.RestPreconditions;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,8 +50,10 @@ public class CardDeckController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CardDeck> getCardDeckById(@PathVariable("id") Integer id) {
+    public ResponseEntity<CardDeck> getCardDeckById(@PathVariable("id") @Valid Integer id){
         CardDeck cd = cds.getCardDeckById(id);
+        if(cd == null)
+            throw new ResourceNotFoundException("No encuentro el cardDeck que me has pedido con id:"+id);
         return new ResponseEntity<>(cd, HttpStatus.OK);
     }
 
@@ -65,7 +69,9 @@ public class CardDeckController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CardDeck> updateCardDeck(@PathVariable("id") int id, @Valid @RequestBody CardDeck cardDeck) {
+    public ResponseEntity<CardDeck> updateCardDeck(@PathVariable("id") @Valid int id, @Valid @RequestBody CardDeck cardDeck, BindingResult br) {
+        if(br.hasErrors())
+			throw new BadRequestException(br.getAllErrors());
         CardDeck updatedCardDeck = cds.updateCardDeck(cardDeck, id);
         return new ResponseEntity<>(updatedCardDeck, HttpStatus.OK);
     }
