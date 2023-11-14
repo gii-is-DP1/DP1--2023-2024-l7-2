@@ -25,10 +25,8 @@ public class SignupRequest {
 	@NotBlank
 	private String firstName;
 	
-	@NotBlank
 	private String lastName;
 	
-	@NotBlank
 	private String city;
 	//Owner
 

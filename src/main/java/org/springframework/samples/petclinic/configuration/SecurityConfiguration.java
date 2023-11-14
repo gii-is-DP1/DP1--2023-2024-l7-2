@@ -74,14 +74,14 @@ public class SecurityConfiguration {
 						.hasAuthority(ADMIN)
 
 						.requestMatchers("/api/v1/plan").hasAuthority("OWNER")
-						.requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/users/**")).hasAuthority(ADMIN)
+						.requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/users/**")).permitAll()
 						.requestMatchers("/api/v1/clinicOwners/all").hasAuthority(ADMIN)
 						.requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/clinicOwners/**"))
 						.hasAnyAuthority(ADMIN, CLINIC_OWNER)
 						.requestMatchers(
 								AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/v1/consultations/**"))
 						.hasAuthority(ADMIN)
-						.requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/owners/**")).hasAuthority(ADMIN)
+						.requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/owners/**")).permitAll()
 						.requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/visits/**")).authenticated()
 						.requestMatchers(HttpMethod.GET, "/api/v1/pets/stats").hasAuthority(ADMIN)
 						.requestMatchers("/api/v1/pets").authenticated()
