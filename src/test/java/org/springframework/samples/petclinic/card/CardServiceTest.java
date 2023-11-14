@@ -1,54 +1,73 @@
 package org.springframework.samples.petclinic.card;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@SpringBootTest
+@Transactional
 public class CardServiceTest {
 
-  @Autowired
-  private TestEntityManager entityManager;
+    @Autowired
+    private CardService cardService;
 
-  @Autowired
-  private CardService cardService;
+    @Test
+    public void testGetCards() {
+        List<Card> cards = cardService.getCards();
+        assertNotNull(cards);
+        
+    }
 
-  @Test
-  public void testGetCards() {
+    @Test
+    public void testGetById() {
+        
+        Card existingCard = cardService.getCards().get(0);
+
+        Card retrievedCard = cardService.getById(existingCard.getId());
+        assertNotNull(retrievedCard);
+        assertEquals(existingCard.getId(), retrievedCard.getId());
       
-      Card card = new Card();
-      card.setName("Test Card");
-      entityManager.persist(card);
-      entityManager.flush();
+    }
 
-      
-      List<Card> cards = cardService.getCards();
+    @Test
+    public void testSaveCard() {
+        Card newCard = new Card();
+        
 
-      
-      assertThat(cards.size()).isGreaterThan(0);
-  }
+        Card savedCard = cardService.saveCard(newCard);
 
-  @Test
-  public void testGetById() {
-      // Guarda una tarjeta en la base de datos
-      Card card = new Card();
-      card.setName("Test Card");
-      entityManager.persist(card);
-      entityManager.flush();
+        assertNotNull(savedCard.getId());
+        
+    }
 
-     
-      Card foundCard = cardService.getById(card.getId());
+    @Test
+    public void testDeleteCardById() {
+        
+        Card existingCard = cardService.getCards().get(0);
+        int existingCardId = existingCard.getId();
 
-      // Verifica que la tarjeta encontrada es la correcta
-      assertThat(foundCard.getName()).isEqualTo("Test Card");
-  }
+        cardService.deleteCardById(existingCardId);
 
-  // Puedes agregar pruebas similares para los otros métodos en CardService
+        assertNull(cardService.getById(existingCardId));
+    }
+
+    @Test
+    public void testGetCardByName() {
+        
+        Card existingCard = cardService.getCards().get(0);
+        String cardName = existingCard.getName();
+
+        Card retrievedCard = cardService.getCardByName(cardName);
+
+        assertNotNull(retrievedCard);
+        assertEquals(cardName, retrievedCard.getName());
+       
+    }
 }
