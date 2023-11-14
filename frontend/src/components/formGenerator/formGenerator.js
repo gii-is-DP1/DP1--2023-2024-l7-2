@@ -60,7 +60,7 @@ const FormGenerator = forwardRef((props, ref) => {
   function handleSubmit(e) {
     e.preventDefault();
     let formValuesCopy = {};
-
+    console.log(formInputs)
     for (let i = 0; i < props.inputs.length; i++) {
       let input = props.inputs[i];
       if (input.type === "files") {
