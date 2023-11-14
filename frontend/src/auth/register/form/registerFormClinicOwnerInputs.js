@@ -18,19 +18,19 @@ export const registerFormClinicOwnerInputs = [
     validators: [formValidators.notEmptyValidator],
   },
   {
-    tag: "First Name",
+    tag: "Name",
     name: "firstName",
     type: "text",
     defaultValue: "",
     isRequired: true,
     validators: [formValidators.notEmptyValidator],
   },
-  {
+  /*{
     tag: "Last Name",
     name: "lastName",
     type: "text",
     defaultValue: "",
     isRequired: true,
     validators: [formValidators.notEmptyValidator],
-  },
+  },*/
 ];
