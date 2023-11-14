@@ -73,6 +73,9 @@ function AppNavbar() {
                     <NavItem>
                         <NavLink style={{ color: "white" }} tag={Link} to="/rules">Rules</NavLink>
                     </NavItem>
+                    <NavItem>
+                        <NavLink style={{ color: "white" }} tag={Link} to="/user">My profile</NavLink>
+                    </NavItem>
                     
                     
                 </>
