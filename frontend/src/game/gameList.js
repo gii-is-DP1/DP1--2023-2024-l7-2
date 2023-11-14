@@ -35,7 +35,7 @@ export default function GameList() {
                   color="primary"
                   aria-label={"edit-" + game.name}
                   tag={Link}
-                  to={"/games/" + game.id}
+                  to={"/game/edit/" + game.id}
                 >
                     <Link to={`/game/edit/${game.id}`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
                 </Button>
@@ -85,9 +85,9 @@ export default function GameList() {
         <h1 className="text-center">Games</h1>        
         {modal}
         <div className="float-right">
-          <Button color="success" tag={Link} to="/games/new">
-            Add Game
-          </Button>
+        <Button className="btn btn-dark btn-lg" outline color="warning" size="lg">
+            <Link to={`/game/edit/new`} style={{ color: 'rgb(238, 191, 47)'}}> Add Create </Link>
+        </Button>
         </div>
         <div>
           <Table aria-label="gamess" className="mt-4">

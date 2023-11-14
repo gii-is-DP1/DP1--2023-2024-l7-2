@@ -1,27 +1,19 @@
 package org.springframework.samples.petclinic.game;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.dwarf.Dwarf;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import jakarta.validation.Valid;
 
 @Service
 public class GameService {
@@ -96,14 +88,18 @@ public class GameService {
         Optional<List<Player>> plys_optional = getPlayers(g.getId());
         List<Player> plys = plys_optional.get();
 
-        Map<Player, Integer> totalScore = new HashMap<Player,Integer>();
+        Map<Player, Integer> totalScore = new HashMap<Player, Integer>();
         plys.stream().forEach(p -> totalScore.put(p, 0));
 
         // steal
-        Player playerWithMoreSteal = null ;
+        Player playerWithMoreSteal = null;
 
-        for (Player p: plys) {
-            if (playerWithMoreSteal == null) {
+        for (Player p : plys) {
+            if (p.getSteal() == 0) {
+                continue;
+            }
+
+            if (playerWithMoreSteal == null && p.getSteal() > 0) {
                 playerWithMoreSteal = p;
                 continue;
             }
@@ -111,13 +107,18 @@ public class GameService {
                 playerWithMoreSteal = p;
             }
         }
-        totalScore.put(playerWithMoreSteal, totalScore.get(playerWithMoreSteal) + 1);
+        if (playerWithMoreSteal != null) {
+            totalScore.put(playerWithMoreSteal, totalScore.get(playerWithMoreSteal) + 1);
+        }
 
         // gold
 
         Player playerWithMoreGold = null;
-        for (Player p: plys) {
-            if (playerWithMoreGold == null) {
+        for (Player p : plys) {
+            if (p.getGold() == 0) {
+                continue;
+            }
+            if (playerWithMoreGold == null && p.getGold() > 0) {
                 playerWithMoreGold = p;
                 continue;
             }
@@ -125,41 +126,76 @@ public class GameService {
                 playerWithMoreGold = p;
             }
         }
-        totalScore.put(playerWithMoreGold, totalScore.get(playerWithMoreGold) + 1);
+        if (playerWithMoreGold != null)
+            totalScore.put(playerWithMoreGold, totalScore.get(playerWithMoreGold) + 1);
+
+        Integer mayor = totalScore.entrySet().stream()
+                .max(Comparator.comparingInt(Map.Entry::getValue)).get().getValue();
 
         // iron
-        
-        Player playerWithMoreIron = null;
-        for (Player p: plys) {
-            if (playerWithMoreIron == null) {
-                playerWithMoreIron = p;
-                continue;
+        if (hayEmpate(totalScore.values().stream().toList(), mayor) == true) {
+            Player playerWithMoreIron = null;
+            Integer m = mayor;
+            List<Player> plys1 = totalScore.entrySet().stream().filter(i -> i.getValue() == m).map(i -> i.getKey())
+                    .toList();
+            for (Player p : plys1) {
+                if (p.getIron() == 0) {
+                    continue;
+                }
+                if (playerWithMoreIron == null && p.getIron() > 0) {
+                    playerWithMoreIron = p;
+                    continue;
+                }
+                if (p.getIron() > playerWithMoreIron.getIron()) {
+                    playerWithMoreIron = p;
+                }
             }
-            if (p.getIron() > playerWithMoreIron.getIron()) {
-                playerWithMoreIron = p;
+            if (playerWithMoreIron != null) {
+                totalScore.put(playerWithMoreIron, totalScore.get(playerWithMoreIron) + 1);
             }
         }
-        totalScore.put(playerWithMoreIron, totalScore.get(playerWithMoreIron) + 1);
+
+        mayor = totalScore.entrySet().stream()
+                .max(Comparator.comparingInt(Map.Entry::getValue)).get().getValue();
 
         // medal
-        
-        Player playerWithMoreMedal = null;
-        for (Player p: plys) {
-            if (playerWithMoreMedal == null) {
-                playerWithMoreMedal = p;
-                continue;
+        if (hayEmpate(totalScore.values().stream().toList(), mayor) == true) {
+            Player playerWithMoreMedal = null;
+            Integer m = mayor;
+            List<Player> plys2 = totalScore.entrySet().stream().filter(i -> i.getValue() == m).map(i -> i.getKey())
+                    .toList();
+            for (Player p : plys2) {
+                if (p.getMedal() == 0) {
+                    continue;
+                }
+                if (playerWithMoreMedal == null && p.getMedal() > 0) {
+                    playerWithMoreMedal = p;
+                    continue;
+                }
+                if (p.getIron() > playerWithMoreMedal.getIron()) {
+                    playerWithMoreMedal = p;
+                }
             }
-            if (p.getIron() > playerWithMoreMedal.getIron()) {
-                playerWithMoreMedal = p;
+            if (playerWithMoreMedal != null) {
+                totalScore.put(playerWithMoreMedal, totalScore.get(playerWithMoreMedal) + 1);
             }
         }
-        totalScore.put(playerWithMoreMedal, totalScore.get(playerWithMoreMedal) + 1);
 
         Player p = totalScore.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey).orElse(null);
 
         return p;
+    }
+
+    private Boolean hayEmpate(List<Integer> lista, Integer mayor) {
+        Integer cont = 0;
+        for (int i : lista) {
+            if (lista.get(i).equals(mayor)) {
+                cont++; // Hay elementos duplicados
+            }
+        }
+        return cont >= 2;
     }
 
     @Transactional

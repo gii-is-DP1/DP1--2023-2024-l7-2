@@ -17,23 +17,31 @@ export default function GameEdit() {
         start: null,
         finish: null,
         winner_id: null,
-        round: 0
+        round: 0,
+        playerCreator: null
     };
     const [message, setMessage] = useState(null);
     const [visible, setVisible] = useState(false);
     
-    const [game, setGame] = useState(emptyGame)
+    const [game, setGame] = useFetchState(
+        emptyGame,
+        `/api/v1/game/${id}`,
+        jwt,
+        setMessage,
+        setVisible,
+        id
+    );
 
-    if (id !== "new") {
-        fetch(`/api/v1/game/${id}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${jwt}`,
-              Accept: 'application/json',
-            }
-          }).then(response => response.json()).then(response => setGame(response))
-    } 
+    // if (id !== "new") {
+    //     fetch(`/api/v1/game/${id}`, {
+    //         method: "GET",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //           Authorization: `Bearer ${jwt}`,
+    //           Accept: 'application/json',
+    //         }
+    //       }).then(response => response.json()).then(response => setGame(response))
+    // } 
 
     const modal = getErrorModal(setVisible, visible, message);
 
@@ -55,17 +63,15 @@ export default function GameEdit() {
         )
         .then((response) => response.text())
         .then((data) => {
-            console.log(data);
             if(data==="")
-                console.log("error at creating game")
+                window.location.href = "/game";
             else{
                 let json = JSON.parse(data);
                 if(json.message){
                     setMessage(JSON.parse(data).message);
                     setVisible(true);
-                }else{
-                    window.location.href = `/game/${json.code}`;
-                }
+                }else
+                    window.location.href = "/game";
             }
         })
 
