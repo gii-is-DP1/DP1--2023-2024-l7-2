@@ -34,6 +34,7 @@ public class MainBoardService {
     }
 
     @Transactional(readOnly = true)
+    public
     List<MainBoard> getMainBoard() {
         return repo.findAll();
     }
