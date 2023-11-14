@@ -122,6 +122,7 @@ function App() {
           <Route path="/card" exact={true} element={<PrivateRoute><CardViewer/></PrivateRoute>} />
           <Route path="/cards" exact={true} element={<PrivateRoute><CardList/></PrivateRoute>}/>
           <Route path="/rules" exact={true} element={<PrivateRoute><RulesText/></PrivateRoute>}/>
+          <Route path="/user" exact={true} element={<PrivateRoute><UserPage/></PrivateRoute>}/>
           
           
           
