@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 //@DataJpaTest(includeFilters = {@ComponentScan.Filter(Service.class),@ComponentScan.Filter(PasswordEncoder.class)})
 @SpringBootTest
-@AutoConfigureTestDatabase
+//@AutoConfigureTestDatabase
 public class OwnerServiceTests {
 
 	private OwnerService ownerService;
