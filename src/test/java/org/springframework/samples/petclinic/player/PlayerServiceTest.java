@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -52,6 +52,19 @@ public class PlayerServiceTest {
     }
 
     @Test
+    public void testGetByName() {
+        Player player = new Player();
+        player.setName("John");
+
+        when(playerRepository.findByName("John")).thenReturn(player);
+
+        Player retrievedPlayer = playerService.getByName("John");
+
+        assertNotNull(retrievedPlayer);
+        assertEquals("John", retrievedPlayer.getName());
+    }
+
+    @Test
     public void testGetPlayerByUserAndGame() {
         User user = new User();
         Game game = new Game();
@@ -77,8 +90,38 @@ public class PlayerServiceTest {
         verify(playerRepository, times(1)).save(player);
     }
 
+    @Test
+    public void testGetById() {
+        Player player = new Player();
+        player.setId(1);
+
+        when(playerRepository.findById(1)).thenReturn(Optional.of(player));
+
+        Player retrievedPlayer = playerService.getById(1);
+
+        assertNotNull(retrievedPlayer);
+        assertEquals(1, retrievedPlayer.getId(), "La tarjeta recuperada no coincide");
+    }
     
-    
+    @Test
+    public void testGetPlayersByColor() {
+        // Crea una lista de jugadores para simular la respuesta de la base de datos
+        Player player = new Player();
+        player.setId(1);
+        player.setName("John");
+        player.setColor("Red");
+
+        // Configura el comportamiento del repositorio para devolver la lista cuando se llama a findByColor
+        when(playerRepository.findByColor("Red")).thenReturn(player);
+
+        // Llama al método en tu servicio que utiliza el repositorio findByColor
+        Player retrievedPlayers = playerService.getPlayersByColor("Red");
+
+        // Verifica que se obtenga un resultado no nulo y que la lista tenga el tamaño esperado
+        assertNotNull(retrievedPlayers);
+        assertEquals("Red", retrievedPlayers.getColor());
+    }
+
     @Test
     public void testStatusChangeMC() {
         Player player = new Player();

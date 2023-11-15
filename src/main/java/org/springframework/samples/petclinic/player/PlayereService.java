@@ -59,10 +59,10 @@ public class PlayereService {
         return repo.findByColor(color);
     }
 
-    @Transactional(readOnly = true)
+    /*@Transactional(readOnly = true)
     public Player getPlayersByName(String name) {
         return repo.findByName(name);
-    }
+    }*/
 
     @Transactional
     public Player statusChangeMC(@Valid Player p, @Valid Card c) {
