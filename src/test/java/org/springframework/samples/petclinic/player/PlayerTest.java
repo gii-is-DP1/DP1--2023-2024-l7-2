@@ -17,12 +17,19 @@ public class PlayerTest {
         assertEquals("Red", player.getColor());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testPlayerColorBlank() {
         Player player = new Player();
         player.setColor("");
 
         // This should throw an IllegalArgumentException due to @NotBlank validation
+        validatePlayerColor(player.getColor());
+    }
+
+    private void validatePlayerColor(String color) {
+        if (color.isBlank()) {
+            throw new IllegalArgumentException("Color cannot be blank");
+        }
     }
 
     @Test

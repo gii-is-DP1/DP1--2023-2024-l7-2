@@ -35,37 +35,37 @@ public class GameServiceTest {
 
     @Test
     public void testGetAllGames() {
-        // Configuración del repositorio mock
         List<Game> mockGames = Arrays.asList(new Game(), new Game());
         when(gameRepository.findAll()).thenReturn(mockGames);
 
-        // Ejecución del método y verificación del resultado
         List<Game> result = gameService.getAllGames();
         assertEquals(2, result.size(), "Número incorrecto de juegos recuperados");
     }
 
     @Test
+    public void testDelete() {
+        Game entityToDelete = new Game();
+        when(gameService.getGameById(1)).thenReturn(Optional.of(entityToDelete));
+
+        gameService.delete(1);
+        verify(gameRepository).deleteById(1);
+    }
+
+    @Test
     public void testGetGameByCode() {
-        // Configuración del repositorio mock
         String gameCode = "TEST123";
         Game mockGame = new Game();
         when(gameRepository.findByCode(gameCode)).thenReturn(Collections.singletonList(mockGame));
 
-        // Ejecución del método y verificación del resultado
         Game result = gameService.getGameByCode(gameCode);
         assertNotNull(result, "Juego no encontrado por código");
     }
 
     @Test
     public void testGetFinishedGames() {
-        // Configuración del repositorio mock
         List<Game> mockFinishedGames = Arrays.asList(new Game(), new Game());
         when(gameRepository.findByFinishIsNotNull()).thenReturn(mockFinishedGames);
-
-        // Ejecución del método y verificación del resultado
         List<Game> result = gameService.getFinishedGames();
         assertEquals(2, result.size(), "Número incorrecto de juegos finalizados recuperados");
     }
-
-    // Puedes continuar creando más pruebas para otros métodos en la clase GameService.
 }
