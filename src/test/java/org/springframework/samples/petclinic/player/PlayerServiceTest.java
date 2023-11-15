@@ -19,6 +19,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -35,7 +36,7 @@ public class PlayerServiceTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -90,7 +91,7 @@ public class PlayerServiceTest {
         card.setTotalSteal(2);
         card.setTotalMedals(1);
 
-        when(cardService.getById(anyInt())).thenReturn(card);
+       // when(cardService.getById(anyInt())).thenReturn(card);
         when(playerRepository.save(any(Player.class))).thenReturn(player);
 
         Player result = playerService.statusChangeMC(player, card);
