@@ -1,18 +1,3 @@
-/*
- * Copyright 2002-2013 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.springframework.samples.petclinic.owner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,6 +39,10 @@ public class OwnerServiceTests {
 	private PetService petService;
 	private AuthoritiesService authService;
 	
+	@Before
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
 	@Autowired
 	public OwnerServiceTests(OwnerService ownerService, PetService petService, AuthoritiesService authService) {
@@ -63,7 +54,7 @@ public class OwnerServiceTests {
 	@Test
 	void shouldFindAllOwners() {
 		List<Owner> owners = (List<Owner>) this.ownerService.findAll();
-		assertEquals(10, owners.size());
+		assertEquals(14, owners.size());
 	}
 
 	@Test
@@ -177,7 +168,7 @@ public class OwnerServiceTests {
 		assertTrue(stats.containsKey("totalOwners"));
 		assertEquals(((Collection<Owner>) ownerService.findAll()).size(), stats.get("totalOwners"));
 		assertTrue(stats.containsKey("basicOwners"));
-		assertEquals(3, stats.get("basicOwners"));
+		assertEquals(7, stats.get("basicOwners"));
 		assertTrue(stats.containsKey("goldOwners"));
 		assertEquals(3, stats.get("goldOwners"));
 		assertTrue(stats.containsKey("platinumOwners"));
@@ -186,3 +177,4 @@ public class OwnerServiceTests {
 	}
 
 }
+

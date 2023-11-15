@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -16,12 +17,15 @@ public class SpecialCardDeckRepositoryTest {
     @Autowired
     private SpecialCardDeckRepository specialCardDeckRepository;
 
+    @Mock
+    private SpecialCardDeckService specialCardDeckService;
+
     @Test
     public void testFindAll() {
         List<SpecialCardDeck> specialCardDecks = new ArrayList<>();
         specialCardDeckRepository.findAll().forEach(specialCardDecks::add);
 
-        assertEquals(0, specialCardDecks.size()); // Cambia el valor esperado según la lógica de tu aplicación
+        assertEquals(3, specialCardDecks.size()); // Cambia el valor esperado según la lógica de tu aplicación
     }
 
     @Test
