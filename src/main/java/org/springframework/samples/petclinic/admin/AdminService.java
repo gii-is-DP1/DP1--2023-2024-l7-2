@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.petclinic.owner.OwnerService;
+import org.springframework.samples.petclinic.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,12 +14,12 @@ import jakarta.validation.Valid;
 public class AdminService {
     
     AdminRepository repo;
-    OwnerService os;
+    UserRepository us;
 
     @Autowired
-    public AdminService(AdminRepository repo, OwnerService os){
+    public AdminService(AdminRepository repo, UserRepository us){
         this.repo=repo;
-        this.os = os;
+        this.us = us;
     }
 
     @Transactional(readOnly = true)
@@ -51,8 +51,7 @@ public class AdminService {
 
     @Transactional
     public void deleteUser(Integer id){
-        
-        os.deleteOwner(id);
+        us.deleteById(id.toString());
     }
 
 }
