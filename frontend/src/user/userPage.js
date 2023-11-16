@@ -12,20 +12,9 @@ const jwt = tokenService.getLocalAccessToken();
 
 
 const UserProfile = () => {
-  
-  const[message, setMessage] = useState(null);
-  const[visible, setVisible] = useState(false);
-  const[ownerData, setOwnerData] = useFetchState(
-    {},
-    `/api/v1/owners/byUser/${user.id}`,
-    jwt,
-    setMessage,
-    setVisible
-  );
 
-  console.log(ownerData)
-  
-  function deleteUser(url,id,ownerData,setOwnerData) {
+  console.log(user);
+  function deleteUser(url,id,ownerData) {
     let confirmMessage = window.confirm("Are you sure you want to delete it?");
     if (confirmMessage) {
         fetch(url, {
@@ -37,7 +26,6 @@ const UserProfile = () => {
             },
         })
             .then((response) => {
-                setOwnerData(ownerData.filter((i) => i.id !== id))
                 return response.text();
             })
             .catch((err) => {
@@ -52,14 +40,14 @@ const UserProfile = () => {
       <h2 style={{ margin: 0 }}>My profile</h2>
       <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
         <li>Username: {user.username}</li>
-        <li>Nombre: {ownerData.firstName}</li>
+        <li>Nombre: {user.name}</li>
         
       </ul>
       <Button outline color="success" >
                     <Link to={`/user/userEdit`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
       </Button>
       <Button outline color="danger" >
-                    <Link to="/home" onClickCapture={() => deleteUser(`/api/v1/owners/${ownerData.id}`,ownerData.id, ownerData,setOwnerData)} 
+                    <Link to="/home" onClickCapture={() => deleteUser(`/api/v1/owners/${user.id}`,user.id, user)} 
                     className="btn sm" style={{ textDecoration: "none" }}>Delete</Link>
       </Button>
     </div>
