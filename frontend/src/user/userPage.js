@@ -36,20 +36,26 @@ const UserProfile = () => {
     }
   console.log(user)
   return (
-    <div style={{ textAlign: 'center', padding: 0 }}>
-      <h2 style={{ margin: 0 }}>My profile</h2>
-      <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
+    <div className="auth-page-container" style={{height: "100vh"}}>
+      
+      <h1>My profile</h1>
+      
+      <h4 style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
         <li>Username: {user.username}</li>
         <li>Nombre: {user.name}</li>
         
-      </ul>
-      <Button outline color="success" >
-                    <Link to={`/user/userEdit`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
-      </Button>
-      <Button outline color="danger" >
-                    <Link to="/home" onClickCapture={() => deleteUser(`/api/v1/owners/${user.id}`,user.id, user)} 
-                    className="btn sm" style={{ textDecoration: "none" }}>Delete</Link>
-      </Button>
+      </h4>
+
+      <div className="col text-center" style={{marginTop: "20px"}}>
+        <Button outline color="success" margin="15px">
+          <Link to={`/user/userEdit`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
+        </Button>
+        <Button outline color="danger" margin="15px">
+            <Link to="/home" onClickCapture={() => deleteUser(`/api/v1/owners/${user.id}`,user.id, user)} 
+                      className="btn sm" style={{ textDecoration: "none" }}>Delete</Link>
+        </Button>
+      </div>
+
     </div>
   );
 };

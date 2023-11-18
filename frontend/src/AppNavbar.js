@@ -30,9 +30,6 @@ function AppNavbar() {
             adminLinks = (
                 <>
                     <NavItem>
-                        <NavLink style={{ color: "white" }} tag={Link} to="/owners">Owners</NavLink>
-                    </NavItem>
-                    <NavItem>
                         <NavLink style={{ color: "white" }} tag={Link} to="/users">Users</NavLink>
                     </NavItem>
                     <NavItem>
@@ -59,9 +56,6 @@ function AppNavbar() {
             registeredUserLinks = (
                 <>
                     <NavItem>
-                        <NavLink style={{ color: "white" }} tag={Link} to="/game">Play</NavLink>
-                    </NavItem>
-                    <NavItem>
                         <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/">Stats</NavLink>
                     </NavItem>
                     <NavItem>
@@ -73,11 +67,6 @@ function AppNavbar() {
                     <NavItem>
                         <NavLink style={{ color: "white" }} tag={Link} to="/rules">Rules</NavLink>
                     </NavItem>
-                    <NavItem>
-                        <NavLink style={{ color: "white" }} tag={Link} to="/user">My profile</NavLink>
-                    </NavItem>
-                    
-                    
                 </>
             )
         }
@@ -98,16 +87,11 @@ function AppNavbar() {
             </>
         )
     } else {
-        userLinks = (
-            <>
-                <NavItem>
-                    <NavLink style={{ color: "white" }} tag={Link} to="/">Dwarf</NavLink>
-                </NavItem>
-            </>
-        )
         userLogout = (
             <>
-                <NavbarText style={{ color: "white" }} className="justify-content-end">{username}</NavbarText>
+                <NavItem className="d-flex">
+                    <NavLink style={{ color: "white" }} id="logout" tag={Link} to="/user">{username}</NavLink>
+                </NavItem>
                 <NavItem className="d-flex">
                     <NavLink style={{ color: "white" }} id="logout" tag={Link} to="/logout">Logout</NavLink>
                 </NavItem>
@@ -118,9 +102,10 @@ function AppNavbar() {
 
     return (
         <div>
-            <Navbar expand="md" dark color="black">
+            <Navbar expand="md" fixed="top" dark color="black">
                 <NavbarBrand href="/">
                     <img alt="logo" src="/logo1-recortado.png" style={{ height: 40, width: 40 }} />
+                    <span style={{ color: "white" }}>Dwarf</span>
                 </NavbarBrand>
                 <NavbarToggler onClick={toggleNavbar} className="ms-2" />
                 <Collapse isOpen={!collapsed} navbar>
@@ -135,6 +120,7 @@ function AppNavbar() {
                     </Nav>
                 </Collapse>
             </Navbar>
+
         </div>
     );
 }

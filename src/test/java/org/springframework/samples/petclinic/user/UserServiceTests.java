@@ -28,7 +28,6 @@ class UserServiceTests {
 	@Autowired
 	private AuthoritiesService authService;
 
-
 	@Test
 	@WithMockUser(username = "owner1", password = "0wn3r")
 	void shouldFindCurrentUser() {
@@ -50,7 +49,7 @@ class UserServiceTests {
 	@Test
 	void shouldFindAllUsers() {
 		List<User> users = (List<User>) this.userService.findAll();
-		assertEquals(23, users.size());
+		assertEquals(15, users.size());
 	}
 
 	@Test
@@ -61,14 +60,14 @@ class UserServiceTests {
 
 	@Test
 	void shouldFindUsersByAuthority() {
-		List<User> owners = (List<User>) this.userService.findAllByAuthority("OWNER");
+		List<User> owners = (List<User>) this.userService.findAllByAuthority("USER");
 		assertEquals(14, owners.size());
 
 		List<User> admins = (List<User>) this.userService.findAllByAuthority("ADMIN");
 		assertEquals(1, admins.size());
 
-		List<User> vets = (List<User>) this.userService.findAllByAuthority("VET");
-		assertEquals(6, vets.size());
+		// List<User> vets = (List<User>) this.userService.findAllByAuthority("VET");
+		// assertEquals(6, vets.size());
 	}
 
 	@Test
@@ -100,10 +99,10 @@ class UserServiceTests {
 	@Test
 	@Transactional
 	void shouldUpdateUser() {
-		User user = this.userService.findUser(2);
+		User user = this.userService.findUser(4);
 		user.setUsername("Change");
-		userService.updateUser(user, 2);
-		user = this.userService.findUser(2);
+		userService.updateUser(user, 4);
+		user = this.userService.findUser(4);
 		assertEquals("Change", user.getUsername());
 	}
 
@@ -124,7 +123,6 @@ class UserServiceTests {
 		int finalCount = ((Collection<User>) this.userService.findAll()).size();
 		assertEquals(count + 1, finalCount);
 	}
-	
 
 	@Test
 	@Transactional
@@ -133,7 +131,7 @@ class UserServiceTests {
 		User user = new User();
 		user.setUsername("Sam");
 		user.setPassword("password");
-		Authorities auth = authService.findByAuthority("OWNER");
+		Authorities auth = authService.findByAuthority("USER");
 		user.setAuthority(auth);
 		this.userService.saveUser(user);
 
@@ -144,72 +142,72 @@ class UserServiceTests {
 		assertEquals(firstCount, lastCount);
 	}
 
-//	@Test
-//	@Transactional
-//	void shouldDeleteUserWithOwner() {
-//		Integer firstCount = ((Collection<User>) userService.findAll()).size();
-//		User user = new User();
-//		user.setUsername("Sam");
-//		user.setPassword("password");
-//		Authorities auth = authService.findByAuthority("OWNER");
-//		user.setAuthority(auth);
-//		Owner owner = new Owner();
-//		owner.setAddress("Test");
-//		owner.setFirstName("Test");
-//		owner.setLastName("Test");
-//		owner.setPlan(PricingPlan.BASIC);
-//		owner.setTelephone("999999999");
-//		owner.setUser(user);
-//		owner.setCity("Test");
-//		this.ownerService.saveOwner(owner);
-//
-//		Integer secondCount = ((Collection<User>) userService.findAll()).size();
-//		assertEquals(firstCount + 1, secondCount);
-//		userService.deleteUser(user.getId());
-//		Integer lastCount = ((Collection<User>) userService.findAll()).size();
-//		assertEquals(firstCount, lastCount);
-//	}
+	// @Test
+	// @Transactional
+	// void shouldDeleteUserWithOwner() {
+	// Integer firstCount = ((Collection<User>) userService.findAll()).size();
+	// User user = new User();
+	// user.setUsername("Sam");
+	// user.setPassword("password");
+	// Authorities auth = authService.findByAuthority("OWNER");
+	// user.setAuthority(auth);
+	// Owner owner = new Owner();
+	// owner.setAddress("Test");
+	// owner.setFirstName("Test");
+	// owner.setLastName("Test");
+	// owner.setPlan(PricingPlan.BASIC);
+	// owner.setTelephone("999999999");
+	// owner.setUser(user);
+	// owner.setCity("Test");
+	// this.ownerService.saveOwner(owner);
+	//
+	// Integer secondCount = ((Collection<User>) userService.findAll()).size();
+	// assertEquals(firstCount + 1, secondCount);
+	// userService.deleteUser(user.getId());
+	// Integer lastCount = ((Collection<User>) userService.findAll()).size();
+	// assertEquals(firstCount, lastCount);
+	// }
 
-	@Test
-	@Transactional
-	void shouldDeleteUserWithoutVet() {
-		Integer firstCount = ((Collection<User>) userService.findAll()).size();
-		User user = new User();
-		user.setUsername("Sam");
-		user.setPassword("password");
-		Authorities auth = authService.findByAuthority("VET");
-		user.setAuthority(auth);
-		this.userService.saveUser(user);
+	// @Test
+	// @Transactional
+	// void shouldDeleteUserWithoutVet() {
+	// Integer firstCount = ((Collection<User>) userService.findAll()).size();
+	// User user = new User();
+	// user.setUsername("Sam");
+	// user.setPassword("password");
+	// Authorities auth = authService.findByAuthority("VET");
+	// user.setAuthority(auth);
+	// this.userService.saveUser(user);
 
-		Integer secondCount = ((Collection<User>) userService.findAll()).size();
-		assertEquals(firstCount + 1, secondCount);
-		userService.deleteUser(user.getId());
-		Integer lastCount = ((Collection<User>) userService.findAll()).size();
-		assertEquals(firstCount, lastCount);
-	}
+	// Integer secondCount = ((Collection<User>) userService.findAll()).size();
+	// assertEquals(firstCount + 1, secondCount);
+	// userService.deleteUser(user.getId());
+	// Integer lastCount = ((Collection<User>) userService.findAll()).size();
+	// assertEquals(firstCount, lastCount);
+	// }
 
-//	@Test
-//	@Transactional
-//	void shouldDeleteUserWithVet() {
-//		Integer firstCount = ((Collection<User>) userService.findAll()).size();
-//		User user = new User();
-//		user.setUsername("Sam");
-//		user.setPassword("password");
-//		Authorities auth = authService.findByAuthority("VET");
-//		user.setAuthority(auth);
-//		userService.saveUser(user);
-//		Vet vet = new Vet();
-//		vet.setFirstName("Test");
-//		vet.setLastName("Test");
-//		vet.setUser(user);
-//		vet.setCity("Test");
-//		this.vetService.saveVet(vet);
-//
-//		Integer secondCount = ((Collection<User>) userService.findAll()).size();
-//		assertEquals(firstCount + 1, secondCount);
-//		userService.deleteUser(user.getId());
-//		Integer lastCount = ((Collection<User>) userService.findAll()).size();
-//		assertEquals(firstCount, lastCount);
-//	}
+	// @Test
+	// @Transactional
+	// void shouldDeleteUserWithVet() {
+	// Integer firstCount = ((Collection<User>) userService.findAll()).size();
+	// User user = new User();
+	// user.setUsername("Sam");
+	// user.setPassword("password");
+	// Authorities auth = authService.findByAuthority("VET");
+	// user.setAuthority(auth);
+	// userService.saveUser(user);
+	// Vet vet = new Vet();
+	// vet.setFirstName("Test");
+	// vet.setLastName("Test");
+	// vet.setUser(user);
+	// vet.setCity("Test");
+	// this.vetService.saveVet(vet);
+	//
+	// Integer secondCount = ((Collection<User>) userService.findAll()).size();
+	// assertEquals(firstCount + 1, secondCount);
+	// userService.deleteUser(user.getId());
+	// Integer lastCount = ((Collection<User>) userService.findAll()).size();
+	// assertEquals(firstCount, lastCount);
+	// }
 
 }

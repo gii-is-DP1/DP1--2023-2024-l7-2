@@ -15,8 +15,8 @@ export default function Home(){
     if (!jwt) {
         publicLinks = (
             <>
-                <Button outline color="warning" size="lg">
-                        <Link to={"/login"} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
+                <Button className="btn btn-dark btn-lg" outline color="warning" size="lg">
+                        <Link to={"/login"} className="btn" style={{ textDecoration: "none", color: "white"}}>Play Now</Link>
                 </Button>
             </>
         )

@@ -68,9 +68,9 @@ export default function Register() {
   }
 
   return (
-    <div className="auth-page-container">
+    <div className="auth-page-container"  style={{height: "100vh"}}>
       <h1>Register</h1>
-      <div className="auth-form-container">
+      <div className="custom-form-input">
         <FormGenerator
           ref={registerFormRef}
           inputs={registerFormOwnerInputs}

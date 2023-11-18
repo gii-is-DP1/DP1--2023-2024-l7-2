@@ -376,9 +376,10 @@ export default function GamePlay() {
 
   console.log(choosedCards)
   return (
-    <div>
+    <div style={{marginTop: "70px"}}>
+
       <div className="admin-page-container">
-        <h1 className="text-center">Dwarf - </h1>
+      <h1 className="text-center">{game.name} - Round {game.round}</h1>
           { game != {} && game.playerCreator && game.playerCreator.name === user.username 
           && players && players.length > 1 && !gameStarted &&
           <Button
@@ -451,7 +452,6 @@ export default function GamePlay() {
           </section>
           {cards.length != 0 && player && player.color &&
           <section className="cardDeckLayout">
-            Ronda: {game.round}
             <section className="cardDeckLayoutRow1" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[0].id} 
                     onClick={() => selectCard(1,cards[0])} color={getCardColor(1,cards[0])}/>

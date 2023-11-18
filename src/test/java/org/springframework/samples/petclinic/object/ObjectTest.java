@@ -1,32 +1,21 @@
 package org.springframework.samples.petclinic.object;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;;
 
+@SpringBootTest
 public class ObjectTest {
 
     @Test
-    public void testObjectCreation() {
+    public void testObjectProperties() {
         Object object = new Object();
-        assertNotNull(object);
+        object.setName("Wooden sword");
+        object.setPhoto("src/main/resources/static/objects/maze.png");
+
+        // Asegúrate de que las propiedades se hayan establecido correctamente
+        assertEquals("Wooden sword", object.getName());
+        assertEquals("src/main/resources/static/objects/maze.png", object.getPhoto());
     }
 
-    @Test
-    public void testSetName() {
-        Object object = new Object();
-        String testName = "Test Object";
-        object.setName(testName);
-        assertEquals(testName, object.getName());
-    }
-
-    @Test
-    public void testSetPhoto() {
-        Object object = new Object();
-        String testPhoto = "test-photo.jpg";
-        object.setPhoto(testPhoto);
-        assertEquals(testPhoto, object.getPhoto());
-    }
-   
 }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
@@ -107,12 +106,10 @@ public class GameService {
                 playerWithMoreSteal = p;
             }
         }
-        if (playerWithMoreSteal != null) {
+        if (playerWithMoreSteal != null)
             totalScore.put(playerWithMoreSteal, totalScore.get(playerWithMoreSteal) + 1);
-        }
 
         // gold
-
         Player playerWithMoreGold = null;
         for (Player p : plys) {
             if (p.getGold() == 0) {
@@ -128,6 +125,23 @@ public class GameService {
         }
         if (playerWithMoreGold != null)
             totalScore.put(playerWithMoreGold, totalScore.get(playerWithMoreGold) + 1);
+
+        // gold
+        Player playerWithMoreObjects = null;
+        for (Player p : plys) {
+            if (p.getObjects().size() == 0) {
+                continue;
+            }
+            if (playerWithMoreObjects == null && p.getObjects().size() > 0) {
+                playerWithMoreObjects = p;
+                continue;
+            }
+            if (p.getObjects().size() > playerWithMoreObjects.getObjects().size()) {
+                playerWithMoreObjects = p;
+            }
+        }
+        if (playerWithMoreObjects != null)
+            totalScore.put(playerWithMoreObjects, totalScore.get(playerWithMoreObjects) + 1);
 
         Integer mayor = totalScore.entrySet().stream()
                 .max(Comparator.comparingInt(Map.Entry::getValue)).get().getValue();
@@ -209,20 +223,23 @@ public class GameService {
 
         if (dwarves.size() == plys.size()) {
             // Añadimos a cada player los materiales correspondientes a las carta elegidas
+            // Por cada Dwarf
             for (int i = 0; i < dwarves.size(); i++) {
                 Player p = dwarves.get(i).getPlayer();
                 Dwarf d = dwarves.get(i);
-                List<Card> c = d.getCards();
+                List<Card> cards = d.getCards();
 
-                for (int j = 0; j < c.size(); j++) {
-                    Card card = c.get(j);
-                    System.out.println(card.getTotalIron());
-                    System.out.println(card.getCardType());
-                    if (card.getCardType().getName().equals("Other")) {
-                        p.setGold(p.getGold() + card.getTotalGold());
-                        p.setIron(p.getIron() + card.getTotalIron());
-                        p.setSteal(p.getSteal() + card.getTotalSteal());
-                        p.setMedal(p.getMedal() + card.getTotalMedals());
+                // Por cada carta
+                for (int j = 0; j < cards.size(); j++) {
+                    Card c = cards.get(j);
+                    System.out.println(c.getTotalIron());
+                    System.out.println(c.getCardType());
+                    if (c.getCardType().getName().equals("Other")) {
+                        p.setGold(p.getGold() + c.getTotalGold());
+                        p.setIron(p.getIron() + c.getTotalIron());
+                        p.setSteal(p.getSteal() + c.getTotalSteal());
+                        p.setMedal(p.getMedal() + c.getTotalMedals());
+                        p.getObjects().add(c.getObject());
                     }
                 }
                 System.out.println(p.getIron());

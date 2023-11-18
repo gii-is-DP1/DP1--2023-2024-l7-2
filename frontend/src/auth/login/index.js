@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from 'react-router-dom';
-import { Alert } from "reactstrap";
+import { Alert, Button} from "reactstrap";
 import FormGenerator from "../../components/formGenerator/formGenerator";
 import tokenService from "../../services/token.service";
 import "../../static/css/auth/authButton.css";
@@ -35,7 +35,7 @@ export default function Login() {
   }
   
     return (
-      <div className="auth-page-container">
+      <div className="auth-page-container" style={{height: "100vh"}}>
         {message ? (
           <Alert color="primary">{message}</Alert>
         ) : (
@@ -44,7 +44,7 @@ export default function Login() {
 
         <h1>Login</h1>
 
-        <div className="auth-form-container">
+        <div  className="custom-form-input">
           <FormGenerator
             ref={loginFormRef}
             inputs={loginFormInputs}
@@ -54,13 +54,12 @@ export default function Login() {
             buttonText="Login"
             buttonClassName="auth-button"
           />
-       <li>
-        <Link to="/register"><button className="auth-page-container">
-          ¿No tienes cuenta? Regístrate aquí
-        </button></Link>
-              
-            </li>
-        
+          <div className="col text-center" style={{marginTop: "20px"}}>
+              <h4>¿No tienes cuenta? </h4>
+              <Button className="btn btn-dark btn-lg" outline color="warning" size="lg">
+                <Link to={"/register"}className="btn" style={{ textDecoration: "none", color: "white"}}>Regístrate aquí</Link>
+              </Button>
+          </div>
         </div>
       </div>
     );  
