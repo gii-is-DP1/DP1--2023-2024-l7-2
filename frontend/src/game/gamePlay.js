@@ -370,6 +370,24 @@ export default function GamePlay() {
         <td style={{color:play.color}} className="text-center">Gold: {play.gold}</td>
         <td style={{color:play.color}} className="text-center">Steal: {play.steal}</td>
         <td style={{color:play.color}} className="text-center">Medals: {play.medal}</td>
+        <td style={{color:play.color}} className="text-center">Medals: {play.objects.map(
+          (object) => {
+            return (
+              <div key={object.id} className="text-center">
+                <img
+                  src={object.image}
+                  alt={object.name}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "contain",
+                    margin: "10px",
+                  }}
+                />
+              </div>
+            )
+          }
+        )}</td>
       </tr>
     )
   })
