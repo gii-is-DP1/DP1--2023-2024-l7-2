@@ -74,9 +74,9 @@ export default function AchievementEdit() {
 
 
     return (
-        <div className="auth-page-container">
+        <div className="auth-page-container" style={{marginTop: "65px", height: "100vh"}}>
             <h2 className="text-center">
-                {achievement.id ? "Edit Consultation" : "Add Consultation"}
+                {achievement.id ? "Edit Achievement" : "Add Achievement"}
             </h2>
             <div className="auth-form-container">
                 {modal}

@@ -81,7 +81,7 @@ export default function GameList() {
 
   return (
     <div>
-      <div className="admin-page-container">
+      <div className="admin-page-container" style={{marginTop: "70px"}}>
         <h1 className="text-center">Games</h1>        
         {modal}
         <div className="float-right">
