@@ -75,7 +75,7 @@ export default function AchievementList() {
     });
     return (
         <div>
-            <div className="admin-page-container">
+            <div className="admin-page-container" style={{marginTop: "70px"}}>
                 <h1 className="text-center">Achievements</h1>
                 <div>
                     <Table aria-label=

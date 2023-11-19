@@ -62,7 +62,7 @@ export default function UserListAdmin() {
   const modal = getErrorModal(setVisible, visible, message);
 
   return (
-    <div className="admin-page-container">
+    <div className="admin-page-container" style={{marginTop: "70px"}}>
       <h1 className="text-center">Users</h1>
       {alerts.map((a) => a.alert)}
       {modal}

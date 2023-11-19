@@ -2,7 +2,8 @@ import React from 'react';
 
 export default function RulesText() {
   return (
-    <div className="text-center">
+    <div className="text-center" style={{marginTop: "70px"}}>
+      
       <h1>Rules</h1>
       <p style={{ fontSize: '16px' }}>
         Aquí puedes encontrar las reglas de la aplicación. <strong>Resumen del juego Dwarf:</strong>

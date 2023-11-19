@@ -18,7 +18,10 @@ export default function SwaggerDocs(){
     
     
     return (
-        <SwaggerUI spec={docs} url="" />
+        <div style={{marginTop: "70px"}}>
+            <SwaggerUI spec={docs} url="" />
+        </div>
+        
     );
     
 }

@@ -70,10 +70,11 @@ export default function UserEditAdmin() {
   ));
 
   return (
-    <div className="auth-page-container">
-      {<h2>{user.id ? "Edit User" : "Add User"}</h2>}
-      {modal}
-      <div className="auth-form-container">
+    <div className="auth-page-container" style={{height: "100vh"}}>
+      <h1 className="text-center">
+        {user.id ? "Edit User" : "Add User"}</h1>
+      <div className="custom-form-input">
+        {modal}
         <Form onSubmit={handleSubmit}>
           <div className="custom-form-input">
             <Label for="username" className="custom-form-input-label">
