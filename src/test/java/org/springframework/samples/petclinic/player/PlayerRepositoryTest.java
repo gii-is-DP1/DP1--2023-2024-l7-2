@@ -1,4 +1,5 @@
 package org.springframework.samples.petclinic.player;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,28 +75,26 @@ public class PlayerRepositoryTest {
         assertEquals("Yellow", result.getColor());
     }
 
-
     @Test
     public void testFindByUserAndGame() {
         // Given
         Game game = new Game();
-        
+
         User user = new User();
         user.setUsername("Pepe");
-        
+
         Player player = new Player();
         player.setName("Player4");
         player.setColor("Purple");
         player.setGame(game);
         player.setUser(user);
-        
-    
+
         // When
         playerRepository.save(player);
-    
+
         // Then
         Player result = playerRepository.findByUserAndGame(user, game);
-    
+
         assertNotNull(result);
         assertEquals("Player4", result.getName());
         assertEquals("Purple", result.getColor());

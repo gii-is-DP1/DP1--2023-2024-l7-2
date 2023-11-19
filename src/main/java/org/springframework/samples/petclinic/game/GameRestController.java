@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.samples.petclinic.object.Object;
 
 @RestController
 @RequestMapping("/api/v1/game")
@@ -185,6 +186,7 @@ public class GameRestController {
             p.setGold(0);
             p.setIron(0);
             p.setMedal(0);
+            p.setObjects(new ArrayList<Object>());
             ps.savePlayer(p);
         } else {
             System.out.println("This player already in game");
@@ -200,7 +202,7 @@ public class GameRestController {
     private String getRandomColor(Integer id) {
 
         ArrayList<String> colours = new ArrayList<String>();
-        colours.addAll(List.of("red", "blue", "green", "yellow", "orange", "pink", "purple"));
+        colours.addAll(List.of("red", "blue", "green", "magenta", "orange", "pink", "purple", "pink", "cyan", "brown"));
         Collections.shuffle(colours);
 
         Optional<List<Player>> players = gs.getPlayers(id);
@@ -231,6 +233,7 @@ public class GameRestController {
             p.setGold(0);
             p.setIron(0);
             p.setMedal(0);
+            p.setObjects(new ArrayList<Object>());
             ps.savePlayer(p);
 
             // Si no se hace asi da error porque
@@ -376,9 +379,23 @@ public class GameRestController {
 
     @GetMapping("/play/{code}/isFinished")
     public ResponseEntity<Boolean> endGame(@PathVariable("code") String code) {
-        // FALTA CONDICIÓN DE OBJETOS
-        Boolean finished = false;
+
         Game g = gs.getGameByCode(code);
+        if (g == null) {
+            System.out.println("No game");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
+        List<Player> plys = plys_optional.get();
+
+        Boolean finished = false;
+
+        // tiene que terminar si un jugador consigue 4 objetos
+        for (Player p : plys) {
+            if (p.getObjects().size() >= 4)
+                finished = true;
+        }
 
         // tiene que terminar en 6 rondas
         if (g.getRound() >= 2)

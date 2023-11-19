@@ -370,15 +370,34 @@ export default function GamePlay() {
         <td style={{color:play.color}} className="text-center">Gold: {play.gold}</td>
         <td style={{color:play.color}} className="text-center">Steal: {play.steal}</td>
         <td style={{color:play.color}} className="text-center">Medals: {play.medal}</td>
+        <td style={{color:play.color}} className="text-center">Medals: {play.objects.map(
+          (object) => {
+            return (
+              <div key={object.id} className="text-center">
+                <img
+                  src={object.image}
+                  alt={object.name}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "contain",
+                    margin: "10px",
+                  }}
+                />
+              </div>
+            )
+          }
+        )}</td>
       </tr>
     )
   })
 
   console.log(choosedCards)
   return (
-    <div>
+    <div style={{marginTop: "70px"}}>
+
       <div className="admin-page-container">
-        <h1 className="text-center">Dwarf - </h1>
+      <h1 className="text-center">{game.name} - Round {game.round}</h1>
           { game != {} && game.playerCreator && game.playerCreator.name === user.username 
           && players && players.length > 1 && !gameStarted &&
           <Button
@@ -451,7 +470,6 @@ export default function GamePlay() {
           </section>
           {cards.length != 0 && player && player.color &&
           <section className="cardDeckLayout">
-            Ronda: {game.round}
             <section className="cardDeckLayoutRow1" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
               <Card id={cards[0].id} 
                     onClick={() => selectCard(1,cards[0])} color={getCardColor(1,cards[0])}/>

@@ -9,8 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,7 +28,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,10 +80,11 @@ class AuthControllerTests {
 		signupRequest.setUsername("username");
 		signupRequest.setPassword("password");
 		// TODO: set an authority
-		//signupRequest.setAuthority("OWNER");
+		// signupRequest.setAuthority("OWNER");
 
-		//userDetails = new UserDetailsImpl(1, loginRequest.getUsername(), loginRequest.getPassword(),
-		//		List.of(new SimpleGrantedAuthority("OWNER")));
+		// userDetails = new UserDetailsImpl(1, loginRequest.getUsername(),
+		// loginRequest.getPassword(),
+		// List.of(new SimpleGrantedAuthority("OWNER")));
 
 		token = "JWT TOKEN";
 	}

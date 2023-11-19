@@ -16,8 +16,8 @@ const Logout = () => {
   }
 
   return (
-    <div className="auth-page-container">
-      <div className="auth-form-container">
+    <div className="auth-page-container"  style={{height: "100vh"}}>
+      <div className="text-center">
         <h2 className="text-center text-md">
           Are you sure you want to log out?
         </h2>

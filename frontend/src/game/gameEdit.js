@@ -88,11 +88,11 @@ export default function GameEdit() {
 
 
     return (
-        <div className="auth-page-container">
-            <h2 className="text-center">
+        <div className="auth-page-container" style={{height: "100vh"}}>
+            <h1 className="text-center">
                 {game.id ? "Edit Game" : "Add Game"}
-            </h2>
-            <div className="auth-form-container">
+            </h1>
+            <div  className="custom-form-input">
                 {modal}
                 <Form onSubmit={handleSubmit}>
                     <div  className="custom-form-input">

@@ -5,17 +5,19 @@ import org.springframework.samples.petclinic.model.NamedEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.samples.petclinic.object.Object;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "card")
 public class Card extends NamedEntity {
-    
+
     @NotBlank
     private String description;
     @NotBlank
@@ -30,5 +32,8 @@ public class Card extends NamedEntity {
     private Integer totalGold;
     private Integer totalSteal;
     private Integer totalMedals;
+
+    @OneToOne(optional = true)
+    Object object;
 
 }

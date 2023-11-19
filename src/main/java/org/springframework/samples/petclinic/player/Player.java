@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.List;
 
-import org.springframework.samples.petclinic.dwarf.Dwarf;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.model.NamedEntity;
 
@@ -19,6 +18,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.samples.petclinic.object.Object;
 
 @Entity
 @Getter
@@ -40,7 +40,12 @@ public class Player extends NamedEntity {
     @ManyToOne(optional = true)
     private Game game;
 
-    /* 
-    @OneToMany(mappedBy="player")
-    List<Dwarf> dwarfs;*/
+    /*
+     * @OneToMany(mappedBy="player")
+     * List<Dwarf> dwarfs;
+     */
+
+    @OneToMany
+    List<Object> objects;
+
 }

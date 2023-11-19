@@ -19,7 +19,7 @@ import lombok.Setter;
 public class User extends NamedEntity {
 
 	String profilePicture;
-	
+
 	@Column(unique = true)
 	String username;
 

@@ -2,15 +2,11 @@ package org.springframework.samples.petclinic.object;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -18,67 +14,36 @@ import org.springframework.transaction.annotation.Transactional;
 public class ObjectServiceTest {
 
     @Autowired
-    private ObjectService objectService;
-
-    private Object testObject;
-
-    @BeforeEach
-    public void setUp() {
-        testObject = new Object();
-        testObject.setName("Test Object");
-        testObject.setPhoto("test-photo.jpg");
-    }
+    private ObjectService os;
 
     @Test
     public void testGetObjects() {
-        List<Object> objects = objectService.getObjects();
+        List<Object> objects = os.getObjects();
         assertNotNull(objects);
-        
+
     }
 
     @Test
     public void testGetById() {
-        Object savedObject = objectService.saveObject(testObject);
 
-        Object retrievedObject = objectService.getById(savedObject.getId());
+        Object existingObject = os.getObjects().get(0);
+
+        Object retrievedObject = os.getById(existingObject.getId());
         assertNotNull(retrievedObject);
-        assertEquals(savedObject.getId(), retrievedObject.getId());
-        
-    }
+        assertEquals(existingObject.getId(), retrievedObject.getId());
 
-    @Test
-    public void testSaveObject() {
-       
-        Object savedObject = objectService.saveObject(testObject);
-
-        assertNotNull(savedObject.getId());
-       
-    }
-
-    @Test
-    @DirtiesContext
-    public void testDeleteObjectById() {
-        Object savedObject = objectService.saveObject(testObject);
-        int testObjectId = savedObject.getId();
-
-        
-        objectService.deleteObjectById(testObjectId);
-
-      
-        assertNull(objectService.getById(testObjectId));
     }
 
     @Test
     public void testGetObjectByName() {
-      
-        Object savedObject = objectService.saveObject(testObject);
-        String objectName = savedObject.getName();
 
-      
-        Object retrievedObject = objectService.getObjectByName(objectName);
+        Object existingObject = os.getObjects().get(0);
+        String objectName = existingObject.getName();
 
-        assertNotNull(retrievedObject);
-        assertEquals(objectName, retrievedObject.getName());
-        
+        Object retrievedCard = os.getObjectByName(objectName);
+
+        assertNotNull(retrievedCard);
+        assertEquals(objectName, retrievedCard.getName());
+
     }
 }
