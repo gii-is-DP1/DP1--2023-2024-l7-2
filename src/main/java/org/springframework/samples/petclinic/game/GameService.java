@@ -8,10 +8,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.dwarf.Dwarf;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.object.Object;
 import org.springframework.samples.petclinic.player.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,6 +200,24 @@ public class GameService {
         return winner;
 
     }
+    @Transactional(readOnly = true) 
+    public Boolean canApplyCard(Player p, Card c) {
+        if (c.getTotalGold()*-1 > p.getGold()) {
+            return false;
+        } else  if (c.getTotalSteal()*-1 > p.getSteal()) {
+            return false;
+        } else  if (c.getTotalIron()*-1 > p.getIron()) {
+            return false;
+        } else if (c.getTotalMedals()*-1 > p.getMedal()) {
+            return false;
+        } else if (c.getObject() != null) {
+            if (p.getObjects().contains(c.getObject())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     @Transactional
     public void updateMaterials(Game g) {
@@ -221,15 +241,38 @@ public class GameService {
                     Card c = cards.get(j);
                     System.out.println(c.getTotalIron());
                     System.out.println(c.getCardType());
-                    if (c.getCardType().getName().equals("Other")) {
-                        p.setGold(p.getGold() + c.getTotalGold());
-                        p.setIron(p.getIron() + c.getTotalIron());
-                        p.setSteal(p.getSteal() + c.getTotalSteal());
-                        p.setMedal(p.getMedal() + c.getTotalMedals());
-                        p.getObjects().add(c.getObject());
+
+                    // TODO: add exception
+                    if (!canApplyCard(p, c)) {
+                        continue;
+                    }
+
+                    // It has already been tested whether you can use that
+                    // card or not
+                    switch (c.getCardType().getName()) {
+                        case "Other":
+                            p.setGold(p.getGold() + c.getTotalGold());
+                            p.setIron(p.getIron() + c.getTotalIron());
+                            p.setSteal(p.getSteal() + c.getTotalSteal());
+                            p.setMedal(p.getMedal() + c.getTotalMedals());
+                            break;
+                    
+                        case "ObjectCard":
+                            p.setGold(p.getGold() + c.getTotalGold());
+                            p.setIron(p.getIron() + c.getTotalIron());
+                            p.setSteal(p.getSteal() + c.getTotalSteal());
+                            p.setMedal(p.getMedal() + c.getTotalMedals());
+
+                            ArrayList<Object> objects = new ArrayList<>();
+                            objects.addAll(p.getObjects());
+                            objects.add(c.getObject());
+                            p.setObjects(objects);
+                            break;
+                        default:
+                            break;
                     }
                 }
-                System.out.println(p.getIron());
+                System.out.println(p.getObjects());
                 pr.save(p);
             }
 

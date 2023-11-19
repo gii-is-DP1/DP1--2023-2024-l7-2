@@ -361,7 +361,7 @@ export default function GamePlay() {
     }).catch((message) => alert(message));
   }
 
-  //console.log(players)
+  console.log(players)
   const playerList = players.map((play) => {
     return (
       <tr key={play.id} style={{color:play.color}}>
@@ -370,12 +370,12 @@ export default function GamePlay() {
         <td style={{color:play.color}} className="text-center">Gold: {play.gold}</td>
         <td style={{color:play.color}} className="text-center">Steal: {play.steal}</td>
         <td style={{color:play.color}} className="text-center">Medals: {play.medal}</td>
-        <td style={{color:play.color}} className="text-center">Medals: {play.objects.map(
+        <td style={{color:play.color}} className="text-center">Objects: {play.objects.map(
           (object) => {
             return (
-              <div key={object.id} className="text-center">
+              <div key={object.name} className="text-center">
                 <img
-                  src={object.image}
+                  src={object.photo}
                   alt={object.name}
                   style={{
                     width: "100px",
