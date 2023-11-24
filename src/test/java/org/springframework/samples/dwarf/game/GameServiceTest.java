@@ -19,18 +19,21 @@ import org.springframework.samples.dwarf.game.GameRepository;
 import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
+import org.springframework.samples.dwarf.user.UserRepository;
+import org.springframework.samples.dwarf.user.UserService;
 
 public class GameServiceTest {
 
     private GameService gameService;
     private GameRepository gameRepository;
     private PlayerRepository playerRepository;
+    private UserService userService;
 
     @BeforeEach
     public void setUp() {
         gameRepository = mock(GameRepository.class);
         playerRepository = mock(PlayerRepository.class);
-        gameService = new GameService(gameRepository, playerRepository);
+        gameService = new GameService(gameRepository, playerRepository, userService );
     }
 
     @Test

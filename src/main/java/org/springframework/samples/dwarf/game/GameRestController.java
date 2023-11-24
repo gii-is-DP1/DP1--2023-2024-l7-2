@@ -23,6 +23,7 @@ import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayereService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
+import org.springframework.samples.dwarf.game.GameRepository;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,8 +108,9 @@ public class GameRestController {
 
     @GetMapping("/play/{code}")
     public ResponseEntity<Game> playGame(@PathVariable("code") String code) {
-        // comprobar que usuario esta metido en el juego
+        
         Game g = gs.getGameByCode(code);
+        
 
         if (g == null) {
             return ResponseEntity.notFound().build();
@@ -123,6 +125,9 @@ public class GameRestController {
     public ResponseEntity<List<Card>> getCardsFromMainBoardFromGame(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
 
+        if(!gs.checkPlayerInGame(code)){
+            return ResponseEntity.notFound().build();
+        }
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
@@ -138,7 +143,9 @@ public class GameRestController {
     public ResponseEntity<List<Card>> getMainBoardCards(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
-
+        if(!gs.checkPlayerInGame(code)){
+            return ResponseEntity.notFound().build();
+        }
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
@@ -269,11 +276,15 @@ public class GameRestController {
     public ResponseEntity<List<Dwarf>> getDwarvesByRound(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
+        
+        if(!gs.checkPlayerInGame(code)){
+            return ResponseEntity.notFound().build();
+        }
 
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
-
+           
         Integer round = g.getRound();
 
         List<Dwarf> dwarves = g.getDwarves();
@@ -308,6 +319,9 @@ public class GameRestController {
     public ResponseEntity<List<Player>> getPlayersFromGame(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
+        if(!gs.checkPlayerInGame(code)){
+            return ResponseEntity.notFound().build();
+        }
         if (g != null) {
             Optional<List<Player>> plys = gs.getPlayers(g.getId());
             if (plys.isPresent()) {
@@ -331,7 +345,9 @@ public class GameRestController {
     public ResponseEntity<Boolean> getTurn(@PathVariable("code") String code) {
         // Gets the lists of players and dwarfs. Turn is the next player
         Boolean res = false;
-
+        if(!gs.checkPlayerInGame(code)){
+            return ResponseEntity.notFound().build();
+        }
         Game g = gs.getGameByCode(code);
         if (g == null) {
             System.out.println("No game");
@@ -376,6 +392,9 @@ public class GameRestController {
     public ResponseEntity<Boolean> endGame(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
+        if(!gs.checkPlayerInGame(code)){
+            return ResponseEntity.notFound().build();
+        }
         if (g == null) {
             System.out.println("No game");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -403,6 +422,9 @@ public class GameRestController {
     public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
+        if(!gs.checkPlayerInGame(code)){
+            return ResponseEntity.notFound().build();
+        }
         if (g == null) {
             return ResponseEntity.notFound().build();
         }
@@ -490,6 +512,9 @@ public class GameRestController {
     public ResponseEntity<Void> finishGameSetWinner(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
+        if(!gs.checkPlayerInGame(code)){
+            return ResponseEntity.notFound().build();
+        }
         if (g == null) {
             return ResponseEntity.notFound().build();
         }

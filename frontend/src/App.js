@@ -17,6 +17,7 @@ import AchievementEdit from "./achievements/achievementEdit";
 
 import RulesText from "./rules/rulesText";
 import UserPage from "./user/userPage";
+import UserEditPage from "./user/userEdit";
 
 
 import GameList from "./game/gameList";
@@ -87,6 +88,7 @@ function App() {
 
           <Route path="/rules" exact={true} element={<PrivateRoute><RulesText/></PrivateRoute>}/>
           <Route path="/user" exact={true} element={<PrivateRoute><UserPage/></PrivateRoute>}/>
+          <Route path="/user/:userId" exact={true} element={<PrivateRoute><UserEditPage/></PrivateRoute>}/>
 
           <Route path="/game/:gameId/finish" exact={true} element={<PrivateRoute><GameEnd/></PrivateRoute>} />
          

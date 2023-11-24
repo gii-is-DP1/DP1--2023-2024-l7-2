@@ -12,6 +12,15 @@ const jwt = tokenService.getLocalAccessToken();
 
 
 const UserProfile = () => {
+  function sendLogoutRequest() {
+    const jwt = window.localStorage.getItem("jwt");
+    if (jwt || typeof jwt === "undefined") {
+      tokenService.removeUser();
+      window.location.href = "/";
+    } else {
+      alert("There is no user logged in");
+    }
+  }
 
   console.log(user);
   function deleteUser(url,id,ownerData) {
@@ -36,14 +45,13 @@ const UserProfile = () => {
     }
   console.log(user)
   return (
-    <div className="auth-page-container" style={{height: "100vh"}}>
-      
+    <div className="auth-page-container" style={{height: "100vh", marginTop: "60px"}}>
+
       <h1>My profile</h1>
-      
+
       <h4 style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
         <li>Username: {user.username}</li>
         <li>Nombre: {user.name}</li>
-        
       </h4>
 
       <div className="col text-center" style={{marginTop: "20px"}}>
@@ -51,7 +59,7 @@ const UserProfile = () => {
           <Link to={`/user/userEdit`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
         </Button>
         <Button outline color="danger" margin="15px">
-            <Link to="/home" onClickCapture={() => deleteUser(`/api/v1/owners/${user.id}`,user.id, user)} 
+            <Link to="/" onClickCapture={() => {deleteUser(`/api/v1/users/${user.id}`,user.id, user); sendLogoutRequest() }} 
                       className="btn sm" style={{ textDecoration: "none" }}>Delete</Link>
         </Button>
       </div>
