@@ -3,6 +3,14 @@ import { formValidators } from "../../../validators/formValidators";
 
 export const registerFormOwnerInputs = [
   {
+    tag: "Name",
+    name: "name",
+    type: "text",
+    defaultValue: "",
+    isRequired: true,
+    validators: [formValidators.notEmptyValidator],
+  },
+  {
     tag: "Username",
     name: "username",
     type: "text",
@@ -14,14 +22,6 @@ export const registerFormOwnerInputs = [
     tag: "Password",
     name: "password",
     type: "password",
-    defaultValue: "",
-    isRequired: true,
-    validators: [formValidators.notEmptyValidator],
-  },
-  {
-    tag: "Name",
-    name: "firstName",
-    type: "text",
     defaultValue: "",
     isRequired: true,
     validators: [formValidators.notEmptyValidator],
