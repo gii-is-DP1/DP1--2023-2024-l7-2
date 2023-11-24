@@ -9,24 +9,30 @@ import java.util.Optional;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
+import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
+import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class GameService {
 
     GameRepository gr;
     PlayerRepository pr;
+    UserService us;
 
     @Autowired
-    public GameService(GameRepository gr, PlayerRepository pr) {
+    public GameService(GameRepository gr, PlayerRepository pr, UserService us) {
         this.gr = gr;
         this.pr = pr;
+        this.us=us;
 
     }
 
@@ -275,6 +281,25 @@ public class GameService {
             }
 
         }
+    }
+
+    @Transactional(readOnly = true)
+	public Optional<List<Player>> getPlayersByGameId(Integer gameId){
+		return gr.getPlayersByGameId(gameId);
+	}
+
+    @Transactional
+    public boolean checkPlayerInGame(@PathVariable("code") String code){
+        boolean check = false;
+
+        Game g = getGameByCode(code);
+        Optional<List<Player>> l = getPlayersByGameId(g.getId());
+        for(Player p: l.get()){
+            if (p.getUser().equals(us.findCurrentUser())) {
+                check=true;
+            }
+        }
+        return check;
     }
 
 }
