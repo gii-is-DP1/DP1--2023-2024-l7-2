@@ -8,8 +8,7 @@ import { registerFormClinicOwnerInputs } from "./form/registerFormClinicOwnerInp
 import { useEffect, useRef, useState } from "react";
 
 export default function Register() {
-  const type = "Owner"
-  const authority = "Owner"
+  const authority = "USER"
   let [clinics, setClinics] = useState([]);
 
   const registerFormRef = useRef();
@@ -18,6 +17,7 @@ export default function Register() {
 
     if(!registerFormRef.current.validate()) return;
 
+    console.log(values)
     const request = values;
     //request.clinic = clinics.filter((clinic) => clinic.name === request.clinic)[0];
     request["authority"] = authority;

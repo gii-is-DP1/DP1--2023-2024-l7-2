@@ -35,7 +35,9 @@ public class AuthService {
 		user.setUsername(request.getUsername());
 		user.setPassword(encoder.encode(request.getPassword()));
 		String strRoles = request.getAuthority();
-		Authorities role;
+		user.setAuthority(authoritiesService.findByAuthority(strRoles));
+		userService.saveUser(user);
+
 	}
 
 }
