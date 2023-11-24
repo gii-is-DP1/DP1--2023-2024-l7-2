@@ -456,7 +456,7 @@ public class GameRestController {
         dwarves = g.getDwarves();
         dwarves.add(dwarf);
         if (dwarves.size() == plys.size()) {
-            gs.updateMaterials(g);
+            gs.faseResolucionAcciones(g);
 
             for (Dwarf d : dwarves) {
                 d.setPlayer(null);
