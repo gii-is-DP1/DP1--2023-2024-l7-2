@@ -245,18 +245,69 @@ public class GameService {
 
     @Transactional
     public void orcCardKnockersAction(Game g) {
+        List<Player> players = pr.findAll();
+        for(Player p : players){
+            p.setIron(p.getIron()-1);
+            if(p.getIron()<0){
+                p.setIron(0);
+            }
+        }
+
 
     }
 
     @Transactional
     public void orcCardSidheAction(Game g) {
 
+        List<Player> players = pr.findAll();
+        for(Player p : players){
+
+            p.setGold(p.getGold()-2);
+            if(p.getGold()==-1){
+                p.setIron(p.getIron()+1);
+            }
+            else if (p.getGold()==-2) {
+                p.setIron(p.getIron());
+                
+            }
+            else {
+                p.setIron(p.getIron()+2);
+                if(p.getIron()<0){
+                    p.setIron(0);
+                }
+            }
+            if(p.getGold()<0){
+                p.setGold(0);
+            }
+           
+        }
+
     }
 
     @Transactional
     public void orcCardDragonAction(Game g) {
 
+        List<Player> players = pr.findAll();
+        for(Player p : players){
+            p.setGold(p.getGold()-1);
+            if(p.getGold()<0){
+                p.setGold(0);
+            }
+        }
+
     }
+
+     @Transactional
+    public void orcCardGreatDragonAction(Game g) {
+
+         List<Player> players = pr.findAll();
+        for(Player p : players){
+            p.setGold(0);
+        }
+
+    }
+
+    
 
 
     @Transactional
@@ -296,6 +347,8 @@ public class GameService {
                     orcCardSidheAction(g);
                 case "Knockers":
                     orcCardKnockersAction(g);
+                case "Great Dragon":
+                    orcCardGreatDragonAction(g);
             }
         }
 
