@@ -21,6 +21,7 @@ import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayereService;
+import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,18 +49,18 @@ public class GameRestController {
     private final PlayereService ps;
     private final MainBoardService mbs;
     private final CardDeckService cds;
-    // private final SpecialCardDeckService scds;
+    private final SpecialCardDeckService scds;
     private final DwarfService ds;
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayereService ps,
-            MainBoardService mbs, CardDeckService cds, DwarfService ds) {
+            MainBoardService mbs, CardDeckService cds, DwarfService ds, SpecialCardDeckService scds) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
         this.mbs = mbs;
         this.cds = cds;
-        // this.scds = scds;
+        this.scds = scds;
         this.ds = ds;
     }
 

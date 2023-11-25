@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.card.SpecialCardRepository;
 import org.springframework.samples.dwarf.card.SpecialCardService;
+import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,10 +121,16 @@ public class SpecialCardDeckService {
     }
 
     @Transactional()
-    public SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck specialcardDeck, int id) {
-        SpecialCardDeck scd = getSpecialCardDeckById(id);
-        BeanUtils.copyProperties(scd, specialcardDeck);
-        return saveSpecialCardDeck(scd);
+    public SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck scd, int sCardDeckId) {
+        SpecialCardDeck sCarddeck = getSpecialCardDeckById(sCardDeckId);
+
+        if (sCarddeck != null) {
+            saveSpecialCardDeck(scd);
+            return scd;
+        } else {
+            return null;
+        }
+
     }
 
 }

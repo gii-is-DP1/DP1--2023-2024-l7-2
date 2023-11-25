@@ -3,6 +3,7 @@ package org.springframework.samples.dwarf.mainboard;
 import java.util.List;
 
 import org.springframework.samples.dwarf.card.Card;
+import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.model.BaseEntity;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
@@ -29,4 +30,7 @@ public class MainBoard extends BaseEntity {
 
     @ManyToMany
     private List<Card> cards;
+
+    @ManyToMany
+    private List<SpecialCard> sCards;
 }

@@ -364,22 +364,22 @@ export default function GamePlay() {
   console.log(players)
   const playerList = players.map((play) => {
     return (
-      <tr key={play.id} style={{color:play.color}}>
-        <td style={{color:play.color}} className="text-center">{play.name}</td>
-        <td style={{color:play.color}} className="text-center">Iron: {play.iron}</td>
-        <td style={{color:play.color}} className="text-center">Gold: {play.gold}</td>
-        <td style={{color:play.color}} className="text-center">Steal: {play.steal}</td>
-        <td style={{color:play.color}} className="text-center">Medals: {play.medal}</td>
-        <td style={{color:play.color}} className="text-center">Objects: {play.objects.map(
+      <tr key={play.id} style={{ color: play.color }}>
+        <td style={{ color: play.color }} className="text-center">{play.name}</td>
+        <td style={{ color: play.color }} className="text-center">Iron: {play.iron}</td>
+        <td style={{ color: play.color }} className="text-center">Gold: {play.gold}</td>
+        <td style={{ color: play.color }} className="text-center">Steal: {play.steal}</td>
+        <td style={{ color: play.color }} className="text-center">Medals: {play.medal}</td>
+        <td style={{ color: play.color }} className="text-center">Objects: {play.objects.map(
           (object) => {
             return (
               <div key={object.name} className="text-center">
                 <img
-                  src={object.photo}
+                  src={"../src/static/objects/" + object.name + ".png"}
                   alt={object.name}
                   style={{
-                    width: "100px",
-                    height: "100px",
+                    width: "50px",
+                    height: "50px",
                     objectFit: "contain",
                     margin: "10px",
                   }}
@@ -393,6 +393,7 @@ export default function GamePlay() {
   })
 
   console.log(choosedCards)
+  console.log(playerList)
   return (
     <div style={{marginTop: "70px"}}>
 

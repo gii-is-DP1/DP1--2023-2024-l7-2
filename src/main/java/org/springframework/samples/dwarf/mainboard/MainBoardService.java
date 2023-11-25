@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
@@ -23,14 +24,16 @@ public class MainBoardService {
     MainBoardRepository repo;
     private final CardDeckService cds;
     private final SpecialCardDeckService scds;
+    private final SpecialCardService scs;
     private final CardService cs;
 
     @Autowired
     public MainBoardService(MainBoardRepository repo, CardDeckService cds, SpecialCardDeckService scds,
-            CardService cs) {
+            SpecialCardService scs, CardService cs) {
         this.repo = repo;
         this.cds = cds;
         this.scds = scds;
+        this.scs = scs;
         this.cs = cs;
     }
 
@@ -54,11 +57,11 @@ public class MainBoardService {
     public MainBoard initialize() {
 
         CardDeck cardDecks = cds.initialiate();
-        // ArrayList<SpecialCardDeck> specCardDecks = scds.initialize();
+        ArrayList<SpecialCardDeck> specCardDecks = scds.initialize();
 
         MainBoard mb = new MainBoard();
         mb.setCardDeck(cardDecks);
-        // mb.setSpecialCardDecks(specCardDecks);
+        mb.setSpecialCardDecks(specCardDecks);
 
         ArrayList<Card> cards = new ArrayList<Card>();
         for (int i = 1; i <= 9; i++) {
@@ -69,6 +72,16 @@ public class MainBoardService {
         mb.setCards(cards);
         saveMainBoard(mb);
         System.out.println(cards);
+
+        ArrayList<SpecialCard> sCards = new ArrayList<SpecialCard>();
+        for (int i = 1; i <= 3; i++) {
+            SpecialCard a = scs.getById(i);
+            System.out.println(a);
+            sCards.add(a);
+        }
+        mb.setSCards(sCards);
+        saveMainBoard(mb);
+        System.out.println(sCards);
 
         return mb;
     }
