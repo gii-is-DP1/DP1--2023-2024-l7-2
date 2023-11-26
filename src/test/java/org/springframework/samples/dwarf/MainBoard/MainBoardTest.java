@@ -34,14 +34,12 @@ public class MainBoardTest {
     }
 
     @Test
-    public void testGetAndSetSpecialCardDecks() {
-        SpecialCardDeck specialCardDeck1 = mock(SpecialCardDeck.class);
-        SpecialCardDeck specialCardDeck2 = mock(SpecialCardDeck.class);
-        List<SpecialCardDeck> specialCardDecks = Arrays.asList(specialCardDeck1, specialCardDeck2);
+    public void testGetAndSetSpecialCardDeck() {
+        SpecialCardDeck specialCardDeck = mock(SpecialCardDeck.class);
 
-        mainBoard.setSpecialCardDecks(specialCardDecks);
+        mainBoard.setSpecialCardDeck(specialCardDeck);
 
-        assertEquals(specialCardDecks, mainBoard.getSpecialCardDecks());
+        assertEquals(specialCardDeck, mainBoard.getSpecialCardDeck());
     }
 
     @Test

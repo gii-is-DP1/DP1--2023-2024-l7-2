@@ -10,7 +10,6 @@ import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -25,8 +24,8 @@ public class MainBoard extends BaseEntity {
     @OneToOne
     private CardDeck cardDeck;
 
-    @OneToMany
-    private List<SpecialCardDeck> specialCardDecks;
+    @OneToOne
+    private SpecialCardDeck specialCardDeck;
 
     @ManyToMany
     private List<Card> cards;

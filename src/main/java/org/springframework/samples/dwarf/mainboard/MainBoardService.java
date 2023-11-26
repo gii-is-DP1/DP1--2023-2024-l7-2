@@ -57,11 +57,11 @@ public class MainBoardService {
     public MainBoard initialize() {
 
         CardDeck cardDecks = cds.initialiate();
-        ArrayList<SpecialCardDeck> specCardDecks = scds.initialize();
+        SpecialCardDeck specCardDeck = scds.initialize();
 
         MainBoard mb = new MainBoard();
         mb.setCardDeck(cardDecks);
-        mb.setSpecialCardDecks(specCardDecks);
+        mb.setSpecialCardDeck(specCardDeck);
 
         ArrayList<Card> cards = new ArrayList<Card>();
         for (int i = 1; i <= 9; i++) {
@@ -86,17 +86,18 @@ public class MainBoardService {
         return mb;
     }
 
-    @Transactional
-    public MainBoard numberOfSpecialCards(@Valid MainBoard mb, @Valid SpecialCardDeck sc) {
-        if (mb.getSpecialCardDecks().size() == 3) {
-            return mb;
-        } else {
-            SpecialCard lastSpecialCard = sc.getLastSpecialCard();
-            for (SpecialCardDeck specialCardDeck : mb.getSpecialCardDecks()) {
-                specialCardDeck.getSpecialCards().add(lastSpecialCard);
+    // @Transactional
+    // public MainBoard numberOfSpecialCards(@Valid MainBoard mb, @Valid
+    // SpecialCardDeck sc) {
+    // if (mb.getSpecialCardDeck().size() == 3) {
+    // return mb;
+    // } else {
+    // SpecialCard lastSpecialCard = sc.getLastSpecialCard();
+    // for (SpecialCardDeck specialCardDeck : mb.getSpecialCardDeck()) {
+    // specialCardDeck.getSpecialCards().add(lastSpecialCard);
 
-            }
-            return mb;
-        }
-    }
+    // }
+    // return mb;
+    // }
+    // }
 }

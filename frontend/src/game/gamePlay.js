@@ -5,6 +5,7 @@ import getErrorModal from "../util/getErrorModal";
 import { Button, ButtonGroup, Table } from "reactstrap";
 import getIdFromUrl from "./../util/getIdFromUrl";
 import Card from "./../cards/card"
+import SpecialCard from "../cards/specialCard";
 import  { fetchDwarves, fetchCards, fetchPlayers, 
   fetchIsMyTurn, isFinished, sendCards}  from "./gameFunctions";
 
@@ -20,6 +21,7 @@ export default function GamePlay() {
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
   const [choosedCards, setChoosedCards] = useState([]);
+  const [choosedSpecialCards, setChoosedSpecialCards] = useState([]);
   const [cards, setCards] = useFetchState(
     [],
     `/api/v1/game/play/${code}/getCards`,
@@ -27,12 +29,23 @@ export default function GamePlay() {
     setMessage,
     setVisible,
     code
-);
+  );
+  const [specialCards, setSpecialCards] = useFetchState(
+    [],
+    `/api/v1/game/play/${code}/getSpecialCards`,
+    jwt,
+    setMessage,
+    setVisible,
+    code
+  );
 
   const emptySelectedCards = {1: null,2: null,3: null,
     4: null,5: null,6: null,
     7: null,8: null,9: null}
   const [selectedCards,setSelectedCards] = useState(emptySelectedCards)
+
+  const emptySelectedSpecialCards = {1: null,2: null,3: null}
+  const [selectedSpecialCards,setSelectedSpecialCards] = useState(emptySelectedSpecialCards)
 
   const [game, setGame] = useFetchState(
       {},
@@ -107,18 +120,52 @@ export default function GamePlay() {
     }
   }
 
+  function selectSpecialCard(id,specialCard) {
+    if (isMyTurn === false) {
+      console.log("is not your turn")
+      return false; // Just a random return to ensure that function exits
+    }
+
+    if (selectedSpecialCards[id] !== null && selectedSpecialCards[id] !== undefined) {
+      // Card is already selected, you can't select it
+      console.log(selectedSpecialCards)
+      console.log(id);
+      console.log(selectedSpecialCards[id])
+      return false;
+    }
+    
+    if (choosedSpecialCards.includes(specialCard)) {
+      console.log("we are filtering")
+      setChoosedSpecialCards(choosedSpecialCards.filter((c) => c.position !== specialCard.position))
+    } else {
+      if (choosedSpecialCards.length <1) {
+        setChoosedSpecialCards([...choosedSpecialCards,specialCard])
+      } else {
+        console.log("You cant choose that many cads :(")
+      }
+    }
+  }
+
+
   //console.log(selectedCards)
   function getCardColor(id,card) {
     // If card was already selected by another player, card's color is other player's color
     let color = selectedCards[id] !== null ? selectedCards[id] : "white"
+    let color2 = selectedSpecialCards[id] !== null ? selectedSpecialCards[id] : "white"
 
     // Else it is checked if the card has been selected
     if ( color === "white") {
       color = choosedCards.includes(card) ? player.color : "white"
     }
+    if ( color2 === "white") {
+      color2 = choosedSpecialCards.includes(card) ? player.color : "white"
+    }
 
     return color
   }
+
+
+
 
   const playerList = players.map((play) => {
     return (
@@ -256,9 +303,12 @@ export default function GamePlay() {
           </section>
           }
           <section className="specialCardDeckLayout">
-            <div><h2 className="text-center">Special Card</h2></div>
-            <div><h2 className="text-center">Special Card</h2></div>
-            <div><h2 className="text-center">Special Card</h2></div>
+            <SpecialCard id={specialCards[0].id} 
+                  onClick={() => selectSpecialCard(1,specialCards[0])} color={getCardColor(1,specialCards[0])}/>
+            <SpecialCard id={specialCards[1].id}
+                  onClick={() => selectSpecialCard(2,specialCards[1])} color={getCardColor(2,specialCards[1])}/>
+            <SpecialCard id={specialCards[2].id} 
+                  onClick={() => selectSpecialCard(3,specialCards[2])} color={getCardColor(3,specialCards[2])}/>
           </section>
         </section>
       </div>
