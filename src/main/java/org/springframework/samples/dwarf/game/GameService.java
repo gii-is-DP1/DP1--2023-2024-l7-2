@@ -20,6 +20,7 @@ import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
+import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -251,9 +252,8 @@ public class GameService {
             if(p.getIron()<0){
                 p.setIron(0);
             }
+            pr.save(p);
         }
-
-
     }
 
     @Transactional
@@ -279,7 +279,7 @@ public class GameService {
             if(p.getGold()<0){
                 p.setGold(0);
             }
-           
+            pr.save(p);
         }
 
     }
@@ -293,23 +293,22 @@ public class GameService {
             if(p.getGold()<0){
                 p.setGold(0);
             }
+            pr.save(p);
         }
 
     }
 
-     @Transactional
+    @Transactional
     public void orcCardGreatDragonAction(Game g) {
 
-         List<Player> players = pr.findAll();
+        List<Player> players = pr.findAll();
         for(Player p : players){
             p.setGold(0);
+            pr.save(p);
         }
-
     }
 
     
-
-
     @Transactional
     public Boolean faseOrcos(Game g, ArrayList<Pair<Player,Card>> orcCards){
         Boolean res = true;
@@ -454,15 +453,19 @@ public class GameService {
 		return gr.getPlayersByGameId(gameId);
 	}
 
-    @Transactional
-    public boolean checkPlayerInGame(@PathVariable("code") String code){
+    @Transactional(readOnly = true)
+    public boolean checkPlayerInGameAndGameExists(Game g){
         boolean check = false;
 
-        Game g = getGameByCode(code);
+        if (g == null) {
+            return false;
+        }
+
+        User currentUser = us.findCurrentUser();
         Optional<List<Player>> l = getPlayersByGameId(g.getId());
         for(Player p: l.get()){
-            if (p.getUser().equals(us.findCurrentUser())) {
-                check=true;
+            if (p.getUser().equals(currentUser)) {
+                return true;
             }
         }
         return check;

@@ -1,5 +1,7 @@
 package org.springframework.samples.dwarf.player;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.game.Game;
+import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +21,13 @@ public class PlayereService {
 
     PlayerRepository repo;
     CardService cs;
+    GameService gs;
 
     @Autowired
-    public PlayereService(PlayerRepository repo, CardService cs) {
+    public PlayereService(PlayerRepository repo, CardService cs, GameService gs) {
         this.repo = repo;
         this.cs = cs;
+        this.gs = gs;
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +67,34 @@ public class PlayereService {
      * return repo.findByName(name);
      * }
      */
+
+    @Transactional(readOnly = true)
+    public String getRandomColor(Optional<List<Player>> players) {
+
+        ArrayList<String> colours = new ArrayList<String>();
+        colours.addAll(List.of("red", "blue", "green", "magenta", "orange", "pink", "purple", "pink", "cyan", "brown"));
+        Collections.shuffle(colours);
+
+        if (players.isEmpty()) {
+            return colours.get(0);
+        }
+
+        players.get().forEach(p -> colours.remove(p.getColor()));
+        return colours.get(0);
+    }
+
+    // Doesn't save the player
+    @Transactional(readOnly = true)
+    public Player initialize(String username) {
+            Player p = new Player();
+            
+            p.setName(username);
+            p.setSteal(0);
+            p.setGold(0);
+            p.setIron(0);
+            p.setMedal(0);
+            return p;
+    }
 
     @Transactional
     public Player statusChangeMC(@Valid Player p, @Valid Card c) {
