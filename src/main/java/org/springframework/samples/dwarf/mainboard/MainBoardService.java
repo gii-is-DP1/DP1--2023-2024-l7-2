@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
@@ -23,14 +24,16 @@ public class MainBoardService {
     MainBoardRepository repo;
     private final CardDeckService cds;
     private final SpecialCardDeckService scds;
+    private final SpecialCardService scs;
     private final CardService cs;
 
     @Autowired
     public MainBoardService(MainBoardRepository repo, CardDeckService cds, SpecialCardDeckService scds,
-            CardService cs) {
+            SpecialCardService scs, CardService cs) {
         this.repo = repo;
         this.cds = cds;
         this.scds = scds;
+        this.scs = scs;
         this.cs = cs;
     }
 
@@ -54,11 +57,11 @@ public class MainBoardService {
     public MainBoard initialize() {
 
         CardDeck cardDecks = cds.initialiate();
-        // ArrayList<SpecialCardDeck> specCardDecks = scds.initialize();
+        SpecialCardDeck specCardDeck = scds.initialize();
 
         MainBoard mb = new MainBoard();
         mb.setCardDeck(cardDecks);
-        // mb.setSpecialCardDecks(specCardDecks);
+        mb.setSpecialCardDeck(specCardDeck);
 
         ArrayList<Card> cards = new ArrayList<Card>();
         for (int i = 1; i <= 9; i++) {
@@ -67,23 +70,33 @@ public class MainBoardService {
             cards.add(a);
         }
         mb.setCards(cards);
-        saveMainBoard(mb);
         System.out.println(cards);
+
+        ArrayList<SpecialCard> sCards = new ArrayList<SpecialCard>();
+        for (int i = 1; i <= 3; i++) {
+            SpecialCard a = scs.getById(i);
+            System.out.println(a);
+            sCards.add(a);
+        }
+        mb.setSCards(sCards);
+        System.out.println(sCards);
+        saveMainBoard(mb);
 
         return mb;
     }
 
-    @Transactional
-    public MainBoard numberOfSpecialCards(@Valid MainBoard mb, @Valid SpecialCardDeck sc) {
-        if (mb.getSpecialCardDecks().size() == 3) {
-            return mb;
-        } else {
-            SpecialCard lastSpecialCard = sc.getLastSpecialCard();
-            for (SpecialCardDeck specialCardDeck : mb.getSpecialCardDecks()) {
-                specialCardDeck.getSpecialCards().add(lastSpecialCard);
+    // @Transactional
+    // public MainBoard numberOfSpecialCards(@Valid MainBoard mb, @Valid
+    // SpecialCardDeck sc) {
+    // if (mb.getSpecialCardDeck().size() == 3) {
+    // return mb;
+    // } else {
+    // SpecialCard lastSpecialCard = sc.getLastSpecialCard();
+    // for (SpecialCardDeck specialCardDeck : mb.getSpecialCardDeck()) {
+    // specialCardDeck.getSpecialCards().add(lastSpecialCard);
 
-            }
-            return mb;
-        }
-    }
+    // }
+    // return mb;
+    // }
+    // }
 }

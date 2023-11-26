@@ -35,14 +35,14 @@ INSERT INTO card_type(id, name) VALUES (1, 'HelpCard'),
         (4, 'Other');
 
 /*OBJECTS*/
-INSERT INTO object(id, name, photo) VALUES (1, 'Maze', 'src/main/resources/static/objects/maze.png'),
-                                        (2, 'Sword', 'src/main/resources/static/objects/sword.png'),
-                                        (3, 'Axe', 'src/main/resources/static/objects/axe.png'),
-                                        (4, 'Dagger', 'src/main/resources/static/objects/dagger.png'),
-                                        (5, 'Armour', 'src/main/resources/static/objects/armour.png'),
-                                        (6, 'Helm', 'src/main/resources/static/objects/helm.png'),
-                                        (7, 'Crown', 'src/main/resources/static/objects/crown.png'),
-                                        (8, 'Diadem', 'src/main/resources/static/objects/diadem.png');
+INSERT INTO object(id, name, photo) VALUES (1, 'maze', '../src/static/objects/maze.png'),
+                                        (2, 'sword', '../src/static/objects/sword.png'),
+                                        (3, 'axe', '../src/static/objects/axe.png'),
+                                        (4, 'dagger', '../src/static/objects/dagger.png'),
+                                        (5, 'armour', '../src/static/objects/armour.png'),
+                                        (6, 'helm', '../src/static/objects/helm.png'),
+                                        (7, 'crown', '../src/static/objects/crown.png'),
+                                        (8, 'diadem', '../src/static/objects/diadem.png');
 
 /*CARD*/
 INSERT INTO card(id, name, description, position, card_type_id, total_iron, total_gold, total_steal, total_medals, object_id) 
@@ -138,9 +138,7 @@ INSERT INTO special_card_deck_special_cards(special_card_deck_id, special_cards_
                 (1,1),(1,2),(1,3),(2,4),(2,5),(2,6),(3,7),(3,8),(3,9);
 
 
-INSERT INTO main_board(id, card_deck_id) VALUES (1, 1);
-
-INSERT INTO main_board_special_card_decks(main_board_id, special_card_decks_id) VALUES (1,1),(1,3),(1,2);
+INSERT INTO main_board(id, card_deck_id, special_card_deck_id) VALUES (1, 1, 1);
 
 INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1);
 

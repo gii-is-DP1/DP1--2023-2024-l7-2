@@ -13,11 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.dwarf.Dwarf;
-import org.springframework.samples.dwarf.game.Game;
-import org.springframework.samples.dwarf.game.GameRestController;
-import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayereService;
 import org.springframework.samples.dwarf.user.User;
@@ -37,7 +32,7 @@ public class GameRestControllerTest {
         userService = mock(UserService.class);
         playerService = mock(PlayereService.class);
 
-        gameRestController = new GameRestController(gameService, userService, playerService, null, null, null);
+        gameRestController = new GameRestController(gameService, userService, playerService, null, null, null, null);
     }
 
     @Test

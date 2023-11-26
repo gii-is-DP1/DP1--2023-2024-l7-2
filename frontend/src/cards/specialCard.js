@@ -20,20 +20,23 @@ const SpecialCard = (props) => {
       setVisible,
       id);
 
-    const rectanguloStyle = {
-      width: '300px',
-      height: '400px',
-      backgroundColor: 'white',
-      border: '3px solid black',
-    };
+      const rectanguloStyle = {
+        width: '200px',
+        height: '250px',
+        backgroundColor: 'white',
+        border: '7px solid black',
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        flexDirection: 'column',
+        backgroundColor: props.color
+      };
 
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-      <div style={rectanguloStyle}>
-        <h1 style={{ textAlign: 'center' }}> {specialCard.name} </h1>
-        <p style={{ textAlign: 'center', marginTop: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{specialCard.description}</p>
-      </div>
+    <div style={rectanguloStyle} onClick={props.onClick}>
+      <h3 style={{ textAlign: 'center', marginTop: '30px' }}> {specialCard.name} </h3>
+      <p style={{ textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{specialCard.description}</p>
     </div>
    );
   }
