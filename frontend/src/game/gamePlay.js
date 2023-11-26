@@ -64,10 +64,7 @@ export default function GamePlay() {
     setVisible,
     code
   );
-
-  if (players) {
-    const player = players.filter(p => p.name === user.username)[0]
-  }
+  const player = players.filter(p => p.name === user.username)[0];
 
   const [isMyTurn, setIsMyTurn] = useFetchState(
     false,
@@ -79,7 +76,6 @@ export default function GamePlay() {
   );
 
   const [dwarves, setDwarves] = useFetchState([]);
-  let player = players.filter(p => p.name === user.username)[0]
   /*
   useEffect(() => {
     setSelectedCards(emptySelectedCards);
@@ -159,22 +155,6 @@ export default function GamePlay() {
 
     return color
   }
-
-  function getSpecialCardColor(id,card) {
-    // If card was already selected by another player, card's color is other player's color
-    let color = selectedSpecialCards[id] !== null ? selectedSpecialCards[id] : "white"
-
-    // Else it is checked if the card has been selected
-
-    if ( color === "white") {
-      color = choosedSpecialCards.includes(card) ? player.color : "white"
-    }
-
-    return color
-  }
-
-
-
 
   const playerList = players.map((play) => {
     return (
@@ -314,11 +294,11 @@ export default function GamePlay() {
           {specialCards.length != 0 && player && player.color &&
           <section className="specialCardDeckLayout"  style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
             <SpecialCard id={specialCards[0].id} 
-                  onClick={() => selectSpecialCard(1,specialCards[0])} color={getSpecialCardColor(1,specialCards[0])}/>
+                  onClick={() => selectSpecialCard(1,specialCards[0])}/>
             <SpecialCard id={specialCards[1].id}
-                  onClick={() => selectSpecialCard(2,specialCards[1])} color={getSpecialCardColor(2,specialCards[1])}/>
+                  onClick={() => selectSpecialCard(2,specialCards[1])}/>
             <SpecialCard id={specialCards[2].id} 
-                  onClick={() => selectSpecialCard(3,specialCards[2])} color={getSpecialCardColor(3,specialCards[2])}/>
+                  onClick={() => selectSpecialCard(3,specialCards[2])}/>
           </section>
           }
         </section>
