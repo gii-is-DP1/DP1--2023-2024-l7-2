@@ -70,7 +70,6 @@ public class MainBoardService {
             cards.add(a);
         }
         mb.setCards(cards);
-        saveMainBoard(mb);
         System.out.println(cards);
 
         ArrayList<SpecialCard> sCards = new ArrayList<SpecialCard>();
@@ -80,8 +79,8 @@ public class MainBoardService {
             sCards.add(a);
         }
         mb.setSCards(sCards);
-        saveMainBoard(mb);
         System.out.println(sCards);
+        saveMainBoard(mb);
 
         return mb;
     }

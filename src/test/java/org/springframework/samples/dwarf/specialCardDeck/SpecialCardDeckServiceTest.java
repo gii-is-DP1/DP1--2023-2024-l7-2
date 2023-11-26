@@ -73,20 +73,6 @@ public class SpecialCardDeckServiceTest {
     }
 
     @Test
-    public void testInitializeOneCardDeck() {
-        ArrayList<SpecialCard> testCards = new ArrayList<>();
-        testCards.add(new SpecialCard());
-
-        SpecialCardDeck result = specialCardDeckService.initializeOneCardDeck(testCards);
-
-        assertNotNull(result);
-        assertEquals(testCards.get(0), result.getLastSpecialCard());
-        assertEquals(testCards, result.getSpecialCards());
-
-        verify(specialCardDeckRepository, times(1)).save(any());
-    }
-
-    @Test
     public void testSaveSpecialCardDeck() {
         SpecialCardDeck testSpecialCardDeck = new SpecialCardDeck();
 

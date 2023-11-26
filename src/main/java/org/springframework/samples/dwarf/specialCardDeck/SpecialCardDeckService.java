@@ -23,12 +23,11 @@ public class SpecialCardDeckService {
 
     SpecialCardDeckRepository scdr;
     SpecialCardRepository scr;
-    SpecialCardService scs;
 
     @Autowired
-    public SpecialCardDeckService(SpecialCardDeckRepository scdr, SpecialCardService scs) {
+    public SpecialCardDeckService(SpecialCardDeckRepository scdr, SpecialCardRepository scr) {
         this.scdr = scdr;
-        this.scs = scs;
+        this.scr = scr;
     }
 
     @Transactional(readOnly = true)
@@ -42,37 +41,28 @@ public class SpecialCardDeckService {
     }
 
     @Transactional
-    public SpecialCardDeck initializeOneCardDeck(ArrayList<SpecialCard> cards) {
+    public SpecialCardDeck initialize() throws DataAccessException {
+        // Not tested
         SpecialCardDeck scd = new SpecialCardDeck();
-        scd.setLastSpecialCard(cards.get(0));
+
+        ArrayList<SpecialCard> cards = new ArrayList<SpecialCard>();
+        cards.addAll(scr.findAll());
+
+        // TODO: test this
+        for (int i = 1; i < 4; i++) {
+            cards.remove(0);
+        }
+
+        Collections.shuffle(cards);
+
         scd.setSpecialCards(cards);
+        scd.setLastSpecialCard(cards.get(0));
+
         saveSpecialCardDeck(scd);
         return scd;
     }
 
     @Transactional
-    public SpecialCardDeck initialize() throws DataAccessException {
-        // Not tested
-        SpecialCardDeck scd = new SpecialCardDeck();
-
-        ArrayList<SpecialCard> specialCards = new ArrayList<SpecialCard>();
-        specialCards.addAll(scr.findAll());
-
-        // TODO: test this
-        for (int i = 1; i < 10; i++) {
-            specialCards.remove(0);
-        }
-
-        Collections.shuffle(specialCards);
-
-        scd.setSpecialCards(specialCards);
-        scd.setLastSpecialCard(specialCards.get(0));
-
-        saveSpecialCardDeck(scd);
-        return scd;
-    }
-
-    @Transactional()
     public SpecialCard getSpecialCard(Integer id) {
         List<SpecialCard> cards = getSpecialCardDeckById(id).getSpecialCards();
 
@@ -88,13 +78,13 @@ public class SpecialCardDeckService {
         return cards.get(lastCardIndex);
     }
 
-    @Transactional()
-    public SpecialCardDeck saveSpecialCardDeck(@Valid SpecialCardDeck newSpecialCardDeck) {
-        scdr.save(newSpecialCardDeck);
-        return newSpecialCardDeck;
+    @Transactional
+    public SpecialCardDeck saveSpecialCardDeck(@Valid SpecialCardDeck scd) {
+        scdr.save(scd);
+        return scd;
     }
 
-    @Transactional()
+    @Transactional
     public SpecialCardDeck updateSpecialCardDeck(@Valid SpecialCardDeck scd, int sCardDeckId) {
         SpecialCardDeck sCarddeck = getSpecialCardDeckById(sCardDeckId);
 
