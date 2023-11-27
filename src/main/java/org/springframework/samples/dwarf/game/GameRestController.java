@@ -232,6 +232,7 @@ public class GameRestController {
             gs.saveGame(g);
 
             p.setGame(g);
+            g.setPlayerStart(g.getPlayerCreator());
             ps.savePlayer(p);
         } catch (Exception e) {
             System.out.println("Exception =>" + e);

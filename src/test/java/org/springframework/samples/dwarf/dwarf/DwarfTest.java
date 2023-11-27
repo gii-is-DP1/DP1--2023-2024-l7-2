@@ -30,7 +30,6 @@ public class DwarfTest {
     @Before
     public void setUp() {
         dwarf = new Dwarf();
-        dwarf.setName("Gimli");
         dwarf.setRound(1);
 
         Player player = new Player();
@@ -53,13 +52,11 @@ public class DwarfTest {
 
         Dwarf savedDwarf = new Dwarf();
         Player jugador = new Player();
-        savedDwarf.setName("Pepe");
         savedDwarf.setCards(cards);
         jugador.setName("Aragorn");
         savedDwarf.setRound(1);
         savedDwarf.setPlayer(jugador);
         assertNotNull(savedDwarf);
-        assertEquals("Pepe", savedDwarf.getName());
         assertEquals(1, savedDwarf.getRound().intValue());
         assertNotNull(savedDwarf.getPlayer());
         assertEquals("Aragorn", savedDwarf.getPlayer().getName());
