@@ -205,8 +205,6 @@ public class GameRestController {
 
     }
 
-
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
@@ -219,7 +217,7 @@ public class GameRestController {
 
             Player p = ps.initialize(u.getUsername());
             p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
-            //p.setGame(g);
+            // p.setGame(g);
             p.setUser(u);
             p.setObjects(new ArrayList<Object>());
             ps.savePlayer(p);
@@ -282,12 +280,12 @@ public class GameRestController {
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             return ResponseEntity.notFound().build();
         }
-        
+
         Optional<List<Player>> plys = gs.getPlayers(g.getId());
         if (plys.isPresent()) {
             return new ResponseEntity<>(plys.get(), HttpStatus.OK);
         }
-        
+
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -299,7 +297,7 @@ public class GameRestController {
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             return ResponseEntity.notFound().build();
         }
-        
+
         Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
         if (plys_optional.isEmpty()) {
             System.out.println("No players");
@@ -320,13 +318,21 @@ public class GameRestController {
         List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
         System.out.println(dwarves_players);
 
-        ArrayList<Player> players_mutable = new ArrayList<Player>();
-        players_mutable.addAll(plys);
+        ArrayList<Player> remaining_turns = new ArrayList<Player>();
+        remaining_turns.addAll(plys);
+        remaining_turns.addAll(plys);
 
-        players_mutable.removeAll(dwarves_players);
+        for (Dwarf d : dwarves) {
+            if (d.getCard().getCardType().equals("HelpCard")) {
+                remaining_turns.add(d.getPlayer());
+                remaining_turns.add(d.getPlayer());
+            }
+        }
 
-        if (players_mutable.size() > 0) {
-            if (players_mutable.get(0).equals(p)) {
+        remaining_turns.removeAll(dwarves_players);
+
+        if (remaining_turns.size() > 0) {
+            if (remaining_turns.get(0).equals(p)) {
                 res = true;
             }
         }
@@ -361,14 +367,12 @@ public class GameRestController {
     }
 
     @PostMapping("/play/{code}/dwarves")
-    public ResponseEntity<Void> addDwarves(@Valid @RequestBody List<Card> cards, @PathVariable("code") String code) {
+    public ResponseEntity<Void> addDwarves(@Valid @RequestBody Card card, @PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             return ResponseEntity.notFound().build();
         }
-
-
 
         Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
         List<Player> plys = plys_optional.get();
@@ -378,8 +382,7 @@ public class GameRestController {
 
         dwarf.setPlayer(p);
         dwarf.setRound(g.getRound());
-        dwarf.setCards(cards);
-
+        dwarf.setCard(card);
 
         ds.saveDwarf(dwarf);
         /*
@@ -392,19 +395,20 @@ public class GameRestController {
         List<Dwarf> dwarves = g.getDwarves();
         dwarves.add(dwarf);
         g.setDwarves(dwarves);
-        
+
         List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
         if (thisRoundDwarves.size() == plys.size()) {
             gs.faseResolucionAcciones(g);
 
             /*
-            for (Dwarf d : dwarves) {
-                d.setPlayer(null);
-                d.setCards(null);
-                ds.saveDwarf(d);
-                ds.deleteDwarf(d);
-            }
-            dwarves = null;*/
+             * for (Dwarf d : dwarves) {
+             * d.setPlayer(null);
+             * d.setCards(null);
+             * ds.saveDwarf(d);
+             * ds.deleteDwarf(d);
+             * }
+             * dwarves = null;
+             */
 
             MainBoard mb = g.getMainBoard();
             ArrayList<Card> mbCards = new ArrayList<Card>();
@@ -433,7 +437,6 @@ public class GameRestController {
 
             g.setRound(g.getRound() + 1);
         }
-        
 
         try {
             gs.saveGame(g);

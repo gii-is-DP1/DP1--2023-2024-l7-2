@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
-import java.util.HashMap;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -37,7 +35,7 @@ public class GameService {
     public GameService(GameRepository gr, PlayerRepository pr, UserService us) {
         this.gr = gr;
         this.pr = pr;
-        this.us=us;
+        this.us = us;
 
     }
 
@@ -229,8 +227,8 @@ public class GameService {
     }
 
     @Transactional
-    public void updateMaterials(Game g, ArrayList<Pair<Player,Card>> cards) {
-        for (Pair<Player,Card> pc: cards) {
+    public void updateMaterials(Game g, ArrayList<Pair<Player, Card>> cards) {
+        for (Pair<Player, Card> pc : cards) {
             Player p = pc.getFirst();
             Card c = pc.getSecond();
             if (canApplyCard(p, c)) {
@@ -247,9 +245,9 @@ public class GameService {
     @Transactional
     public void orcCardKnockersAction(Game g) {
         List<Player> players = pr.findAll();
-        for(Player p : players){
-            p.setIron(p.getIron()-1);
-            if(p.getIron()<0){
+        for (Player p : players) {
+            p.setIron(p.getIron() - 1);
+            if (p.getIron() < 0) {
                 p.setIron(0);
             }
             pr.save(p);
@@ -260,23 +258,21 @@ public class GameService {
     public void orcCardSidheAction(Game g) {
 
         List<Player> players = pr.findAll();
-        for(Player p : players){
+        for (Player p : players) {
 
-            p.setGold(p.getGold()-2);
-            if(p.getGold()==-1){
-                p.setIron(p.getIron()+1);
-            }
-            else if (p.getGold()==-2) {
+            p.setGold(p.getGold() - 2);
+            if (p.getGold() == -1) {
+                p.setIron(p.getIron() + 1);
+            } else if (p.getGold() == -2) {
                 p.setIron(p.getIron());
-                
-            }
-            else {
-                p.setIron(p.getIron()+2);
-                if(p.getIron()<0){
+
+            } else {
+                p.setIron(p.getIron() + 2);
+                if (p.getIron() < 0) {
                     p.setIron(0);
                 }
             }
-            if(p.getGold()<0){
+            if (p.getGold() < 0) {
                 p.setGold(0);
             }
             pr.save(p);
@@ -288,9 +284,9 @@ public class GameService {
     public void orcCardDragonAction(Game g) {
 
         List<Player> players = pr.findAll();
-        for(Player p : players){
-            p.setGold(p.getGold()-1);
-            if(p.getGold()<0){
+        for (Player p : players) {
+            p.setGold(p.getGold() - 1);
+            if (p.getGold() < 0) {
                 p.setGold(0);
             }
             pr.save(p);
@@ -302,41 +298,41 @@ public class GameService {
     public void orcCardGreatDragonAction(Game g) {
 
         List<Player> players = pr.findAll();
-        for(Player p : players){
+        for (Player p : players) {
             p.setGold(0);
             pr.save(p);
         }
     }
 
-    
     @Transactional
-    public Boolean faseOrcos(Game g, ArrayList<Pair<Player,Card>> orcCards){
+    public Boolean faseOrcos(Game g, ArrayList<Pair<Player, Card>> orcCards) {
         Boolean res = true;
 
         // Obtemenemos las cartas del juego actual
         ArrayList<Card> currentCards = new ArrayList<>();
-        for (Card c:g.getMainBoard().getCards()) {
+        for (Card c : g.getMainBoard().getCards()) {
             // Solo guardamos las cartas que son de orcos
-            if (c.getCardType().getName().equals("OrcCard")){
+            if (c.getCardType().getName().equals("OrcCard")) {
                 currentCards.add(c);
             }
         }
 
         // Si no hay ninguna carta de orcos salimos de la funcion
-        if (currentCards.size() == 0) return res;
+        if (currentCards.size() == 0)
+            return res;
 
         // De esta forma obtenemos las cartas que no han sido seleccionadas
-        // al eliminar de las cartas del tablero 
-        ArrayList<Pair<Player,Card>> notSelected = new ArrayList<>();
-        for (Pair<Player,Card> pc: orcCards) {
+        // al eliminar de las cartas del tablero
+        ArrayList<Pair<Player, Card>> notSelected = new ArrayList<>();
+        for (Pair<Player, Card> pc : orcCards) {
             if (!currentCards.contains(pc.getSecond())) {
                 notSelected.add(pc);
             }
         }
 
-        // Ahora tenmos las cartas de orcos que no se han seleccionado 
-        for (Pair<Player,Card> pc: notSelected) {
-            switch(pc.getSecond().getCardType().getName()) {
+        // Ahora tenmos las cartas de orcos que no se han seleccionado
+        for (Pair<Player, Card> pc : notSelected) {
+            switch (pc.getSecond().getCardType().getName()) {
                 case "Orc Raiders":
                     // Si se selecciona esta carta no se hace la fase de recoleccion
                     res = false;
@@ -357,9 +353,9 @@ public class GameService {
     }
 
     @Transactional
-    public void faseForjar(Game g, ArrayList<Pair<Player,Card>> playerCards) {
+    public void faseForjar(Game g, ArrayList<Pair<Player, Card>> playerCards) {
 
-        for (Pair<Player,Card> pc: playerCards) {
+        for (Pair<Player, Card> pc : playerCards) {
             Player p = pc.getFirst();
             Card c = pc.getSecond();
             if (canApplyCard(p, c)) {
@@ -380,11 +376,12 @@ public class GameService {
 
     @Transactional
     public void faseResolucionAcciones(Game g) {
-        /* 1. Recibir ayuda
+        /*
+         * 1. Recibir ayuda
          * 2. Defenter
          * 3. Extraear mineral
          * 4. Forjar
-        */
+         */
         List<Dwarf> dwarves = g.getDwarves();
         dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
 
@@ -392,40 +389,36 @@ public class GameService {
         List<Player> plys = plys_optional.get();
 
         // TODO: CREATE ERROR
-        if (dwarves.size() != plys.size()) return;
+        if (dwarves.size() != plys.size())
+            return;
 
         // Obtenemos todas las cartas y las guardamos
         // con su player para despues aplicarselo al player
-        ArrayList<Pair<Player,Card>> cards = new ArrayList<Pair<Player,Card>>();
-        for (Dwarf d: dwarves) {
-            for (Card c:d.getCards()) {
-
-                Pair<Player,Card> playerPair = Pair.of(d.getPlayer(),c);
-                cards.add(playerPair);
-            }
-            
+        ArrayList<Pair<Player, Card>> cards = new ArrayList<Pair<Player, Card>>();
+        for (Dwarf d : dwarves) {
+            Pair<Player, Card> playerPair = Pair.of(d.getPlayer(), d.getCard());
+            cards.add(playerPair);
         }
 
         // Separamos las cartas por su tipo para
         // poder aplicar cada tipo en el ordern correcto
-        HashMap<String,ArrayList<Pair<Player,Card>>> cardsByType = new HashMap<String,ArrayList<Pair<Player,Card>>>();
-        for (Pair<Player,Card> c:cards) {
+        HashMap<String, ArrayList<Pair<Player, Card>>> cardsByType = new HashMap<String, ArrayList<Pair<Player, Card>>>();
+        for (Pair<Player, Card> c : cards) {
             String type = c.getSecond().getCardType().getName();
             if (cardsByType.containsKey(type)) {
                 cardsByType.get(type).add(c);
             } else {
-                ArrayList<Pair<Player,Card>> cardList = new ArrayList<Pair<Player,Card>>();
+                ArrayList<Pair<Player, Card>> cardList = new ArrayList<Pair<Player, Card>>();
                 cardList.add(c);
-                cardsByType.put(type,cardList);
+                cardsByType.put(type, cardList);
             }
         }
 
         // Obtenemos las cartas por su tipo
-        ArrayList<Pair<Player,Card>> helpCards = cardsByType.get("HelpCard");
-        ArrayList<Pair<Player,Card>> orcCards = cardsByType.get("OrcCard");
-        ArrayList<Pair<Player,Card>> objectCards = cardsByType.get("ObjectCard");
-        ArrayList<Pair<Player,Card>> normalCards = cardsByType.get("Other");
-
+        ArrayList<Pair<Player, Card>> helpCards = cardsByType.get("HelpCard");
+        ArrayList<Pair<Player, Card>> orcCards = cardsByType.get("OrcCard");
+        ArrayList<Pair<Player, Card>> objectCards = cardsByType.get("ObjectCard");
+        ArrayList<Pair<Player, Card>> normalCards = cardsByType.get("Other");
 
         // Las cartas de la fase anterior pueden hacer que no se haga la siguiente fase
         Boolean canContinue = true;
@@ -440,7 +433,7 @@ public class GameService {
 
         // Fase de recoleccion
         if (canContinue && normalCards != null) {
-            updateMaterials(g,normalCards);
+            updateMaterials(g, normalCards);
         }
 
         if (objectCards != null) {
@@ -449,12 +442,12 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
-	public Optional<List<Player>> getPlayersByGameId(Integer gameId){
-		return gr.getPlayersByGameId(gameId);
-	}
+    public Optional<List<Player>> getPlayersByGameId(Integer gameId) {
+        return gr.getPlayersByGameId(gameId);
+    }
 
     @Transactional(readOnly = true)
-    public boolean checkPlayerInGameAndGameExists(Game g){
+    public boolean checkPlayerInGameAndGameExists(Game g) {
         boolean check = false;
 
         if (g == null) {
@@ -463,7 +456,7 @@ public class GameService {
 
         User currentUser = us.findCurrentUser();
         Optional<List<Player>> l = getPlayersByGameId(g.getId());
-        for(Player p: l.get()){
+        for (Player p : l.get()) {
             if (p.getUser().equals(currentUser)) {
                 return true;
             }
