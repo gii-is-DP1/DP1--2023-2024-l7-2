@@ -219,7 +219,7 @@ public class GameRestController {
 
             Player p = ps.initialize(u.getUsername());
             p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
-            p.setGame(g);
+            //p.setGame(g);
             p.setUser(u);
             p.setObjects(new ArrayList<Object>());
             ps.savePlayer(p);
