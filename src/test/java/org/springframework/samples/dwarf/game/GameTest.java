@@ -77,11 +77,9 @@ public class GameTest {
     public void testSetDwarves() {
         List<Dwarf> dwarves = new ArrayList<>();
         Dwarf dwarf1 = new Dwarf();
-        dwarf1.setName("Dwarf1");
         dwarves.add(dwarf1);
 
         Dwarf dwarf2 = new Dwarf();
-        dwarf2.setName("Dwarf2");
         dwarves.add(dwarf2);
 
         game.setDwarves(dwarves);
