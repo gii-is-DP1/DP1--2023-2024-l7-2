@@ -368,21 +368,18 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        List<Dwarf> dwarves = g.getDwarves();
-        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
+
 
         Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
         List<Player> plys = plys_optional.get();
 
         Dwarf dwarf = new Dwarf();
         Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
-        System.out.println(p);
 
         dwarf.setPlayer(p);
         dwarf.setRound(g.getRound());
         dwarf.setCards(cards);
 
-        System.out.println(cards);
 
         ds.saveDwarf(dwarf);
         /*
@@ -392,18 +389,22 @@ public class GameRestController {
          * ps.savePlayer(p)
          */
 
-        dwarves = g.getDwarves();
+        List<Dwarf> dwarves = g.getDwarves();
         dwarves.add(dwarf);
-        if (dwarves.size() == plys.size()) {
+        g.setDwarves(dwarves);
+        
+        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
+        if (thisRoundDwarves.size() == plys.size()) {
             gs.faseResolucionAcciones(g);
 
+            /*
             for (Dwarf d : dwarves) {
                 d.setPlayer(null);
                 d.setCards(null);
                 ds.saveDwarf(d);
                 ds.deleteDwarf(d);
             }
-            dwarves = null;
+            dwarves = null;*/
 
             MainBoard mb = g.getMainBoard();
             ArrayList<Card> mbCards = new ArrayList<Card>();
@@ -432,7 +433,7 @@ public class GameRestController {
 
             g.setRound(g.getRound() + 1);
         }
-        g.setDwarves(dwarves);
+        
 
         try {
             gs.saveGame(g);
