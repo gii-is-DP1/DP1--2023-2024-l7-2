@@ -20,7 +20,7 @@ export default function GamePlay() {
   const [gameStarted, setGameStarted] = useState(null);
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
-  const [choosedCard, setChoosedCard] = useState([]);
+  const [choosedCard, setChoosedCard] = useState(null);
   const [choosedSpecialCard, setChoosedSpecialCard] = useState([]);
   const [cards, setCards] = useFetchState(
     [],
@@ -104,12 +104,13 @@ export default function GamePlay() {
       return false;
     }
     
-    if (choosedCard.includes(card)) {
-      console.log("we are filtering")
-      setChoosedCard(choosedCard.filter((c) => c.position !== card.position))
+    if (choosedCard === card) {
+      //console.log("we are filtering")
+      //setChoosedCard(choosedCard.filter((c) => c.position !== card.position))
+      setChoosedCard(null);
     } else {
-      if (choosedCard.length <1) {
-        setChoosedCard([...choosedCard,card])
+      if (choosedCard === null) {
+        setChoosedCard(card)
       } else {
         console.log("You cant choose that many cads :(")
       }
@@ -150,7 +151,7 @@ export default function GamePlay() {
 
     // Else it is checked if the card has been selected
     if ( color === "white") {
-      color = choosedCard.includes(card) ? player.color : "white"
+      color = choosedCard === card ? player.color : "white"
     }
 
     return color
@@ -230,7 +231,7 @@ export default function GamePlay() {
               style={{ border: "3px solid black", padding: "3px" }}>
               checkTurn
             </Button>
-            {choosedCard.length === 1 && (
+            {choosedCard && (
               <Button
               onClick={() => {
                 sendCard(code,jwt,choosedCard)
