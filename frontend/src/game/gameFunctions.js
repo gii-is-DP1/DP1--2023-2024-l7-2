@@ -21,12 +21,11 @@ function getAlreadySelectedCardByPlayers(dwarves, setSelectedCards) {
         4: null,5: null,6: null,
         7: null,8: null,9: null};
     for (const d of dwarves) {
-        let dwacards = d.cards;
-        let pacolor = d.player.color;
-        for ( const c of dwacards) {
-            console.log(c.id + " to color => " + pacolor);
-            updated[c.position] = pacolor;
-          }
+        const c = d.card;
+        const pacolor = d.player.color;
+        console.log(c.id + " to color => " + pacolor);
+        updated[c.position] = pacolor;
+          
     }
     console.log(updated)
     setSelectedCards(updated)
@@ -60,7 +59,7 @@ function changeRound(setSelectedCards, setChoosedCards, setGame,newGame) {
     setSelectedCards({1: null,2: null,3: null,
         4: null,5: null,6: null,
         7: null,8: null,9: null})
-    setChoosedCards([])
+    setChoosedCards(null)
     setGame(newGame)
     console.log("changing round")
 }
@@ -181,9 +180,7 @@ function sendCard(code, jwt, choosedCard) {
         Accept: "application/json",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        card: choosedCard
-      })
+      body: JSON.stringify(choosedCard)
     }
   ).then((response) => response.text())
     .then((data) => console.log(data))

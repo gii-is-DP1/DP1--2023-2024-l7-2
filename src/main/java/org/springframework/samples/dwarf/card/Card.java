@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +21,7 @@ public class Card extends NamedEntity {
 
     @NotBlank
     private String description;
-    @NotBlank
+    @NotNull
     private Integer position;
     // private String badgeImage;
 

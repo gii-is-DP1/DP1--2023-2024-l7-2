@@ -397,7 +397,7 @@ public class GameRestController {
         g.setDwarves(dwarves);
 
         List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
-        if (thisRoundDwarves.size() == plys.size()) {
+        if (thisRoundDwarves.size() == plys.size()*2) {
             gs.faseResolucionAcciones(g);
 
             /*
