@@ -7,7 +7,7 @@ import getIdFromUrl from "./../util/getIdFromUrl";
 import Card from "./../cards/card"
 import SpecialCard from "../cards/specialCard";
 import  { fetchDwarves, fetchCards, fetchPlayers, 
-  fetchIsMyTurn, isFinished, sendCards}  from "./gameFunctions";
+  fetchIsMyTurn, isFinished, sendCard}  from "./gameFunctions";
 
 const jwt = tokenService.getLocalAccessToken();
 const user = tokenService.getUser()
@@ -20,8 +20,8 @@ export default function GamePlay() {
   const [gameStarted, setGameStarted] = useState(null);
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
-  const [choosedCards, setChoosedCards] = useState([]);
-  const [choosedSpecialCards, setChoosedSpecialCards] = useState([]);
+  const [choosedCard, setChoosedCard] = useState([]);
+  const [choosedSpecialCard, setChoosedSpecialCard] = useState([]);
   const [cards, setCards] = useFetchState(
     [],
     `/api/v1/game/play/${code}/getCards`,
@@ -79,7 +79,7 @@ export default function GamePlay() {
   /*
   useEffect(() => {
     setSelectedCards(emptySelectedCards);
-    setChoosedCards([]);
+    setChoosedCard([]);
 
     fetchIsMyTurn()
     fetchDwarves()
@@ -104,12 +104,12 @@ export default function GamePlay() {
       return false;
     }
     
-    if (choosedCards.includes(card)) {
+    if (choosedCard.includes(card)) {
       console.log("we are filtering")
-      setChoosedCards(choosedCards.filter((c) => c.position !== card.position))
+      setChoosedCard(choosedCard.filter((c) => c.position !== card.position))
     } else {
-      if (choosedCards.length <2) {
-        setChoosedCards([...choosedCards,card])
+      if (choosedCard.length <1) {
+        setChoosedCard([...choosedCard,card])
       } else {
         console.log("You cant choose that many cads :(")
       }
@@ -130,12 +130,12 @@ export default function GamePlay() {
       return false;
     }
     
-    if (choosedSpecialCards.includes(specialCard)) {
+    if (choosedSpecialCard.includes(specialCard)) {
       console.log("we are filtering")
-      setChoosedSpecialCards(choosedSpecialCards.filter((c) => c.position !== specialCard.position))
+      setChoosedSpecialCard(choosedSpecialCard.filter((c) => c.position !== specialCard.position))
     } else {
-      if (choosedSpecialCards.length <1) {
-        setChoosedSpecialCards([...choosedSpecialCards,specialCard])
+      if (choosedSpecialCard.length <1) {
+        setChoosedSpecialCard([...choosedSpecialCard,specialCard])
       } else {
         console.log("You cant choose that many cads :(")
       }
@@ -150,7 +150,7 @@ export default function GamePlay() {
 
     // Else it is checked if the card has been selected
     if ( color === "white") {
-      color = choosedCards.includes(card) ? player.color : "white"
+      color = choosedCard.includes(card) ? player.color : "white"
     }
 
     return color
@@ -186,7 +186,7 @@ export default function GamePlay() {
     )
   })
 
-  //console.log(choosedCards)
+  //console.log(choosedCard)
   return (
     <div style={{marginTop: "70px"}}>
 
@@ -224,21 +224,21 @@ export default function GamePlay() {
 
             <Button
               onClick={() => {fetchIsMyTurn(game, code, jwt, isMyTurn, setIsMyTurn, setSelectedCards, 
-                setChoosedCards, setGame, setDwarves)}}
+                setChoosedCard, setGame, setDwarves)}}
               title="Start Game"
               color="#008000"
               style={{ border: "3px solid black", padding: "3px" }}>
               checkTurn
             </Button>
-            {choosedCards.length === 2 && (
+            {choosedCard.length === 1 && (
               <Button
               onClick={() => {
-                sendCards(code,jwt,choosedCards)
+                sendCard(code,jwt,choosedCard)
               }}
-              title="Send Cards"
+              title="Send Card"
               color="#008000"
               style={{ border: "3px solid black", padding: "3px" }}>
-                Send Cards
+                Send Card
               </Button>
             )}
 

@@ -4,17 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.dwarf.Dwarf;
-import org.springframework.samples.dwarf.dwarf.DwarfRepository;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -36,23 +31,19 @@ public class DwarfTest {
         player.setName("Aragorn");
         dwarf.setPlayer(player);
 
-        List<Card> cards = new ArrayList<>();
-        Card card1 = new Card();
-        cards.add(card1);
-        dwarf.setCards(cards);
+        Card card = new Card();
+        dwarf.setCard(card);
     }
 
     @Test
     public void saveDwarfWithPlayerAndCards() {
         dwarfRepository.save(dwarf);
 
-        List<Card> cards = new ArrayList<>();
-        Card card1 = new Card();
-        cards.add(card1);
+        Card card = new Card();
 
         Dwarf savedDwarf = new Dwarf();
         Player jugador = new Player();
-        savedDwarf.setCards(cards);
+        savedDwarf.setCard(card);
         jugador.setName("Aragorn");
         savedDwarf.setRound(1);
         savedDwarf.setPlayer(jugador);
@@ -60,20 +51,19 @@ public class DwarfTest {
         assertEquals(1, savedDwarf.getRound().intValue());
         assertNotNull(savedDwarf.getPlayer());
         assertEquals("Aragorn", savedDwarf.getPlayer().getName());
-        assertNotNull(savedDwarf.getCards());
-        assertEquals(1, savedDwarf.getCards().size());
+        assertNotNull(savedDwarf.getCard());
     }
 
     @Test
     public void saveDwarfWithoutPlayerAndCards() {
         dwarf.setPlayer(null);
-        dwarf.setCards(null);
+        dwarf.setCard(null);
 
         dwarfRepository.save(dwarf);
 
         Dwarf savedDwarf = new Dwarf();
         assertNotNull(savedDwarf);
         assertNull(savedDwarf.getPlayer());
-        assertNull(savedDwarf.getCards());
+        assertNull(savedDwarf.getCard());
     }
 }

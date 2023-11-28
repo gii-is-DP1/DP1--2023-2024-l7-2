@@ -132,7 +132,7 @@ INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,22),(1,33),(1
                                                         (1,11),(1,12),(1,13),(1,24),(1,15),(1,26),(1,27),(1,28),(1,19);
 
 
-INSERT INTO special_card_deck(id,card_id) VALUES (1,1),(2,4),(3,7);
+INSERT INTO special_card_deck(id,special_card_id) VALUES (1,1),(2,4),(3,7);
 
 INSERT INTO special_card_deck_special_cards(special_card_deck_id, special_cards_id) VALUES 
                 (1,1),(1,2),(1,3),(2,4),(2,5),(2,6),(3,7),(3,8),(3,9);
