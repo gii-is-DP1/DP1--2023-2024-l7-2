@@ -46,7 +46,7 @@ function fetchDwarves(game, code, jwt, setDwarves, setSelectedCards){
           Accept: 'application/json',
         }
       }).then(response => response.json()).then(response => {
-        setDwarves(response)
+        setDwarves(response.dwarves)
 
         getAlreadySelectedCardByPlayers(response, setSelectedCards);
       })
@@ -171,23 +171,27 @@ function fetchIsMyTurn(game, code, jwt, isMyTurn, setIsMyTurn, setSelectedCards,
     })
   }
   
-function sendCards(code,jwt,choosedCards) {
-    fetch(
-      "/api/v1/game/play/" + code + "/dwarves",
-      {
-          method:  "POST",
-          headers: {
-              Authorization: `Bearer ${jwt}`,
-              Accept: "application/json",
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify(choosedCards),
-      }
-    ).then((response) => response.text())
-    .then((data) =>  console.log(data))
+function sendCard(code, jwt, choosedCard) {
+  fetch(
+    "/api/v1/game/play/" + code + "/dwarves",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        card: choosedCard
+      })
+    }
+  ).then((response) => response.text())
+    .then((data) => console.log(data))
     .catch((message) => alert(message));
 }
 
+
 export { 
     fetchDwarves, fetchCards, fetchPlayers, 
-    fetchIsMyTurn, isFinished, sendCards};
+    fetchIsMyTurn, isFinished, sendCard
+};

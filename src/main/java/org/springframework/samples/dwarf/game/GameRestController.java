@@ -2,7 +2,6 @@ package org.springframework.samples.dwarf.game;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -230,6 +229,7 @@ public class GameRestController {
             gs.saveGame(g);
 
             p.setGame(g);
+            g.setPlayerStart(g.getPlayerCreator());
             ps.savePlayer(p);
         } catch (Exception e) {
             System.out.println("Exception =>" + e);
