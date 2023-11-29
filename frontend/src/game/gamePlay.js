@@ -165,7 +165,7 @@ export default function GamePlay() {
             return (
               <div key={object.name} className="text-center">
                 <img
-                  src={"../src/static/objects/" + object.name + ".png"}
+                  src={"/frontend/static/images/" + object.name + ".png"}
                   alt={object.name}
                   style={{
                     width: "50px",
