@@ -13,8 +13,11 @@ import org.springframework.data.util.Pair;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardType;
+import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.mainboard.MainBoard;
+import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
@@ -22,7 +25,6 @@ import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class GameService {
@@ -30,12 +32,17 @@ public class GameService {
     GameRepository gr;
     PlayerRepository pr;
     UserService us;
+    MainBoardService mbs;
+    CardDeckService cds;
 
     @Autowired
-    public GameService(GameRepository gr, PlayerRepository pr, UserService us) {
+    public GameService(GameRepository gr, PlayerRepository pr, UserService us,
+            MainBoardService mbs, CardDeckService cds) {
         this.gr = gr;
         this.pr = pr;
         this.us = us;
+        this.mbs = mbs;
+        this.cds = cds;
 
     }
 
@@ -88,6 +95,56 @@ public class GameService {
     @Transactional
     public void delete(Integer id) {
         gr.deleteById(id);
+    }
+
+    @Transactional(readOnly = true) 
+    public List<Player> getRemainingTurns(List<Player> plys, List<Dwarf> dwarves) {
+        ArrayList<Player> remaining_turns = new ArrayList<Player>();
+        remaining_turns.addAll(plys);
+        remaining_turns.addAll(plys);
+        // Se ponen al final porque deben de ser los ultimos en tirar
+        // Es decir, cuando se resuelven las acciones
+        for (Dwarf d : dwarves) {
+            if (d.getCard().getCardType().getName().equals("HelpCard")) {
+                remaining_turns.add(d.getPlayer());
+                remaining_turns.add(d.getPlayer());
+            }
+        }
+        return remaining_turns;
+    }
+
+    @Transactional
+    public Game handleRoundChange(Game g) {
+        faseResolucionAcciones(g);
+
+        MainBoard mb = g.getMainBoard();
+        ArrayList<Card> mbCards = new ArrayList<Card>();
+        mbCards.addAll(mb.getCards());
+
+        Card c = g.getMainBoard().getCardDeck().getLastCard();
+        Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
+        ArrayList<Card> cd = new ArrayList<Card>();
+        if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
+                // Returns an empty list
+        } else {
+            List<Card> twoCards = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
+            cd.addAll(twoCards);
+        }
+
+        for (Card ca : cd) {
+            for (int i = 0; i < mbCards.size(); i++) {
+                if (ca.getPosition().equals(mbCards.get(i).getPosition())) {
+                    mbCards.set(i, ca);
+                }
+            }
+        }
+
+        mb.setCards(mbCards);
+        mbs.saveMainBoard(mb);
+
+        g.setRound(g.getRound() + 1);
+
+        return g;
     }
 
     @Transactional(readOnly = true)
@@ -323,27 +380,37 @@ public class GameService {
 
         // De esta forma obtenemos las cartas que no han sido seleccionadas
         // al eliminar de las cartas del tablero
-        ArrayList<Pair<Player, Card>> notSelected = new ArrayList<>();
-        for (Pair<Player, Card> pc : orcCards) {
-            if (!currentCards.contains(pc.getSecond())) {
-                notSelected.add(pc);
+
+        ArrayList<Card> notSelected = new ArrayList<>();
+        notSelected.addAll(currentCards);
+        if (orcCards != null) {
+            for (Pair<Player, Card> pc : orcCards) {
+                if (!currentCards.contains(pc.getSecond())) {
+                    notSelected.remove(pc.getSecond());
+                }
             }
         }
 
+
         // Ahora tenmos las cartas de orcos que no se han seleccionado
-        for (Pair<Player, Card> pc : notSelected) {
-            switch (pc.getSecond().getCardType().getName()) {
+        for (Card pc : notSelected) {
+            switch (pc.getName()) {
                 case "Orc Raiders":
                     // Si se selecciona esta carta no se hace la fase de recoleccion
                     res = false;
+                    break;
                 case "Dragon":
                     orcCardDragonAction(g);
+                    break;
                 case "Sidhe":
                     orcCardSidheAction(g);
+                    break;
                 case "Knockers":
                     orcCardKnockersAction(g);
+                    break;
                 case "Great Dragon":
                     orcCardGreatDragonAction(g);
+                    break;
             }
         }
 
@@ -421,7 +488,7 @@ public class GameService {
         // Las cartas de ayuda todavia no estan implementadas
 
         // Acciones de las cartas de orcos
-        if (canContinue && orcCards != null) {
+        if (canContinue) {
             canContinue = faseOrcos(g, orcCards);
         } else {
             canContinue = true;

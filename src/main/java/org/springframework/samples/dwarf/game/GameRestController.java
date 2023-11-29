@@ -319,16 +319,7 @@ public class GameRestController {
         System.out.println(dwarves_players);
 
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
-        remaining_turns.addAll(plys);
-        remaining_turns.addAll(plys);
-        // Se ponen al final porque deben de ser los ultimos en tirar
-        // Es decir, cuando se resuelven las acciones
-        for (Dwarf d : dwarves) {
-            if (d.getCard().getCardType().getName().equals("HelpCard")) {
-                remaining_turns.add(d.getPlayer());
-                remaining_turns.add(d.getPlayer());
-            }
-        }
+        remaining_turns.addAll(gs.getRemainingTurns(plys, dwarves));
 
         // Partimos de la premisa de que cada ronda se componen de 2 turnos por cada
         // jugador
@@ -340,10 +331,7 @@ public class GameRestController {
                     break;
                 }
             }
-        }
-
-
-        
+        } 
         
         if (remaining_turns.size() > 0) {
             if (remaining_turns.get(0).equals(p)) {
@@ -413,69 +401,22 @@ public class GameRestController {
         dwarf.setCard(card);
 
         ds.saveDwarf(dwarf);
-        /*
-         * ArrayList<Dwarf> dwarflist = new ArrayList<Dwarf>();
-         * dwarflist.addAll(p.getDwarfs());
-         * dwarflist.add(dwarf);
-         * ps.savePlayer(p)
-         */
 
         List<Dwarf> dwarves = g.getDwarves();
         dwarves.add(dwarf);
         g.setDwarves(dwarves);
 
+        Integer round = g.getRound();
         List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> 
-                d.getRound() == g.getRound()
+                d.getRound() == round
                 && d.getPlayer() != null).toList();
-        if (thisRoundDwarves.size() == plys.size()*2) {
-            gs.faseResolucionAcciones(g);
 
-            /*
-             * for (Dwarf d : dwarves) {
-             * d.setPlayer(null);
-             * d.setCards(null);
-             * ds.saveDwarf(d);
-             * ds.deleteDwarf(d);
-             * }
-             * dwarves = null;
-             */
-
-            MainBoard mb = g.getMainBoard();
-            ArrayList<Card> mbCards = new ArrayList<Card>();
-            mbCards.addAll(mb.getCards());
-
-            Card c = g.getMainBoard().getCardDeck().getLastCard();
-            Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
-            ArrayList<Card> cd = new ArrayList<Card>();
-            if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-                // Returns an empty list
-            } else {
-                List<Card> twoCards = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
-                cd.addAll(twoCards);
-            }
-
-            for (Card ca : cd) {
-                for (int i = 0; i < mbCards.size(); i++) {
-                    if (ca.getPosition().equals(mbCards.get(i).getPosition())) {
-                        mbCards.set(i, ca);
-                    }
-                }
-            }
-
-            mb.setCards(mbCards);
-            mbs.saveMainBoard(mb);
-
-            g.setRound(g.getRound() + 1);
+        List<Player> remainingTurns = gs.getRemainingTurns(plys,thisRoundDwarves);
+        if (thisRoundDwarves.size() == remainingTurns.size()) {
+            g = gs.handleRoundChange(g);
         }
 
-        try {
-            gs.saveGame(g);
-        } catch (Exception e) {
-            System.out.println(e);
-            System.out.println(e.getMessage());
-        }
-
-        System.out.println(g.getDwarves());
+        gs.saveGame(g);
 
         return new ResponseEntity<>(HttpStatus.OK);
 
