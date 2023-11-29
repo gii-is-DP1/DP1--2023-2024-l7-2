@@ -45,7 +45,7 @@ export default function GameEdit() {
     // } 
 
     const modal = getErrorModal(setVisible, visible, message);
-    // const role = jwt_decode(jwt).authorities[0];
+    const role = jwt_decode(jwt).authorities[0];
 
     function handleSubmit(event) {
 
@@ -73,8 +73,7 @@ export default function GameEdit() {
                     setMessage(JSON.parse(data).message);
                     setVisible(true);
                 }else
-                    // window.location.href = role=="USER" ? `/game/${json.code}` : "/game";
-                    window.location.href = "/game";
+                    window.location.href = role=="USER" ? `/game/${json.code}` : "/game";
             }
         })
 
