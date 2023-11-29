@@ -388,10 +388,6 @@ public class GameService {
         Optional<List<Player>> plys_optional = getPlayers(g.getId());
         List<Player> plys = plys_optional.get();
 
-        // TODO: CREATE ERROR
-        if (dwarves.size() != plys.size())
-            return;
-
         // Obtenemos todas las cartas y las guardamos
         // con su player para despues aplicarselo al player
         ArrayList<Pair<Player, Card>> cards = new ArrayList<Pair<Player, Card>>();

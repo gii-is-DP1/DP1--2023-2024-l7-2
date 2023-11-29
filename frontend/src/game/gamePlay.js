@@ -76,15 +76,10 @@ export default function GamePlay() {
   );
 
   const [dwarves, setDwarves] = useFetchState([]);
-  /*
+  
   useEffect(() => {
-    setSelectedCards(emptySelectedCards);
-    setChoosedCard([]);
-
-    fetchIsMyTurn()
-    fetchDwarves()
-    setAlreadySelectedCardByPlayers()
-  },[])*/
+    setChoosedCard(null)
+  },[])
 
   const modal = getErrorModal(setVisible, visible, message);
 
@@ -235,6 +230,7 @@ export default function GamePlay() {
               <Button
               onClick={() => {
                 sendCard(code,jwt,choosedCard)
+                setChoosedCard(null)
               }}
               title="Send Card"
               color="#008000"
