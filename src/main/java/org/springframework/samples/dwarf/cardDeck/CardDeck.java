@@ -8,9 +8,8 @@ import org.springframework.samples.dwarf.model.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +23,7 @@ public class CardDeck extends BaseEntity {
     @JoinColumn(name = "card")
     List<Card> cards;
 
-    @OneToOne
+    @ManyToOne
     // @Transient
     @JoinColumn(name = "card_id")
     Card lastCard;

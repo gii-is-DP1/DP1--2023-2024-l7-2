@@ -15,11 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardType;
+import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.game.GameRepository;
 import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
+import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
 import org.springframework.samples.dwarf.user.UserRepository;
@@ -31,12 +33,16 @@ public class GameServiceTest {
     private GameRepository gameRepository;
     private PlayerRepository playerRepository;
     private UserService userService;
+    private MainBoardService mbs;
+    private CardDeckService cds;
 
     @BeforeEach
     public void setUp() {
         gameRepository = mock(GameRepository.class);
         playerRepository = mock(PlayerRepository.class);
-        gameService = new GameService(gameRepository, playerRepository, userService );
+        mbs = mock(MainBoardService.class);
+        cds = mock(CardDeckService.class);
+        gameService = new GameService(gameRepository, playerRepository, userService, mbs, cds);
     }
 
     @Test

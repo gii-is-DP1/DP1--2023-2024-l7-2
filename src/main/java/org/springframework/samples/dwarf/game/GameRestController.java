@@ -313,31 +313,47 @@ public class GameRestController {
         }
 
         List<Dwarf> dwarves = g.getDwarves();
-        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
 
         List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
         System.out.println(dwarves_players);
 
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
-        remaining_turns.addAll(plys);
-        remaining_turns.addAll(plys);
+        remaining_turns.addAll(gs.getRemainingTurns(plys, dwarves));
 
-        for (Dwarf d : dwarves) {
-            if (d.getCard().getCardType().equals("HelpCard")) {
-                remaining_turns.add(d.getPlayer());
-                remaining_turns.add(d.getPlayer());
+        // Partimos de la premisa de que cada ronda se componen de 2 turnos por cada
+        // jugador
+        for (Player p_dwarf: dwarves_players) {
+            //ArrayList<Player> tmp_remaining_turns = new ArrayList<>(remaining_turns);
+            for (int i = 0 ; i < remaining_turns.size() ; i++) {
+                if(remaining_turns.get(i).equals(p_dwarf)){
+                    remaining_turns.remove(i);
+                    break;
+                }
             }
-        }
-
-        remaining_turns.removeAll(dwarves_players);
-
+        } 
+        
         if (remaining_turns.size() > 0) {
             if (remaining_turns.get(0).equals(p)) {
                 res = true;
             }
         }
-
+        
         return new ResponseEntity<>(res, HttpStatus.OK);
+        /*
+        // Existen dos posibilidades, que todos los jugadores
+        // hayan tirado una vez o todavia no lo hayan hecho
+        // por ese motivo se puede determinar el turno de manera correcta
+        // comprobando entre estos dos casos ya que removeAll elimina todas las
+        // instancias del objeto
+        if (dwarves.size() < plys.size()) {
+            remaining_turns.removeAll(dwarves_players);
+        } else { // dwarves.size >= plys.size()
+
+            // Ahora debemos de comprobar si 
+            remaining_turns.addAll(plys);
+    
+        }*/
     }
 
     @GetMapping("/play/{code}/isFinished")
@@ -385,70 +401,53 @@ public class GameRestController {
         dwarf.setCard(card);
 
         ds.saveDwarf(dwarf);
-        /*
-         * ArrayList<Dwarf> dwarflist = new ArrayList<Dwarf>();
-         * dwarflist.addAll(p.getDwarfs());
-         * dwarflist.add(dwarf);
-         * ps.savePlayer(p)
-         */
 
         List<Dwarf> dwarves = g.getDwarves();
         dwarves.add(dwarf);
         g.setDwarves(dwarves);
 
-        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
-        if (thisRoundDwarves.size() == plys.size()*2) {
-            gs.faseResolucionAcciones(g);
+        Integer round = g.getRound();
+        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> 
+                d.getRound() == round
+                && d.getPlayer() != null).toList();
 
-            /*
-             * for (Dwarf d : dwarves) {
-             * d.setPlayer(null);
-             * d.setCards(null);
-             * ds.saveDwarf(d);
-             * ds.deleteDwarf(d);
-             * }
-             * dwarves = null;
-             */
-
-            MainBoard mb = g.getMainBoard();
-            ArrayList<Card> mbCards = new ArrayList<Card>();
-            mbCards.addAll(mb.getCards());
-
-            Card c = g.getMainBoard().getCardDeck().getLastCard();
-            Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
-            ArrayList<Card> cd = new ArrayList<Card>();
-            if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-                // Returns an empty list
-            } else {
-                List<Card> twoCards = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
-                cd.addAll(twoCards);
-            }
-
-            for (Card ca : cd) {
-                for (int i = 0; i < mbCards.size(); i++) {
-                    if (ca.getPosition().equals(mbCards.get(i).getPosition())) {
-                        mbCards.set(i, ca);
-                    }
-                }
-            }
-
-            mb.setCards(mbCards);
-            mbs.saveMainBoard(mb);
-
-            g.setRound(g.getRound() + 1);
+        List<Player> remainingTurns = gs.getRemainingTurns(plys,thisRoundDwarves);
+        if (thisRoundDwarves.size() == remainingTurns.size()) {
+            g = gs.handleRoundChange(g);
         }
 
-        try {
-            gs.saveGame(g);
-        } catch (Exception e) {
-            System.out.println(e);
-            System.out.println(e.getMessage());
-        }
-
-        System.out.println(g.getDwarves());
+        gs.saveGame(g);
 
         return new ResponseEntity<>(HttpStatus.OK);
 
+    }
+
+    @PostMapping("/play/{code}/specialAction/{numberOfDwarves}") 
+    public ResponseEntity<Void> handleSpecialAction(@Valid @RequestBody SpecialCard SpecialCard, 
+        @PathVariable("code") String code, @PathVariable("numberOfDwarves") Integer numberOfDwarves) {
+
+        Game g = gs.getGameByCode(code);
+        if (!gs.checkPlayerInGameAndGameExists(g)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Se crean dwarfs ficticios que cubren las posiciones de los orcos
+        if (SpecialCard.getName().equals("Muster an army")) {
+            List<Card> gameCards = g.getMainBoard().getCards();
+            ArrayList<Dwarf> gameDwarfs = new ArrayList<>(g.getDwarves());
+            for (Card c:gameCards) {
+                if (c.getCardType().getName().equals("OrcCard")) {
+                    Dwarf d = new Dwarf();
+                    d.setCard(c);
+                    d.setRound(g.getRound());
+                    gameDwarfs.add(d);
+                }
+            }
+            g.setDwarves(gameDwarfs);
+            gs.saveGame(g);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/play/{code}/finish")
