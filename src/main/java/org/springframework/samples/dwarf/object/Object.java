@@ -17,5 +17,4 @@ public class Object extends NamedEntity {
     @NotBlank
     @NotNull
     private String name;
-    private String photo;
 }

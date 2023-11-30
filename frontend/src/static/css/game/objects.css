@@ -1,0 +1,80 @@
+
+.maze {
+    background-image: url('../../images/maze.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: "80px";
+    height: "80px";
+    margin: "10px";
+}
+
+.sword{
+    background-image: url('../../images/sword.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: "80px";
+    height: "80px";
+    margin: "10px";
+}
+
+.axe{
+    background-image: url('../../images/axe.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: "80px";
+    height: "80px";
+    margin: "10px";
+}
+
+.dagger{
+    background-image: url('../../images/dagger.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: "80px";
+    height: "80px";
+    margin: "10px";
+}
+
+.armour{
+    background-image: url('../../images/armour.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: "80px";
+    height: "80px";
+    margin: "10px";
+}
+
+.helm{
+    background-image: url('../../images/helm.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: "80px";
+    height: "80px";
+    margin: "10px";
+}
+
+.crown{
+    background-image: url('../../images/crown.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: "80px";
+    height: "80px";
+    margin: "10px";
+}
+
+.armour{
+    background-image: url('../../images/armour.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: "80px";
+    height: "80px";
+    margin: "10px";
+}

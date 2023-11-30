@@ -35,14 +35,14 @@ INSERT INTO card_type(id, name) VALUES (1, 'HelpCard'),
         (4, 'Other');
 
 /*OBJECTS*/
-INSERT INTO object(id, name, photo) VALUES (1, 'maze', '../src/static/objects/maze.png'),
-                                        (2, 'sword', '../src/static/objects/sword.png'),
-                                        (3, 'axe', '../src/static/objects/axe.png'),
-                                        (4, 'dagger', '../src/static/objects/dagger.png'),
-                                        (5, 'armour', '../src/static/objects/armour.png'),
-                                        (6, 'helm', '../src/static/objects/helm.png'),
-                                        (7, 'crown', '../src/static/objects/crown.png'),
-                                        (8, 'diadem', '../src/static/objects/diadem.png');
+INSERT INTO object(id, name) VALUES (1, 'maze'),
+                                        (2, 'sword'),
+                                        (3, 'axe'),
+                                        (4, 'dagger'),
+                                        (5, 'armour'),
+                                        (6, 'helm'),
+                                        (7, 'crown'),
+                                        (8, 'diadem');
 
 /*CARD*/
 INSERT INTO card(id, name, description, position, card_type_id, total_iron, total_gold, total_steal, total_medals, object_id) 
