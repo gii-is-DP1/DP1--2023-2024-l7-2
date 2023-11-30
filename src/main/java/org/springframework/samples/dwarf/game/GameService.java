@@ -1,6 +1,7 @@
 package org.springframework.samples.dwarf.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,8 +95,16 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
-    public List<Player> getRemainingTurns(List<Player> plys, List<Dwarf> dwarves) {
+    public List<Player> getRemainingTurns(List<Player> plys, List<Dwarf> dwarves, Player starter) {
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
+
+        // Asi se consigue que el que empieza la ronda sea
+        // el jugador que debe empezarla
+        if (!plys.get(0).equals(starter)) {
+            Integer starterIndex = plys.indexOf(starter);
+            Collections.rotate(plys, starterIndex);
+        }
+
         remaining_turns.addAll(plys);
         remaining_turns.addAll(plys);
         // Se ponen al final porque deben de ser los ultimos en tirar
@@ -386,26 +395,33 @@ public class GameService {
                 }
             }
         }
+        boolean orcCardsAreDefended = true;
+        if (notSelected.size() > 0) {
+            orcCardsAreDefended = false;
+        }
 
-        // Ahora tenmos las cartas de orcos que no se han seleccionado
-        for (Card pc : notSelected) {
-            switch (pc.getName()) {
-                case "Orc Raiders":
-                    // Si se selecciona esta carta no se hace la fase de recoleccion
-                    res = false;
-                    break;
-                case "Dragon":
-                    orcCardDragonAction(g);
-                    break;
-                case "Sidhe":
-                    orcCardSidheAction(g);
-                    break;
-                case "Knockers":
-                    orcCardKnockersAction(g);
-                    break;
-                case "Great Dragon":
-                    orcCardGreatDragonAction(g);
-                    break;
+        if (orcCardsAreDefended) {
+            // Se le debe de dar medallas a los players
+        } else {
+            for (Card pc : currentCards) {
+                switch (pc.getName()) {
+                    case "Orc Raiders":
+                        // Si se selecciona esta carta no se hace la fase de recoleccion
+                        res = false;
+                        break;
+                    case "Dragon":
+                        orcCardDragonAction(g);
+                        break;
+                    case "Sidhe":
+                        orcCardSidheAction(g);
+                        break;
+                    case "Knockers":
+                        orcCardKnockersAction(g);
+                        break;
+                    case "Great Dragon":
+                        orcCardGreatDragonAction(g);
+                        break;
+                }
             }
         }
 
@@ -493,6 +509,7 @@ public class GameService {
         if (canContinue && normalCards != null) {
             updateMaterials(g, normalCards);
         }
+        canContinue = true;
 
         if (objectCards != null) {
             faseForjar(g, objectCards);

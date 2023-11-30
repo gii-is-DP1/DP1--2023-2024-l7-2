@@ -226,10 +226,10 @@ public class GameRestController {
             // y si se asigna a game el player, el player todavia no existe
 
             g.setPlayerCreator(p);
+            g.setPlayerStart(p);
             gs.saveGame(g);
 
             p.setGame(g);
-            g.setPlayerStart(g.getPlayerCreator());
             ps.savePlayer(p);
         } catch (Exception e) {
             System.out.println("Exception =>" + e);
@@ -319,7 +319,7 @@ public class GameRestController {
         System.out.println(dwarves_players);
 
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
-        remaining_turns.addAll(gs.getRemainingTurns(plys, dwarves));
+        remaining_turns.addAll(gs.getRemainingTurns(plys, dwarves, g.getPlayerStart()));
 
         // Partimos de la premisa de que cada ronda se componen de 2 turnos por cada
         // jugador
@@ -411,7 +411,7 @@ public class GameRestController {
                 d.getRound() == round
                 && d.getPlayer() != null).toList();
 
-        List<Player> remainingTurns = gs.getRemainingTurns(plys,thisRoundDwarves);
+        List<Player> remainingTurns = gs.getRemainingTurns(plys,thisRoundDwarves, g.getPlayerStart());
         if (thisRoundDwarves.size() == remainingTurns.size()) {
             g = gs.handleRoundChange(g);
         }
