@@ -8,6 +8,8 @@ import Card from "./../cards/card"
 import SpecialCard from "../cards/specialCard";
 import  { fetchDwarves, fetchCards, fetchPlayers, 
   fetchIsMyTurn, isFinished, sendCard}  from "./gameFunctions";
+import '../static/css/game/objects.css'; 
+
 
 const jwt = tokenService.getLocalAccessToken();
 const user = tokenService.getUser()
@@ -163,17 +165,8 @@ export default function GamePlay() {
         <td style={{ color: play.color }} className="text-center">Objects: {play.objects.map(
           (object) => {
             return (
-              <div key={object.name} className="text-center">
-                <img
-                  src={"/frontend/static/images/" + object.name + ".png"}
-                  alt={object.name}
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    objectFit: "contain",
-                    margin: "10px",
-                  }}
-                />
+              <div className={object.name}>
+                <br></br>
               </div>
             )
           }

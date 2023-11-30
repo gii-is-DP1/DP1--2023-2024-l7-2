@@ -1,7 +1,6 @@
 package org.springframework.samples.dwarf.game;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +9,9 @@ import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.card.CardType;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
-import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.object.Object;
@@ -97,7 +93,7 @@ public class GameService {
         gr.deleteById(id);
     }
 
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public List<Player> getRemainingTurns(List<Player> plys, List<Dwarf> dwarves) {
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
         remaining_turns.addAll(plys);
@@ -125,7 +121,7 @@ public class GameService {
         Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
         ArrayList<Card> cd = new ArrayList<Card>();
         if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-                // Returns an empty list
+            // Returns an empty list
         } else {
             List<Card> twoCards = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
             cd.addAll(twoCards);
@@ -385,12 +381,11 @@ public class GameService {
         notSelected.addAll(currentCards);
         if (orcCards != null) {
             for (Pair<Player, Card> pc : orcCards) {
-                if (!currentCards.contains(pc.getSecond())) {
+                if (currentCards.contains(pc.getSecond())) {
                     notSelected.remove(pc.getSecond());
                 }
             }
         }
-
 
         // Ahora tenmos las cartas de orcos que no se han seleccionado
         for (Card pc : notSelected) {
@@ -528,53 +523,52 @@ public class GameService {
     }
 
     @Transactional
-    public void changePlayerStart(Game g,ArrayList<Pair<Player,Card>> helpCards) {
-    List<Player> players = pr.findAll();
+    public void changePlayerStart(Game g, ArrayList<Pair<Player, Card>> helpCards) {
+        List<Player> players = pr.findAll();
 
-    // Obtemenemos las cartas del juego actual
-    ArrayList<Card> currentCards = new ArrayList<>();
-    for (Card c:g.getMainBoard().getCards()) {
-        // Solo guardamos las cartas que son de orcos
-        if (c.getCardType().getName().equals("HelpCard")){
-            currentCards.add(c);
-        }
-    }
-
-    // De esta forma obtenemos las cartas que no han sido seleccionadas
-    // al eliminar de las cartas del tablero 
-    ArrayList<Pair<Player,Card>> selected = new ArrayList<>();
-    for (Pair<Player,Card> pc: helpCards) {
-        if (currentCards.contains(pc.getSecond())) {
-            selected.add(pc);
-        }
-    }
-
-
-    // Verificar si el jugador actual (playerStart) seleccionó una carta de tipo "HelpCard"
-    for (Pair<Player, Card> pc : selected) {
-        if (pc.getFirst().getId().equals(g.getPlayerStart().getId()) && "HelpCard".equals(pc.getSecond().getCardType().getName())) {
-            int currentIndex = players.indexOf(pc.getFirst());
-            // Asignar el siguiente jugador en la lista como playerStart
-            if (currentIndex != -1) {
-                int nextIndex = (currentIndex + 1) % players.size();
-                
-                if (nextIndex < players.size()) {
-                    Player nextPlayer = players.get(nextIndex);
-                    g.setPlayerStart(nextPlayer);
-                    break; // Terminar el bucle después de cambiar el playerStart
-                } else {
-                    g.setPlayerStart(g.getPlayerCreator());
-                    break; // Terminar el bucle después de cambiar el playerStart al creador del juego
-                }
-            } else {
-                System.out.println("Error: No se encontró el jugador actual en la lista.");
+        // Obtemenemos las cartas del juego actual
+        ArrayList<Card> currentCards = new ArrayList<>();
+        for (Card c : g.getMainBoard().getCards()) {
+            // Solo guardamos las cartas que son de orcos
+            if (c.getCardType().getName().equals("HelpCard")) {
+                currentCards.add(c);
             }
         }
+
+        // De esta forma obtenemos las cartas que no han sido seleccionadas
+        // al eliminar de las cartas del tablero
+        ArrayList<Pair<Player, Card>> selected = new ArrayList<>();
+        for (Pair<Player, Card> pc : helpCards) {
+            if (currentCards.contains(pc.getSecond())) {
+                selected.add(pc);
+            }
+        }
+
+        // Verificar si el jugador actual (playerStart) seleccionó una carta de tipo
+        // "HelpCard"
+        for (Pair<Player, Card> pc : selected) {
+            if (pc.getFirst().getId().equals(g.getPlayerStart().getId())
+                    && "HelpCard".equals(pc.getSecond().getCardType().getName())) {
+                int currentIndex = players.indexOf(pc.getFirst());
+                // Asignar el siguiente jugador en la lista como playerStart
+                if (currentIndex != -1) {
+                    int nextIndex = (currentIndex + 1) % players.size();
+
+                    if (nextIndex < players.size()) {
+                        Player nextPlayer = players.get(nextIndex);
+                        g.setPlayerStart(nextPlayer);
+                        break; // Terminar el bucle después de cambiar el playerStart
+                    } else {
+                        g.setPlayerStart(g.getPlayerCreator());
+                        break; // Terminar el bucle después de cambiar el playerStart al creador del juego
+                    }
+                } else {
+                    System.out.println("Error: No se encontró el jugador actual en la lista.");
+                }
+            }
+        }
+
+        gr.save(g);
     }
-
-    gr.save(g);
-}
-
-
 
 }
