@@ -386,26 +386,33 @@ public class GameService {
                 }
             }
         }
+        boolean orcCardsAreDefended = true;
+        if (notSelected.size() > 0) {
+            orcCardsAreDefended = false;
+        }
 
-        // Ahora tenmos las cartas de orcos que no se han seleccionado
-        for (Card pc : notSelected) {
-            switch (pc.getName()) {
-                case "Orc Raiders":
-                    // Si se selecciona esta carta no se hace la fase de recoleccion
-                    res = false;
-                    break;
-                case "Dragon":
-                    orcCardDragonAction(g);
-                    break;
-                case "Sidhe":
-                    orcCardSidheAction(g);
-                    break;
-                case "Knockers":
-                    orcCardKnockersAction(g);
-                    break;
-                case "Great Dragon":
-                    orcCardGreatDragonAction(g);
-                    break;
+        if (orcCardsAreDefended) {
+            // Se le debe de dar medallas a los players
+        } else {
+            for (Card pc : currentCards) {
+                switch (pc.getName()) {
+                    case "Orc Raiders":
+                        // Si se selecciona esta carta no se hace la fase de recoleccion
+                        res = false;
+                        break;
+                    case "Dragon":
+                        orcCardDragonAction(g);
+                        break;
+                    case "Sidhe":
+                        orcCardSidheAction(g);
+                        break;
+                    case "Knockers":
+                        orcCardKnockersAction(g);
+                        break;
+                    case "Great Dragon":
+                        orcCardGreatDragonAction(g);
+                        break;
+                }
             }
         }
 
@@ -493,6 +500,7 @@ public class GameService {
         if (canContinue && normalCards != null) {
             updateMaterials(g, normalCards);
         }
+        canContinue = true;
 
         if (objectCards != null) {
             faseForjar(g, objectCards);
