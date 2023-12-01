@@ -8,9 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
-import org.springframework.samples.dwarf.mainboard.MainBoard;
-import org.springframework.samples.dwarf.mainboard.MainBoardService;
-import org.springframework.validation.BindingResult;
+import org.springframework.samples.dwarf.user.User;
+import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,56 +29,71 @@ import jakarta.validation.Valid;
 @SecurityRequirement(name = "bearerAuth")
 public class FriendsController {
 
-    private final FriendRequestService friendRequestService;
+    private FriendRequestService friendRequestService;
+	private UserService us;
 
     @Autowired
-	public FriendsController(FriendRequestService friendRequestService) {
+	public FriendsController(FriendRequestService friendRequestService, UserService us) {
 		this.friendRequestService = friendRequestService;
+		this.us = us;
 	}
 
     @GetMapping
 	public ResponseEntity<List<FriendRequest>> findAll() {
-		return new ResponseEntity<>((List<FriendRequest>) friendRequestService.findAll(), HttpStatus.OK);
+		User u = us.findCurrentUser();
+
+		if (u == null) {
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}
+
+		List<FriendRequest> res = null;
+
+		if (u.getAuthority().getAuthority().equals("ADMIN"))
+		{
+			res = friendRequestService.findAll();
+		} else {
+			res = friendRequestService.findByUser(u);
+		}
+		
+		
+		return new ResponseEntity<>(res, HttpStatus.OK);
+		
 	}
 
     @GetMapping("/{id}")
 	public ResponseEntity<FriendRequest> findFriendRequest(@PathVariable("id") int id) {
-		FriendRequest friendRequestToGet = friendRequestService.findByRequestById(id);
+		FriendRequest friendRequestToGet = friendRequestService.findById(id);
 		if (friendRequestToGet == null)
 			throw new ResourceNotFoundException("FriendRequest with id " + id + " not found!");
 		return new ResponseEntity<FriendRequest>(friendRequestToGet, HttpStatus.OK);
 	}
-
-    @DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteFriendRequest(@PathVariable("id") int id) {
-		findFriendRequest(id);
-		friendRequestService.deleteFriendRequest(id);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-    @PostMapping
-	public ResponseEntity<FriendRequest> createRequest(@RequestBody @Valid FriendRequest sendRequest, BindingResult br) {
-		FriendRequest result = null;
-		if (!br.hasErrors())
-			result = friendRequestService.saveFriendRequest(sendRequest);
-		else
-			throw new BadRequestException(br.getAllErrors());
+	
+	@PostMapping
+	public ResponseEntity<FriendRequest> createRequest(@RequestBody @Valid FriendRequest sendRequest) {
+		FriendRequest result = friendRequestService.saveFriendRequest(sendRequest);
+	
 		return new ResponseEntity<>(result, HttpStatus.CREATED);
 	}
 
+    @DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteFriendRequest(@PathVariable("id") int id) {
+		FriendRequest friendRequestToGet = friendRequestService.findById(id);
+		if (friendRequestToGet == null)
+			throw new ResourceNotFoundException("FriendRequest with id " + id + " not found!");
+		friendRequestService.deleteFriendRequest(id);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
     @PutMapping("/{id}")
-	public ResponseEntity<Void> modifyStatus(@RequestBody @Valid FriendRequest newStatus, BindingResult br,
-			@PathVariable("id") int id) {
-		FriendRequest friendRequestToUpdate = this.findFriendRequest(id).getBody();
-		if (br.hasErrors())
-			throw new BadRequestException(br.getAllErrors());
-		else if (newStatus.getId() == null || !newStatus.getId().equals(id))
+	public ResponseEntity<Void> modifyFriendRequest(@RequestBody @Valid FriendRequest newStatus, @PathVariable("id") Integer id) {
+		FriendRequest friendRequestToUpdate = friendRequestService.findById(id);
+		if (!newStatus.getId().equals(id))
 			throw new BadRequestException("Status id is not consistent with resource URL:" + id);
 		else {
 			BeanUtils.copyProperties(newStatus, friendRequestToUpdate, "id");
 			friendRequestService.saveFriendRequest(friendRequestToUpdate);
 		}
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
         
 }
