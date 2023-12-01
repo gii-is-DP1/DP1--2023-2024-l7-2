@@ -12,6 +12,17 @@ const jwt = tokenService.getLocalAccessToken();
 
 
 const UserProfile = () => {
+
+  const [message, setMessage] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const [friends, setFriends] = useFetchState(
+    [],
+    `/api/v1/friends`,
+    jwt,
+    setMessage,
+    setVisible
+  );
+
   function sendLogoutRequest() {
     const jwt = window.localStorage.getItem("jwt");
     if (jwt || typeof jwt === "undefined") {
@@ -22,7 +33,7 @@ const UserProfile = () => {
     }
   }
 
-  console.log(user);
+  console.log(friends);
   function deleteUser(url,id,ownerData) {
     let confirmMessage = window.confirm("Are you sure you want to delete it?");
     if (confirmMessage) {
@@ -43,25 +54,47 @@ const UserProfile = () => {
             });
     }
     }
-  console.log(user)
+
+  const friendList = friends.map((request) => {
+    return (
+      <tr>
+        <td>{request.receiver.username == user.username ? request.sender.username : request.receiver.username}</td>
+        <td>{request.status.name}</td>
+      </tr>
+    )
+  })
+
   return (
-    <div className="auth-page-container" style={{height: "100vh", marginTop: "60px"}}>
+    <div className="auth-page-container" style={{height: "100vh", marginTop: "60px", textAlign: "center"}}>
 
       <h1>My profile</h1>
+      <div className="user-containe" style={{display:"flex",flexDirection:"row", width:"100vw", justifyContent: "space-around"}}>
+        <div>
+          <h4 style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
+            <li>Username: {user.username}</li>
+            <li>Nombre: {user.name}</li>
+          </h4>
 
-      <h4 style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
-        <li>Username: {user.username}</li>
-        <li>Nombre: {user.name}</li>
-      </h4>
-
-      <div className="col text-center" style={{marginTop: "20px"}}>
-        <Button outline color="success" margin="15px">
-          <Link to={`/user/userEdit`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
-        </Button>
-        <Button outline color="danger" margin="15px">
-            <Link to="/" onClickCapture={() => {deleteUser(`/api/v1/users/${user.id}`,user.id, user); sendLogoutRequest() }} 
-                      className="btn sm" style={{ textDecoration: "none" }}>Delete</Link>
-        </Button>
+          <div className="col text-center" style={{marginTop: "20px"}}>
+            <Button outline color="success" margin="15px">
+              <Link to={`/user/userEdit`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
+            </Button>
+            <Button outline color="danger" margin="15px">
+                <Link to="/" onClickCapture={() => {deleteUser(`/api/v1/users/${user.id}`,user.id, user); sendLogoutRequest() }} 
+                          className="btn sm" style={{ textDecoration: "none" }}>Delete</Link>
+            </Button>
+          </div>
+        </div>
+        <div className="friends">
+          <h3>Friend Requests</h3>
+          <thead>
+              <tr>
+                <th width="15%" className="text-center" style={{borderBottom:"2px solid black"}}>Request User</th>
+                <th width="15%" className="text-center" style={{borderBottom:"2px solid black"}}>Status</th>
+              </tr>
+            </thead>
+            {friendList}
+        </div>
       </div>
 
     </div>

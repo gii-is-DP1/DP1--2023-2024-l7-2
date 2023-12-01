@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "status")
+@Table(name = "friendRequestStatus")
 public class Status  extends NamedEntity {
 
 }
