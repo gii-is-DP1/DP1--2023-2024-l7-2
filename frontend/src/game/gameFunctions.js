@@ -169,6 +169,21 @@ function fetchIsMyTurn(game, code, jwt, isMyTurn, setIsMyTurn, setSelectedCards,
         }
     })
   }
+
+  function isStart(code, jwt) {
+    fetch(`/api/v1/game/play/${code}/isStart`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/json',
+      }
+    }).then(response => response.json()).then(response => {
+        if (response === true) {
+            finDelJuego(code,jwt)
+        }
+    })
+  }
   
 function sendCard(code, jwt, choosedCard) {
   fetch(
@@ -190,5 +205,5 @@ function sendCard(code, jwt, choosedCard) {
 
 export { 
     fetchDwarves, fetchCards, fetchPlayers, 
-    fetchIsMyTurn, isFinished, sendCard
+    fetchIsMyTurn, isFinished, sendCard,isStart,
 };
