@@ -382,6 +382,18 @@ public class GameRestController {
         return new ResponseEntity<>(finished, HttpStatus.OK);
     }
 
+    @GetMapping("/play/{code}/isStart")
+    public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+        if (!gs.checkPlayerInGameAndGameExists(g)) {
+            return ResponseEntity.notFound().build();
+        }
+        g.setStart(LocalDateTime.now());
+        
+            
+        return new ResponseEntity<>(g.getStart(), HttpStatus.OK);
+    }
+
     @PostMapping("/play/{code}/dwarves")
     public ResponseEntity<Void> addDwarves(@Valid @RequestBody Card card, @PathVariable("code") String code) {
 
