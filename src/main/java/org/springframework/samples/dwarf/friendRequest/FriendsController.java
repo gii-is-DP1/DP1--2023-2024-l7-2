@@ -1,4 +1,4 @@
-package org.springframework.samples.dwarf.friendsRequest;
+package org.springframework.samples.dwarf.friendRequest;
 
 import java.util.List;
 
