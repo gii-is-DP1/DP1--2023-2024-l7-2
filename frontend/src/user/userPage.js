@@ -51,7 +51,6 @@ const UserProfile = () => {
 
       <h4 style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
         <li>Username: {user.username}</li>
-        <li>Nombre: {user.name}</li>
       </h4>
 
       <div className="col text-center" style={{marginTop: "20px"}}>

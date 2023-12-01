@@ -66,14 +66,14 @@ export default function GameEdit() {
         .then((response) => response.text())
         .then((data) => {
             if(data==="")
-                window.location.href = "/game";
+            window.location.href = role=="USER" ? `/game` : `/games`;
             else{
                 let json = JSON.parse(data);
                 if(json.message){
                     setMessage(JSON.parse(data).message);
                     setVisible(true);
                 }else
-                    window.location.href = role=="USER" ? `/game/${json.code}` : "/game";
+                    window.location.href = role=="USER" ? `/game/${json.code}` : "/games";
             }
         })
 
@@ -105,7 +105,7 @@ export default function GameEdit() {
                             name="name"
                             id="name"
                             value={game.name || ""}
-                            onChange={handleChange}
+                            onChange={(e) => setGame({ ...game, name: e.target.value })}
                             className="custom-input"
                         />
                     </div>
@@ -113,17 +113,16 @@ export default function GameEdit() {
                         <Label for="code" className="custom-form-input-label"> Code </Label>
                         <Input
                             type="text"
-                            required
                             name="code"
                             id="code"
                             value={game.code || ""}
-                            onChange={handleChange}
+                            onChange={(e) => setGame({ ...game, code: e.target.value })}
                             className="custom-input"
                         />
                     </div>
                     <div className="custom-button-row">
                         <button className="auth-button">Save</button>
-                        <Link to={`/game`} className="auth-button" style={{ textDecoration: "none" }}> Cancel </Link>
+                        <Link to={role=="USER" ? `/game` : `/games`} className="auth-button" style={{ textDecoration: "none" }}> Cancel </Link>
                     </div>
                 </Form>
             </div>

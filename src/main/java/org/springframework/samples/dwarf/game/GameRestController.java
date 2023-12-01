@@ -244,7 +244,7 @@ public class GameRestController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateGame(@Valid @RequestBody Game g, @PathVariable("id") Integer id) {
         Game gToUpdate = getGameById(id);
-        BeanUtils.copyProperties(g, gToUpdate, "id");
+        BeanUtils.copyProperties(g, gToUpdate, "id", "playerCreator", "playerStart");
         gs.saveGame(gToUpdate);
         return ResponseEntity.noContent().build();
     }
@@ -323,37 +323,38 @@ public class GameRestController {
 
         // Partimos de la premisa de que cada ronda se componen de 2 turnos por cada
         // jugador
-        for (Player p_dwarf: dwarves_players) {
-            //ArrayList<Player> tmp_remaining_turns = new ArrayList<>(remaining_turns);
-            for (int i = 0 ; i < remaining_turns.size() ; i++) {
-                if(remaining_turns.get(i).equals(p_dwarf)){
+        for (Player p_dwarf : dwarves_players) {
+            // ArrayList<Player> tmp_remaining_turns = new ArrayList<>(remaining_turns);
+            for (int i = 0; i < remaining_turns.size(); i++) {
+                if (remaining_turns.get(i).equals(p_dwarf)) {
                     remaining_turns.remove(i);
                     break;
                 }
             }
-        } 
-        
+        }
+
         if (remaining_turns.size() > 0) {
             if (remaining_turns.get(0).equals(p)) {
                 res = true;
             }
         }
-        
+
         return new ResponseEntity<>(res, HttpStatus.OK);
         /*
-        // Existen dos posibilidades, que todos los jugadores
-        // hayan tirado una vez o todavia no lo hayan hecho
-        // por ese motivo se puede determinar el turno de manera correcta
-        // comprobando entre estos dos casos ya que removeAll elimina todas las
-        // instancias del objeto
-        if (dwarves.size() < plys.size()) {
-            remaining_turns.removeAll(dwarves_players);
-        } else { // dwarves.size >= plys.size()
-
-            // Ahora debemos de comprobar si 
-            remaining_turns.addAll(plys);
-    
-        }*/
+         * // Existen dos posibilidades, que todos los jugadores
+         * // hayan tirado una vez o todavia no lo hayan hecho
+         * // por ese motivo se puede determinar el turno de manera correcta
+         * // comprobando entre estos dos casos ya que removeAll elimina todas las
+         * // instancias del objeto
+         * if (dwarves.size() < plys.size()) {
+         * remaining_turns.removeAll(dwarves_players);
+         * } else { // dwarves.size >= plys.size()
+         * 
+         * // Ahora debemos de comprobar si
+         * remaining_turns.addAll(plys);
+         * 
+         * }
+         */
     }
 
     @GetMapping("/play/{code}/isFinished")
@@ -407,11 +408,10 @@ public class GameRestController {
         g.setDwarves(dwarves);
 
         Integer round = g.getRound();
-        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> 
-                d.getRound() == round
+        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
                 && d.getPlayer() != null).toList();
 
-        List<Player> remainingTurns = gs.getRemainingTurns(plys,thisRoundDwarves, g.getPlayerStart());
+        List<Player> remainingTurns = gs.getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
         if (thisRoundDwarves.size() == remainingTurns.size()) {
             g = gs.handleRoundChange(g);
         }
@@ -422,9 +422,9 @@ public class GameRestController {
 
     }
 
-    @PostMapping("/play/{code}/specialAction/{numberOfDwarves}") 
-    public ResponseEntity<Void> handleSpecialAction(@Valid @RequestBody SpecialCard SpecialCard, 
-        @PathVariable("code") String code, @PathVariable("numberOfDwarves") Integer numberOfDwarves) {
+    @PostMapping("/play/{code}/specialAction/{numberOfDwarves}")
+    public ResponseEntity<Void> handleSpecialAction(@Valid @RequestBody SpecialCard SpecialCard,
+            @PathVariable("code") String code, @PathVariable("numberOfDwarves") Integer numberOfDwarves) {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
@@ -435,7 +435,7 @@ public class GameRestController {
         if (SpecialCard.getName().equals("Muster an army")) {
             List<Card> gameCards = g.getMainBoard().getCards();
             ArrayList<Dwarf> gameDwarfs = new ArrayList<>(g.getDwarves());
-            for (Card c:gameCards) {
+            for (Card c : gameCards) {
                 if (c.getCardType().getName().equals("OrcCard")) {
                     Dwarf d = new Dwarf();
                     d.setCard(c);
