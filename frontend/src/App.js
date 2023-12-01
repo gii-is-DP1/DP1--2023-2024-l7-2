@@ -18,7 +18,6 @@ import AchievementEdit from "./achievements/achievementEdit";
 import RulesText from "./rules/rulesText";
 import UserPage from "./user/userPage";
 import UserEditPage from "./user/userEdit";
-import FriendsPage from "./friends/FriendsPage";
 
 
 import GameList from "./game/gameList";
@@ -26,10 +25,6 @@ import GameEdit from "./game/gameEdit";
 import GameJoin from "./game/gameJoin";
 import GamePlay from "./game/gamePlay";
 import GameEnd from "./game/gameEnd";
-
-import CardViewer from "./cards/cardViewer";
-import CardList from "./cards/cardList";
-
 
 
 
@@ -91,7 +86,6 @@ function App() {
           <Route path="/game/:gameId" exact={true} element={<PrivateRoute><GamePlay/></PrivateRoute>} />
           <Route path="/game/:gameId/finish" exact={true} element={<PrivateRoute><GameEnd/></PrivateRoute>} />
 
-          <Route path="/friends" exact={true} element={<PrivateRoute><FriendsPage/></PrivateRoute>}/>
           <Route path="/rules" exact={true} element={<PrivateRoute><RulesText/></PrivateRoute>}/>
           
           <Route path="/user" exact={true} element={<PrivateRoute><UserPage/></PrivateRoute>}/>
