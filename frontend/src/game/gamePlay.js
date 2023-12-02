@@ -7,7 +7,7 @@ import getIdFromUrl from "./../util/getIdFromUrl";
 import Card from "./../cards/card"
 import SpecialCard from "../cards/specialCard";
 import  { fetchDwarves, fetchCards, fetchPlayers, 
-  fetchIsMyTurn, isFinished, sendCard, isStart}  from "./gameFunctions";
+  fetchIsMyTurn, isFinished, sendCard, isStart, specialOrder}  from "./gameFunctions";
 import '../static/css/game/objects.css'; 
 
 
@@ -154,6 +154,14 @@ export default function GamePlay() {
     return color
   }
 
+  function specialOrderHandler() {
+    specialOrder(code, jwt, setSelectedCards);
+  }
+  const isSpecialOrderCard = (specialCard) => {
+    // Replace 'isSpecialOrderCard' with the actual property or condition that identifies the "Special Order" card
+    return specialCard  === "Special Order";
+  };
+
   const playerList = players.map((play) => {
     return (
       <tr key={play.id} style={{ color: play.color }}>
@@ -207,6 +215,18 @@ export default function GamePlay() {
                 style={{border: '3px solid black',padding: "3px"}}>
                   Finish?
             </Button>
+
+
+
+            {choosedCard && isSpecialOrderCard(choosedCard) && 
+            <Button
+                onClick={specialOrderHandler}
+                title="Special Order"
+                color="#008000"
+                style={{ border: "3px solid black", padding: "3px" }}>
+                   Special Order
+            </Button>
+            }
           
             <Button
                 onClick={() => {fetchCards(code, jwt, cards, setCards)}}
