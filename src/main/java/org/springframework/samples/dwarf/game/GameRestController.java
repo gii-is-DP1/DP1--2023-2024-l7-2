@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -382,18 +383,6 @@ public class GameRestController {
         return new ResponseEntity<>(finished, HttpStatus.OK);
     }
 
-    @GetMapping("/play/{code}/isStart")
-    public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
-        Game g = gs.getGameByCode(code);
-        if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
-        }
-        g.setStart(LocalDateTime.now());
-        
-            
-        return new ResponseEntity<>(g.getStart(), HttpStatus.OK);
-    }
-
     @PostMapping("/play/{code}/dwarves")
     public ResponseEntity<Void> addDwarves(@Valid @RequestBody Card card, @PathVariable("code") String code) {
 
@@ -461,6 +450,81 @@ public class GameRestController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/play/{code}/specialOrder") 
+public ResponseEntity<Void> handleSpecialAction2(
+        @Valid @RequestBody SpecialCard specialCard,
+        @PathVariable("code") String code,
+        @RequestParam("selectedGold") Integer selectedGold,
+        @RequestParam("selectedIron") Integer selectedIron,
+        @RequestParam("selectedSteal") Integer selectedSteal,
+        @RequestParam("selectedObject") Object selectedObject) {
+
+    Game game = gs.getGameByCode(code);
+
+    if (!gs.checkPlayerInGameAndGameExists(game)) {
+        return ResponseEntity.notFound().build();
+    }
+
+    // Check if the selected card is "Special Order"
+    if ("Special Order".equals(specialCard.getName())) {
+        Player currentPlayer = ps.getPlayerByUserAndGame(us.findCurrentUser(), game);
+
+        // Check if the player has selected materials and an object
+        if (selectedGold != null  
+                && selectedIron != null
+                && selectedSteal != null
+                && selectedObject != null) {
+            {
+
+            // Check if the sum of gold, iron, and steel is 5
+            if (selectedGold + selectedIron
+                    + selectedSteal == 5) {
+
+                // Check if at least one of each material is selected
+                if (selectedGold > 0
+                        && selectedIron > 0
+                        && selectedSteal > 0) {
+
+                    // Update player's state
+                    currentPlayer.setGold(currentPlayer.getGold() - selectedGold);
+                    currentPlayer.setIron(currentPlayer.getIron() - selectedIron);
+                    currentPlayer.setSteal(currentPlayer.getSteal() - selectedSteal);
+
+                    // Add the selected object
+                    currentPlayer.getObjects().add(selectedObject);
+
+                    // Reset selected materials and object
+                    selectedGold = null;
+                    selectedIron = null;
+                    selectedSteal = null;
+                    selectedObject = null;
+
+                    // Save the updated player
+                    ps.savePlayer(currentPlayer);
+
+                    return ResponseEntity.ok().build();
+                }
+            }
+        }
+    }
+}
+
+    return ResponseEntity.badRequest().build();
+}
+
+@GetMapping("/play/{code}/isStart")
+    public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+        if (!gs.checkPlayerInGameAndGameExists(g)) {
+            return ResponseEntity.notFound().build();
+        }
+        g.setStart(LocalDateTime.now());
+        
+            
+        return new ResponseEntity<>(g.getStart(), HttpStatus.OK);
+    }
+    
 
     @PostMapping("/play/{code}/finish")
     public ResponseEntity<Void> finishGameSetWinner(@PathVariable("code") String code) {
