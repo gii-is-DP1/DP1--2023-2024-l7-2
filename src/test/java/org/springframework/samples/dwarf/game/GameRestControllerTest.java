@@ -3,6 +3,7 @@ package org.springframework.samples.dwarf.game;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayereService;
 import org.springframework.samples.dwarf.user.User;
@@ -100,5 +103,49 @@ public class GameRestControllerTest {
         // Verificar que se haya creado un nuevo jugador correctamente
         verify(playerService, times(1)).savePlayer(any(Player.class));
     }
+
+    @Test
+    public void testHandleSpecialAction2_Success() {
+        // Configurar objetos de prueba
+        Game game = new Game();
+        // Configurar otros objetos según sea necesario
+
+        // Simular comportamiento de servicios
+        when(gameService.getGameByCode(anyString())).thenReturn(game);
+        when(gameService.checkPlayerInGameAndGameExists(any(Game.class))).thenReturn(true);
+
+        // Configurar el usuario actual
+        when(userService.findCurrentUser()).thenReturn(new User(/* configurar según sea necesario */));
+
+        // Configurar el jugador actual
+        Player currentPlayer = new Player();
+        List<Object> s = new ArrayList<Object>();
+        currentPlayer.setGold(10);
+        currentPlayer.setIron(10);
+        currentPlayer.setSteal(10);
+         currentPlayer.setObjects(s);
+        // Configurar el estado del jugador según sea necesario
+        when(playerService.getPlayerByUserAndGame(any(User.class), any(Game.class))).thenReturn(currentPlayer);
+
+        // Llamar al método del controlador
+        SpecialCard sp = new SpecialCard();
+        Integer x = 1;
+        Integer y = 2;
+        Integer z= 2;
+        Object o = new Object();
+        o.setName("Axe");
+        sp.setName("Special Order");
+        ResponseEntity<Void> response = gameRestController
+        .handleSpecialAction2(
+                sp,
+                "testCode",
+                x, y, z, o);
+
+        // Verificar el resultado
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        // Verificar otros aspectos según sea necesario
+    }
+
+    
 
 }
