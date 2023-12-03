@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,6 @@ import org.springframework.samples.dwarf.player.PlayereService;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
-import org.springframework.samples.dwarf.game.GameRepository;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -195,10 +194,8 @@ public class GameRestController {
 
             ps.savePlayer(p);
         } else {
+            // TODO: Create error
             System.out.println("This player already in game");
-            System.out.println(g);
-            System.out.println(u);
-            System.out.println(p);
         }
 
         return ResponseEntity.ok(g);
@@ -208,35 +205,31 @@ public class GameRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
-        try {
+        
+        User u = us.findCurrentUser();
 
-            User u = us.findCurrentUser();
+        MainBoard mb = mbs.initialize();
+        g.setMainBoard(mb);
 
-            MainBoard mb = mbs.initialize();
-            g.setMainBoard(mb);
+        Player p = ps.initialize(u.getUsername());
+        p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
+        // p.setGame(g);
+        p.setUser(u);
+        p.setObjects(new ArrayList<Object>());
+        ps.savePlayer(p);
 
-            Player p = ps.initialize(u.getUsername());
-            p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
-            // p.setGame(g);
-            p.setUser(u);
-            p.setObjects(new ArrayList<Object>());
-            ps.savePlayer(p);
+        // Si no se hace asi da error porque
+        // al guardarse el game en player, el game todavia no existe
+        // y si se asigna a game el player, el player todavia no existe
 
-            // Si no se hace asi da error porque
-            // al guardarse el game en player, el game todavia no existe
-            // y si se asigna a game el player, el player todavia no existe
+        g.setPlayerCreator(p);
+        g.setPlayerStart(p);
+        gs.saveGame(g);
 
-            g.setPlayerCreator(p);
-            g.setPlayerStart(p);
-            gs.saveGame(g);
+        p.setGame(g);
+        ps.savePlayer(p);
 
-            p.setGame(g);
-            ps.savePlayer(p);
-        } catch (Exception e) {
-            System.out.println("Exception =>" + e);
-            System.out.println("Exception =>" + e.getMessage());
-        }
-
+        // TODO: revisar
         g.setMainBoard(null);
 
         return new ResponseEntity<>(g, HttpStatus.CREATED);
@@ -341,20 +334,6 @@ public class GameRestController {
         }
         
         return new ResponseEntity<>(res, HttpStatus.OK);
-        /*
-        // Existen dos posibilidades, que todos los jugadores
-        // hayan tirado una vez o todavia no lo hayan hecho
-        // por ese motivo se puede determinar el turno de manera correcta
-        // comprobando entre estos dos casos ya que removeAll elimina todas las
-        // instancias del objeto
-        if (dwarves.size() < plys.size()) {
-            remaining_turns.removeAll(dwarves_players);
-        } else { // dwarves.size >= plys.size()
-
-            // Ahora debemos de comprobar si 
-            remaining_turns.addAll(plys);
-    
-        }*/
     }
 
     @GetMapping("/play/{code}/isFinished")
@@ -423,97 +402,151 @@ public class GameRestController {
 
     }
 
-    @PostMapping("/play/{code}/specialAction/{numberOfDwarves}") 
-    public ResponseEntity<Void> handleSpecialAction(@Valid @RequestBody SpecialCard SpecialCard, 
-        @PathVariable("code") String code, @PathVariable("numberOfDwarves") Integer numberOfDwarves) {
+    @PostMapping("/play/{code}/musterAnArmy") 
+    public ResponseEntity<Void> handleSpecialAction(@Valid @RequestBody SpecialCardRequestHandler request, 
+        @PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             return ResponseEntity.notFound().build();
         }
 
-        // Se crean dwarfs ficticios que cubren las posiciones de los orcos
-        if (SpecialCard.getName().equals("Muster an army")) {
-            List<Card> gameCards = g.getMainBoard().getCards();
-            ArrayList<Dwarf> gameDwarfs = new ArrayList<>(g.getDwarves());
-            for (Card c:gameCards) {
-                if (c.getCardType().getName().equals("OrcCard")) {
-                    Dwarf d = new Dwarf();
-                    d.setCard(c);
-                    d.setRound(g.getRound());
-                    gameDwarfs.add(d);
-                }
+        SpecialCard specialCard = request.getSpecialCard();
+        Boolean usesBothDwarves = request.getUsesBothDwarves();
+        
+        Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
+
+        if (usesBothDwarves) {
+            Dwarf dwarf1 = new Dwarf();
+            Dwarf dwarf2 = new Dwarf();
+
+
+            dwarf1.setPlayer(p);
+            dwarf1.setRound(g.getRound());
+            dwarf1.setCard(null);
+
+            dwarf2.setPlayer(p);
+            dwarf2.setRound(g.getRound());
+            dwarf2.setCard(null);
+
+            ds.saveDwarf(dwarf1);
+            ds.saveDwarf(dwarf2);
+
+            List<Dwarf> gameDwarves = g.getDwarves();
+            gameDwarves.add(dwarf1);
+            gameDwarves.add(dwarf2);
+            g.setDwarves(gameDwarves);
+        } else {
+            if (p.getMedal() > 4) {
+                p.setMedal(p.getMedal() - 4);
+                ps.savePlayer(p);
+            } else {
+                // TODO: create error
             }
-            g.setDwarves(gameDwarfs);
-            gs.saveGame(g);
+
+            Dwarf dwarf1 = new Dwarf();
+
+            dwarf1.setPlayer(p);
+            dwarf1.setRound(g.getRound());
+            dwarf1.setCard(null);
+
+            ds.saveDwarf(dwarf1);
+
+            List<Dwarf> gameDwarves = g.getDwarves();
+            gameDwarves.add(dwarf1);
+        }
+
+        // Ahora vamos a darle la vuelta a la carta. Si hay 
+        // un jugador en esa posicion, es decir, si se hay una entidad
+        // dwarf en la base de datos con esa carta, se resuelve automaticamente.
+        // Despues, se coloca el dwarf del jugador que ha tirado la carta especial
+        // en esa posicion.
+        Card reverseCard = specialCard.getTurnedSide();
+        List<Dwarf> roundDwarves = g.getDwarves();
+        roundDwarves = roundDwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
+
+
+        for (Dwarf d:roundDwarves) {
+            Card dwarfCard = d.getCard();
+            if (reverseCard.getPosition().equals(dwarfCard.getPosition())) {
+                // Solo tiene sentido resolver esta situacion
+                // cuando la carta es de forja o una carta normal
+                // El dwarf tiene que permanecer para seguir con el recuento de turnos
+                gs.applySingleCardWhenSpecialCardAction(p, dwarfCard);
+            }
+        }
+
+        ArrayList<Card> newCards = new ArrayList<>();
+
+        MainBoard mb = g.getMainBoard();
+        for (Card c: mb.getCards()) {
+            if (c.getPosition().equals(reverseCard.getPosition())) {
+                newCards.add(reverseCard);
+            } else {
+                newCards.add(c);
+            }
+        }
+
+        mb.setCards(newCards);
+        mbs.saveMainBoard(mb);
+
+        g.setMainBoard(mb);
+        gs.saveGame(g);
+
+
+        // Ahora aplicamos la carta
+        switch (specialCard.getName()) {
+            case "Muster an army":
+                List<Card> gameCards = g.getMainBoard().getCards();
+                ArrayList<Dwarf> gameDwarves = new ArrayList<>(g.getDwarves());
+                for (Card c:gameCards) {
+                    if (c.getCardType().getName().equals("orcCard")) {
+                        Dwarf d = new Dwarf();
+                        d.setCard(c);
+                        d.setRound(g.getRound());
+                        gameDwarves.add(d);
+                    }
+                }
+                g.setDwarves(gameDwarves);
+                gs.saveGame(g);
+                break;
+            case "Special Order":
+                Integer selectedGold = request.getSelectedGold();
+                Integer selectedIron = request.getSelectedIron();
+                Integer selectedSteal = request.getSelectedSteal();
+                Object selectedObject = request.getSelectedObject();
+                if (selectedGold != null  && selectedIron != null
+                    && selectedSteal != null && selectedObject != null) {
+                        // Check if the sum of gold, iron, and steel is 5
+                        if (selectedGold + selectedIron + selectedSteal == 5) {
+
+                            // Check if at least one of each material is selected
+                            if (selectedGold > 0&& selectedIron > 0&& selectedSteal > 0) {
+
+                                // Update player's state
+                                p.setGold(p.getGold() - selectedGold);
+                                p.setIron(p.getIron() - selectedIron);
+                                p.setSteal(p.getSteal() - selectedSteal);
+
+                                // Add the selected object
+                                p.getObjects().add(selectedObject);
+
+                                // Save the updated player
+                                ps.savePlayer(p);
+
+                                return ResponseEntity.ok().build();
+                            }
+                        }
+                    }
+                break;
+            default:
+                break;
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/play/{code}/specialOrder") 
-public ResponseEntity<Void> handleSpecialAction2(
-        @Valid @RequestBody SpecialCard specialCard,
-        @PathVariable("code") String code,
-        @RequestParam("selectedGold") Integer selectedGold,
-        @RequestParam("selectedIron") Integer selectedIron,
-        @RequestParam("selectedSteal") Integer selectedSteal,
-        @RequestParam("selectedObject") Object selectedObject) {
-
-    Game game = gs.getGameByCode(code);
-
-    if (!gs.checkPlayerInGameAndGameExists(game)) {
-        return ResponseEntity.notFound().build();
-    }
-
-    // Check if the selected card is "Special Order"
-    if ("Special Order".equals(specialCard.getName())) {
-        Player currentPlayer = ps.getPlayerByUserAndGame(us.findCurrentUser(), game);
-
-        // Check if the player has selected materials and an object
-        if (selectedGold != null  
-                && selectedIron != null
-                && selectedSteal != null
-                && selectedObject != null) {
-            {
-
-            // Check if the sum of gold, iron, and steel is 5
-            if (selectedGold + selectedIron
-                    + selectedSteal == 5) {
-
-                // Check if at least one of each material is selected
-                if (selectedGold > 0
-                        && selectedIron > 0
-                        && selectedSteal > 0) {
-
-                    // Update player's state
-                    currentPlayer.setGold(currentPlayer.getGold() - selectedGold);
-                    currentPlayer.setIron(currentPlayer.getIron() - selectedIron);
-                    currentPlayer.setSteal(currentPlayer.getSteal() - selectedSteal);
-
-                    // Add the selected object
-                    currentPlayer.getObjects().add(selectedObject);
-
-                    // Reset selected materials and object
-                    selectedGold = null;
-                    selectedIron = null;
-                    selectedSteal = null;
-                    selectedObject = null;
-
-                    // Save the updated player
-                    ps.savePlayer(currentPlayer);
-
-                    return ResponseEntity.ok().build();
-                }
-            }
-        }
-    }
-}
-
-    return ResponseEntity.badRequest().build();
-}
-
-@GetMapping("/play/{code}/isStart")
+    @GetMapping("/play/{code}/isStart")
     public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {

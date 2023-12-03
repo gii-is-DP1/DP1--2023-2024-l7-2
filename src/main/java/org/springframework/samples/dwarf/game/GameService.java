@@ -32,6 +32,11 @@ public class GameService {
     MainBoardService mbs;
     CardDeckService cds;
 
+    final String helpCard = "HelpCard";
+    final String orcCard = "OrcCard";
+    final String objectCard = "ObjectCard";
+    final String otherCard = "Other";
+
     @Autowired
     public GameService(GameRepository gr, PlayerRepository pr, UserService us,
             MainBoardService mbs, CardDeckService cds) {
@@ -289,7 +294,7 @@ public class GameService {
     }
 
     @Transactional
-    public void updateMaterials(Game g, ArrayList<Pair<Player, Card>> cards) {
+    public void updateMaterials(ArrayList<Pair<Player, Card>> cards) {
         for (Pair<Player, Card> pc : cards) {
             Player p = pc.getFirst();
             Card c = pc.getSecond();
@@ -374,7 +379,7 @@ public class GameService {
         ArrayList<Card> currentCards = new ArrayList<>();
         for (Card c : g.getMainBoard().getCards()) {
             // Solo guardamos las cartas que son de orcos
-            if (c.getCardType().getName().equals("OrcCard")) {
+            if (c.getCardType().getName().equals(orcCard)) {
                 currentCards.add(c);
             }
         }
@@ -431,7 +436,7 @@ public class GameService {
     }
 
     @Transactional
-    public void faseForjar(Game g, ArrayList<Pair<Player, Card>> playerCards) {
+    public void faseForjar(ArrayList<Pair<Player, Card>> playerCards) {
 
         for (Pair<Player, Card> pc : playerCards) {
             Player p = pc.getFirst();
@@ -489,10 +494,10 @@ public class GameService {
         }
 
         // Obtenemos las cartas por su tipo
-        ArrayList<Pair<Player, Card>> helpCards = cardsByType.get("HelpCard");
-        ArrayList<Pair<Player, Card>> orcCards = cardsByType.get("OrcCard");
-        ArrayList<Pair<Player, Card>> objectCards = cardsByType.get("ObjectCard");
-        ArrayList<Pair<Player, Card>> normalCards = cardsByType.get("Other");
+        ArrayList<Pair<Player, Card>> helpCards = cardsByType.get(helpCard);
+        ArrayList<Pair<Player, Card>> orcCards = cardsByType.get(orcCard);
+        ArrayList<Pair<Player, Card>> objectCards = cardsByType.get(objectCard);
+        ArrayList<Pair<Player, Card>> normalCards = cardsByType.get(otherCard);
 
         // Las cartas de la fase anterior pueden hacer que no se haga la siguiente fase
         Boolean canContinue = true;
@@ -507,12 +512,12 @@ public class GameService {
 
         // Fase de recoleccion
         if (canContinue && normalCards != null) {
-            updateMaterials(g, normalCards);
+            updateMaterials(normalCards);
         }
         canContinue = true;
 
         if (objectCards != null) {
-            faseForjar(g, objectCards);
+            faseForjar(objectCards);
         }
     }
 
@@ -547,7 +552,7 @@ public class GameService {
         ArrayList<Card> currentCards = new ArrayList<>();
         for (Card c : g.getMainBoard().getCards()) {
             // Solo guardamos las cartas que son de orcos
-            if (c.getCardType().getName().equals("HelpCard")) {
+            if (c.getCardType().getName().equals(helpCard)) {
                 currentCards.add(c);
             }
         }
@@ -565,7 +570,7 @@ public class GameService {
         // "HelpCard"
         for (Pair<Player, Card> pc : selected) {
             if (pc.getFirst().getId().equals(g.getPlayerStart().getId())
-                    && "HelpCard".equals(pc.getSecond().getCardType().getName())) {
+                    && pc.getSecond().getCardType().getName().equals(helpCard)) {
                 int currentIndex = players.indexOf(pc.getFirst());
                 // Asignar el siguiente jugador en la lista como playerStart
                 if (currentIndex != -1) {
@@ -580,6 +585,7 @@ public class GameService {
                         break; // Terminar el bucle después de cambiar el playerStart al creador del juego
                     }
                 } else {
+                    // TODO: Crear error
                     System.out.println("Error: No se encontró el jugador actual en la lista.");
                 }
             }
@@ -587,5 +593,22 @@ public class GameService {
 
         gr.save(g);
     }
+
+    @Transactional
+    public void applySingleCardWhenSpecialCardAction(Player p, Card c){
+        String cardType = c.getCardType().getName();
+        if (cardType.equals(otherCard)) {
+            Pair<Player, Card> playerAndCard = Pair.of(p,c);
+            ArrayList<Pair<Player,Card>> payload = new ArrayList<>();
+            payload.add(playerAndCard);
+            updateMaterials(payload);
+
+        } else if (cardType.equals(objectCard)) {
+            Pair<Player, Card> playerAndCard = Pair.of(p,c);
+            ArrayList<Pair<Player,Card>> payload = new ArrayList<>();
+            payload.add(playerAndCard);
+            faseForjar(payload);
+        } // TODO: orcCard
+    } 
 
 }

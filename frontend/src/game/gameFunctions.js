@@ -201,7 +201,7 @@ function sendCard(code, jwt, choosedCard) {
     .then((data) => console.log(data))
     .catch((message) => alert(message));
 }
-
+/*
 function specialOrder(code, jwt, setSelectedCards) {
   const gold = prompt("Enter the number of gold:");
   const steal = prompt("Enter the number of steal:");
@@ -245,7 +245,7 @@ function specialOrder(code, jwt, setSelectedCards) {
     sendOrderToServer(code, jwt, order, setSelectedCards);
   }
 }
-
+/*
 function sendOrderToServer(code, jwt, order, setSelectedCards) {
   // You can replace the following fetch with your actual API call
   fetch(`/api/v1/game/play/${code}/specialOrder`, {
@@ -273,11 +273,11 @@ function sendOrderToServer(code, jwt, order, setSelectedCards) {
       alert("An error occurred during the special order. Please try again.");
     });
 }
-
+*/
 
 
 
 export { 
     fetchDwarves, fetchCards, fetchPlayers, 
-    fetchIsMyTurn, isFinished, sendCard,isStart,specialOrder
+    fetchIsMyTurn, isFinished, sendCard,isStart
 };
