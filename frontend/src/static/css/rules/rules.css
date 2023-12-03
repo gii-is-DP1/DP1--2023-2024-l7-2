@@ -1,0 +1,21 @@
+.rules_page1{
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('../../images/rulebook_ES_1.png');
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.rules_page2{
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('../../images/rulebook_ES_2.png');
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+
+

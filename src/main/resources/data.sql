@@ -121,6 +121,7 @@ INSERT INTO special_card(id, turned_side_id, name, description) VALUES
                         (9, 9, 'Run Amok','Collect all of the cards from each location, in turn, shuffle them and return them to that location.');                                                
 
 
+
 INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,null,null,null,null,null),
         (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1),
         (3,'super cool game', null,'2023-04-11 18:20','2023-04-11 19:20', 2, null); 

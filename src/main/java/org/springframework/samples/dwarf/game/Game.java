@@ -46,7 +46,8 @@ public class Game extends NamedEntity {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Player playerCreator;
-    
+
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Player playerStart;
+
 }

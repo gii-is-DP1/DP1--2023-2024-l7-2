@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button, ButtonGroup, Table } from "reactstrap";
 import tokenService from "../../services/token.service";
@@ -20,8 +20,44 @@ export default function UserListAdmin() {
     setVisible
   );
   const [alerts, setAlerts] = useState([]);
+  
+  const [page, setPage] = useState(0);
+  const [count, setCount] = useState(0);
+  const [pageSize, setPageSize] = useState(8);
+  const [data, setData] = useState({content:[],size:pageSize, first:true,last:false});
 
-  const userList = users.map((user) => {
+  useEffect(() => {
+    fetch("/api/v1/users/paginated?page="+page+"&size="+pageSize, {  
+      headers: {
+      "Authorization": `Bearer ${jwt}` ,
+      },
+    }).then((response) => response.json()).then(json => {
+      if(json.message){
+        setMessage (json.message);
+        setVisible(json.setVisible);
+      }else{
+        setData(json);
+        setCount (json.totalElements);
+      }
+    }).catch((error) => {window.alert(error);});
+    }, [page ,pageSize]);
+    
+  // let datatable = data.content.map((user) =>{
+  //   return ( <tr>
+  //   <td>{user.username}</td>
+  //   </tr>);
+  // });
+  
+  function handleNextPage(){
+    if(data.content.length >= pageSize)
+      setPage (page+1);
+  }
+  function handlePreviousPage(){
+    if(page > 0)
+      setPage (page-1);
+  }
+
+  const userList = data.content.map((user) => {
     return (
       <tr key={user.id}>
         <td>{user.username}</td>
@@ -81,6 +117,16 @@ export default function UserListAdmin() {
           <tbody>{userList}</tbody>
         </Table>
       </div>
+      <div className="pagination-container" style={{ margin: "20px" }}>
+        <Button style={{ marginRight: "10px" }} onClick={handlePreviousPage}>
+          Prev Page
+        </Button>
+
+        <Button onClick={handleNextPage}>
+          Next Page
+        </Button>
+      </div>
+
     </div>
   );
 }

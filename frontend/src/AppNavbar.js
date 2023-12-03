@@ -36,7 +36,7 @@ function AppNavbar() {
                         <NavLink style={{ color: "white" }} tag={Link} to="/achievements">Achievements</NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink style={{ color: "white" }} tag={Link} to="/game">Games</NavLink>
+                        <NavLink style={{ color: "white" }} tag={Link} to="/games">Games</NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/">Stats</NavLink>
@@ -56,10 +56,10 @@ function AppNavbar() {
             registeredUserLinks = (
                 <>
                     <NavItem>
-                        <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/">Stats</NavLink>
+                        <NavLink style={{ color: "white" }} tag={Link} to="/games">My Games</NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/friends">Friends</NavLink>
+                        <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/">Stats</NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/docs">Docs</NavLink>

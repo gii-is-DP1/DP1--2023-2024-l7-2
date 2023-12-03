@@ -42,7 +42,7 @@ public class SecurityConfiguration {
 	DataSource dataSource;
 
 	private static final String ADMIN = "ADMIN";
-	private static final String CLINIC_OWNER = "CLINIC_OWNER";
+	private static final String USER = "USER";
 
 	@Bean
 	protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -58,7 +58,7 @@ public class SecurityConfiguration {
 				.authorizeHttpRequests(authorizeRequests -> authorizeRequests
 						.requestMatchers("/resources/**", "/webjars/**", "/static/**", "/swagger-resources/**")
 						.permitAll()
-						.requestMatchers("/api/v1/clinics", "/", "/oups", "/api/v1/auth/**", "/v3/api-docs/**",
+						.requestMatchers("/", "/oups", "/api/v1/auth/**", "/v3/api-docs/**",
 								"/swagger-ui.html", "/swagger-ui/**")
 						.permitAll()
 						.requestMatchers("/api/v1/developers").permitAll() // api developers

@@ -13,9 +13,8 @@ export default function UserEditPage() {
     const user1 = tokenService.getUser();
     const emptyItem = {
         id: user1.id,
-        username: "",
-        name:"",
-        password: ""
+        username: user1.username,
+        password: user1.password
       };
 
     const [message, setMessage] = useState(null);
@@ -28,8 +27,9 @@ export default function UserEditPage() {
         setVisible
     );
 
-        console.log(`/api/v1/users/${user.id}`)
-      function handleSubmit(event) {
+    console.log(`/api/v1/users/${user.id}`)
+      
+    function handleSubmit(event) {
         event.preventDefault();
     
         fetch("/api/v1/users" + (user.id ? "/" + user.id : ""), {
@@ -57,20 +57,6 @@ export default function UserEditPage() {
         {user.id ? "Edit User" : "Add User"}</h1>
       <div className="custom-form-input">
         <Form onSubmit={handleSubmit}>
-        <div className="custom-form-input">
-            <Label for="lastName" className="custom-form-input-label">
-              Name
-            </Label>
-            <Input
-              type="text"
-              required
-              name="name"
-              id="name"
-              value={user.name || ""}
-              onChange={(e) => setUser({ ...user, name: e.target.value })}
-              className="custom-input"
-            />
-          </div>
           <div className="custom-form-input">
             <Label for="username" className="custom-form-input-label">
               Username

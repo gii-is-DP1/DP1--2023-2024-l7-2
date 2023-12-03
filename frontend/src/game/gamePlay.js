@@ -187,8 +187,8 @@ export default function GamePlay() {
     <div style={{marginTop: "70px"}}>
 
       <div className="admin-page-container">
-      <h1 className="text-center">Game: {game.name} - Round: {game.round}</h1>
-          { game != {} && game.playerCreator && game.playerCreator.name === user.username 
+        <h1 className="text-center">Game: {game.name} - Round: {game.round}</h1>
+        { game != {} && game.playerCreator && game.playerCreator.name === user.username 
           && players && players.length > 1 && !gameStarted &&
           <Button
             onClick={() => {buttonStartGame()}}
@@ -197,9 +197,9 @@ export default function GamePlay() {
             style={{border: '3px solid black',padding: "3px"}}>
               Start game
             </Button>
-          }
+        }
 
-          { (gameStarted || game != {} && game.playerCreator && game.playerCreator.name !== user.username) &&
+        { (gameStarted || game != {} && game.playerCreator && game.playerCreator.name !== user.username) &&
         <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
 
             <Button

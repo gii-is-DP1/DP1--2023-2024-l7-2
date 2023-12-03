@@ -105,7 +105,7 @@ public class GameRestControllerTest {
     }
 /*
     @Test
-    public void testHandleSpecialAction2_Success() {
+    public void testSpecialOrder() {
         // Configurar objetos de prueba
         Game game = new Game();
         // Configurar otros objetos según sea necesario
@@ -123,7 +123,7 @@ public class GameRestControllerTest {
         currentPlayer.setGold(10);
         currentPlayer.setIron(10);
         currentPlayer.setSteal(10);
-         currentPlayer.setObjects(s);
+        currentPlayer.setObjects(s);
         // Configurar el estado del jugador según sea necesario
         when(playerService.getPlayerByUserAndGame(any(User.class), any(Game.class))).thenReturn(currentPlayer);
 
@@ -147,6 +147,6 @@ public class GameRestControllerTest {
             }
             
             */
+
     
 
-}

@@ -2,7 +2,11 @@ package org.springframework.samples.dwarf.user;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -24,4 +28,9 @@ public interface UserRepository extends CrudRepository<User, String> {
 
 	@Query("SELECT u FROM User u WHERE u.authority.authority = :auth")
 	Iterable<User> findAllByAuthority(String auth);
+
+	Pageable pageable = PageRequest.of(0, 5, Sort.by(Order.asc("username")));
+
+	Page<User> findAll(Pageable pageable);
+
 }

@@ -238,7 +238,7 @@ public class GameRestController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateGame(@Valid @RequestBody Game g, @PathVariable("id") Integer id) {
         Game gToUpdate = getGameById(id);
-        BeanUtils.copyProperties(g, gToUpdate, "id");
+        BeanUtils.copyProperties(g, gToUpdate, "id", "playerCreator", "playerStart");
         gs.saveGame(gToUpdate);
         return ResponseEntity.noContent().build();
     }
@@ -317,22 +317,22 @@ public class GameRestController {
 
         // Partimos de la premisa de que cada ronda se componen de 2 turnos por cada
         // jugador
-        for (Player p_dwarf: dwarves_players) {
-            //ArrayList<Player> tmp_remaining_turns = new ArrayList<>(remaining_turns);
-            for (int i = 0 ; i < remaining_turns.size() ; i++) {
-                if(remaining_turns.get(i).equals(p_dwarf)){
+        for (Player p_dwarf : dwarves_players) {
+            // ArrayList<Player> tmp_remaining_turns = new ArrayList<>(remaining_turns);
+            for (int i = 0; i < remaining_turns.size(); i++) {
+                if (remaining_turns.get(i).equals(p_dwarf)) {
                     remaining_turns.remove(i);
                     break;
                 }
             }
-        } 
-        
+        }
+
         if (remaining_turns.size() > 0) {
             if (remaining_turns.get(0).equals(p)) {
                 res = true;
             }
         }
-        
+
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
@@ -387,11 +387,10 @@ public class GameRestController {
         g.setDwarves(dwarves);
 
         Integer round = g.getRound();
-        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> 
-                d.getRound() == round
+        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
                 && d.getPlayer() != null).toList();
 
-        List<Player> remainingTurns = gs.getRemainingTurns(plys,thisRoundDwarves, g.getPlayerStart());
+        List<Player> remainingTurns = gs.getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
         if (thisRoundDwarves.size() == remainingTurns.size()) {
             g = gs.handleRoundChange(g);
         }
@@ -416,10 +415,10 @@ public class GameRestController {
         
         Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
 
+
         if (usesBothDwarves) {
             Dwarf dwarf1 = new Dwarf();
             Dwarf dwarf2 = new Dwarf();
-
 
             dwarf1.setPlayer(p);
             dwarf1.setRound(g.getRound());
@@ -545,6 +544,7 @@ public class GameRestController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 
     @GetMapping("/play/{code}/isStart")
     public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
