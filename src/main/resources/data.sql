@@ -109,24 +109,17 @@ INSERT INTO friend_request(id, receiver_id, sender_id, status_id) VALUES
                 (1,4,5,1), (2,6,7,1);
 
 
-INSERT INTO special_card(id, name, description) 
-                        VALUES (1,'Muster an army','When resolving actions this round, treat all defend locations as if they are occupied.');
-INSERT INTO special_card(id, name, description) 
-                        VALUES (2,'Hold a council','Remove the top card from each location (leaving at least one card) and shuffle them back into The Mountain.');
-INSERT INTO special_card(id, name, description) 
-                        VALUES (3,'Sell an item','Exchange 1 of your items for 5 resources of your choice.');
-INSERT INTO special_card(id, name, description) 
-                        VALUES (4,'Past Glories','Name a card previously on top in any location and return it to the top of that location.');
-INSERT INTO special_card(id, name, description) 
-                        VALUES (5,'Special order','Return 5 resources of your choice, including at least 1 of each type, to the supply and take 1 item.');
-INSERT INTO special_card(id, name, description) 
-                        VALUES (6,'Turn back','Remove the top card from 1 location and shuffle it back into the mountain. Immediately place 1 on that location.');
-INSERT INTO special_card(id, name, description) 
-                        VALUES (7,'Apprentice','Place one worker on a location occupied by the other player.');
-INSERT INTO special_card(id, name, description) 
-                        VALUES (8,'Collapse the Shafts ','Remove the top card from each location and place it on the bottom of that stack.');
-INSERT INTO special_card(id, name, description) 
-                        VALUES (9,'Run Amok','Collect all of the cards from each location, in turn, shuffle them and return them to that location.');                                                
+INSERT INTO special_card(id, turned_side_id, name, description) VALUES 
+                        (1, 1, 'Muster an army','When resolving actions this round, treat all defend locations as if they are occupied.'),
+                        (2, 2, 'Hold a council','Remove the top card from each location (leaving at least one card) and shuffle them back into The Mountain.'),
+                        (3, 3, 'Sell an item','Exchange 1 of your items for 5 resources of your choice.'),
+                        (4, 4, 'Past Glories','Name a card previously on top in any location and return it to the top of that location.'),
+                        (5, 5, 'Special order','Return 5 resources of your choice, including at least 1 of each type, to the supply and take 1 item.'),
+                        (6, 6, 'Turn back','Remove the top card from 1 location and shuffle it back into the mountain. Immediately place 1 on that location.'),
+                        (7, 7, 'Apprentice','Place one worker on a location occupied by the other player.'),
+                        (8, 8, 'Collapse the Shafts ','Remove the top card from each location and place it on the bottom of that stack.'),
+                        (9, 9, 'Run Amok','Collect all of the cards from each location, in turn, shuffle them and return them to that location.');                                                
+
 
 
 INSERT INTO game(id,name,code,start,finish, winner_id, round) VALUES (1,null,null,null,null,null,null),
@@ -148,7 +141,5 @@ INSERT INTO special_card_deck_special_cards(special_card_deck_id, special_cards_
 INSERT INTO main_board(id, card_deck_id, special_card_deck_id) VALUES (1, 1, 1);
 
 INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1);
-
-
 
 

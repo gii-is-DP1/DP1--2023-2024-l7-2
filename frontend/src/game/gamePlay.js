@@ -8,6 +8,7 @@ import Card from "./../cards/card"
 import SpecialCard from "../cards/specialCard";
 import  { fetchDwarves, fetchCards, fetchPlayers, 
   fetchIsMyTurn, isFinished, sendCard, isStart, specialOrder}  from "./gameFunctions";
+import ConfirmSpecialCardModel from "./modals/ConfirmSpecialCardModel";
 import '../static/css/game/objects.css'; 
 
 
@@ -23,7 +24,8 @@ export default function GamePlay() {
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
   const [choosedCard, setChoosedCard] = useState(null);
-  const [choosedSpecialCard, setChoosedSpecialCard] = useState([]);
+  const [choosedSpecialCard, setChoosedSpecialCard] = useState(null);
+  const [specialCardToBeConfirmed, setSpecialCardToBeConfirmed] = useState(false);
   const [cards, setCards] = useFetchState(
     [],
     `/api/v1/game/play/${code}/getCards`,
@@ -115,29 +117,13 @@ export default function GamePlay() {
   }
 
   function selectSpecialCard(id,specialCard) {
+    console.log("we are here")
     if (isMyTurn === false) {
       console.log("is not your turn")
       return false; // Just a random return to ensure that function exits
     }
-
-    if (selectedSpecialCards[id] !== null && selectedSpecialCards[id] !== undefined) {
-      // Card is already selected, you can't select it
-      console.log(selectedSpecialCards)
-      console.log(id);
-      console.log(selectedSpecialCards[id])
-      return false;
-    }
-    
-    if (choosedSpecialCard.includes(specialCard)) {
-      console.log("we are filtering")
-      setChoosedSpecialCard(choosedSpecialCard.filter((c) => c.position !== specialCard.position))
-    } else {
-      if (choosedSpecialCard.length <1) {
-        setChoosedSpecialCard([...choosedSpecialCard,specialCard])
-      } else {
-        console.log("You cant choose that many cads :(")
-      }
-    }
+    setSpecialCardToBeConfirmed(true);
+    setChoosedSpecialCard(specialCard)
   }
 
 
@@ -153,14 +139,14 @@ export default function GamePlay() {
 
     return color
   }
-
+/*
   function specialOrderHandler() {
     specialOrder(code, jwt, setSelectedCards);
   }
   const isSpecialOrderCard = (specialCard) => {
     // Replace 'isSpecialOrderCard' with the actual property or condition that identifies the "Special Order" card
     return specialCard  === "Special Order";
-  };
+  };*/
 
   const playerList = players.map((play) => {
     return (
@@ -190,6 +176,14 @@ export default function GamePlay() {
 
   //console.log(choosedCard)
   return (
+    <>
+    <ConfirmSpecialCardModel
+      isOpen={specialCardToBeConfirmed}
+      toggle={() => {
+        setSpecialCardToBeConfirmed(!specialCardToBeConfirmed)
+      }}
+      card={choosedSpecialCard}
+    ></ConfirmSpecialCardModel>
     <div style={{marginTop: "70px"}}>
 
       <div className="admin-page-container">
@@ -215,18 +209,6 @@ export default function GamePlay() {
                 style={{border: '3px solid black',padding: "3px"}}>
                   Finish?
             </Button>
-
-
-
-            {choosedCard && isSpecialOrderCard(choosedCard) && 
-            <Button
-                onClick={specialOrderHandler}
-                title="Special Order"
-                color="#008000"
-                style={{ border: "3px solid black", padding: "3px" }}>
-                   Special Order
-            </Button>
-            }
           
             <Button
                 onClick={() => {fetchCards(code, jwt, cards, setCards)}}
@@ -319,6 +301,7 @@ export default function GamePlay() {
         </section>
       </div>
     </div>
+    </>
   );
 
 
