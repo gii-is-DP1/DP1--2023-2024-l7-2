@@ -105,7 +105,7 @@ public class GameRestControllerTest {
     }
 
     @Test
-    public void testHandleSpecialAction2_Success() {
+    public void testSpecialOrder() {
         // Configurar objetos de prueba
         Game game = new Game();
         // Configurar otros objetos según sea necesario
@@ -123,7 +123,7 @@ public class GameRestControllerTest {
         currentPlayer.setGold(10);
         currentPlayer.setIron(10);
         currentPlayer.setSteal(10);
-         currentPlayer.setObjects(s);
+        currentPlayer.setObjects(s);
         // Configurar el estado del jugador según sea necesario
         when(playerService.getPlayerByUserAndGame(any(User.class), any(Game.class))).thenReturn(currentPlayer);
 
@@ -135,8 +135,7 @@ public class GameRestControllerTest {
         Object o = new Object();
         o.setName("Axe");
         sp.setName("Special Order");
-        ResponseEntity<Void> response = gameRestController
-        .handleSpecialAction2(
+        ResponseEntity<Void> response = gameRestController.SpecialOrder(
                 sp,
                 "testCode",
                 x, y, z, o);
@@ -146,6 +145,50 @@ public class GameRestControllerTest {
         // Verificar otros aspectos según sea necesario
     }
 
+
+    @Test
+    public void testSellAnItem() {
+        // Arrange
+        String code = "yourCode";
+        SpecialCard specialCard = new SpecialCard();
+        specialCard.setName("Sell an item");
+        Integer selectedGold = 2;
+        Integer selectedIron = 2;
+        Integer selectedSteal = 1;
+        Object selectedObject = new Object(); // You need to replace Object with the actual type of your object
+        selectedObject.setName("Axe");
+
+        when(gameService.getGameByCode(anyString())).thenReturn(new Game()); // Replace Game() with an actual Game object
+        when(gameService.checkPlayerInGameAndGameExists(any())).thenReturn(true);
+
+        when(userService.findCurrentUser()).thenReturn(new User()); // Replace User() with an actual User object
+
+        Player currentPlayer = new Player(); // Replace Player() with an actual Player object
+        List<Object> s = new ArrayList<Object>();
+        currentPlayer.setGold(5);
+        currentPlayer.setIron(5);
+        currentPlayer.setSteal(5);
+           currentPlayer.setObjects(s);
+
+        when(playerService.getPlayerByUserAndGame(any(), any())).thenReturn(currentPlayer);
+
+        // Act
+        ResponseEntity<Void> response = gameRestController.sellAnItem(
+                specialCard,
+                code,
+                selectedGold,
+                selectedIron,
+                selectedSteal,
+                selectedObject
+        );
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(7, currentPlayer.getGold().intValue()); // Adjust the expected values based on your logic
+        assertEquals(7, currentPlayer.getIron().intValue());
+        assertEquals(6, currentPlayer.getSteal().intValue());
+        assertTrue(currentPlayer.getObjects().isEmpty()); // The object should be removed
+    }
+}
     
 
-}
