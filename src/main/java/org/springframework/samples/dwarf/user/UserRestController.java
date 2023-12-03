@@ -20,6 +20,9 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.auth.payload.response.MessageResponse;
@@ -44,11 +47,13 @@ class UserRestController {
 
 	private final UserService userService;
 	private final AuthoritiesService authService;
+	private final UserRepository userRepository;
 
 	@Autowired
-	public UserRestController(UserService userService, AuthoritiesService authService) {
+	public UserRestController(UserService userService, AuthoritiesService authService, UserRepository userRepository) {
 		this.userService = userService;
 		this.authService = authService;
+		this.userRepository = userRepository;
 	}
 
 	@GetMapping
@@ -59,6 +64,14 @@ class UserRestController {
 		} else
 			res = (List<User>) userService.findAll();
 		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
+	@GetMapping("paginated")
+	public Page<User> findAllPagination(@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "size", defaultValue = "5") int pageSize) {
+
+		Pageable pageable = PageRequest.of(page, pageSize);
+		return userRepository.findAll(pageable);
 	}
 
 	@GetMapping("authorities")
@@ -90,8 +103,8 @@ class UserRestController {
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<MessageResponse> delete(@PathVariable("userId") int id) {
 		RestPreconditions.checkNotNull(userService.findUser(id), "User", "ID", id);
-			userService.deleteUser(id);
-			return new ResponseEntity<>(new MessageResponse("User deleted!"), HttpStatus.OK);
+		userService.deleteUser(id);
+		return new ResponseEntity<>(new MessageResponse("User deleted!"), HttpStatus.OK);
 
 	}
 
