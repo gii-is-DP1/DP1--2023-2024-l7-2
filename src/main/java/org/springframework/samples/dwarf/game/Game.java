@@ -27,8 +27,8 @@ public class Game extends NamedEntity {
     @Column(unique = true)
     String code;
 
-    LocalDateTime start;
-    LocalDateTime finish;
+    private LocalDateTime start;
+    private LocalDateTime finish;
 
     /*
      * @ManyToOne(optional=true)
