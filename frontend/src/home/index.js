@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../App.css';
 import '../static/css/home/home.css'; 
 import { Button } from "reactstrap";
 import { Link } from "react-router-dom";
 import tokenService from '../services/token.service.js';
+import jwt_decode from "jwt-decode";
 
 export default function Home(){
 
     const jwt = tokenService.getLocalAccessToken();
+    const [role, setRole] = useState([]);
+
+    useEffect(() => {
+        if (jwt) {
+            setRole(jwt_decode(jwt).authorities[0]);
+        }
+    }, [jwt])
+
 
     let userLinks = <></>;
     let publicLinks = <></>;
@@ -21,13 +30,23 @@ export default function Home(){
             </>
         )
     } else {
-        userLinks = (
-            <>
-                <Button outline color="warning" size="lg">
-                    <Link to={`/game`} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
-                </Button>
-            </>
-        )
+        if (role === "ADMIN") {
+            userLinks = (
+                <>
+                    <Button outline color="warning" size="lg">
+                        <Link to={`/games`} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
+                    </Button>
+                </>
+            )
+        } else if (role === "USER") {
+            userLinks = (
+                <>
+                    <Button outline color="warning" size="lg">
+                        <Link to={`/game`} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
+                    </Button>
+                </>
+            )
+        } 
 
     }
 

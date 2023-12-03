@@ -72,7 +72,6 @@ const UserProfile = () => {
         <div>
           <h4 style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
             <li>Username: {user.username}</li>
-            <li>Nombre: {user.name}</li>
           </h4>
 
           <div className="col text-center" style={{marginTop: "20px"}}>
@@ -83,22 +82,30 @@ const UserProfile = () => {
                 <Link to="/" onClickCapture={() => {deleteUser(`/api/v1/users/${user.id}`,user.id, user); sendLogoutRequest() }} 
                           className="btn sm" style={{ textDecoration: "none" }}>Delete</Link>
             </Button>
+            <div className="col text-center" style={{marginTop: "20px"}}>
+              <Button outline color="success" margin="15px">
+                <Link to={`/user/userEdit`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
+              </Button>
+              <Button outline color="danger" margin="15px">
+                  <Link to="/" onClickCapture={() => {deleteUser(`/api/v1/users/${user.id}`,user.id, user); sendLogoutRequest() }} 
+                            className="btn sm" style={{ textDecoration: "none" }}>Delete</Link>
+              </Button>
+            </div>
           </div>
-        </div>
-        <div className="friends">
-          <h3>Friend Requests</h3>
-          <thead>
-              <tr>
-                <th width="15%" className="text-center" style={{borderBottom:"2px solid black"}}>Request User</th>
-                <th width="15%" className="text-center" style={{borderBottom:"2px solid black"}}>Status</th>
-              </tr>
+          <div className="friends">
+            <h3>Friend Requests</h3>
+            <thead>
+                <tr>
+                  <th width="15%" className="text-center" style={{borderBottom:"2px solid black"}}>Request User</th>
+                  <th width="15%" className="text-center" style={{borderBottom:"2px solid black"}}>Status</th>
+                </tr>
             </thead>
             {friendList}
+          </div>
         </div>
       </div>
-
     </div>
   );
-};
+}
 
 export default UserProfile;

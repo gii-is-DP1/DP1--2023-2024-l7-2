@@ -111,7 +111,6 @@ export default function UserEditAdmin() {
             {user.id ? (
               <Input
                 type="select"
-                disabled
                 name="authority"
                 id="authority"
                 value={user.authority?.id || ""}
