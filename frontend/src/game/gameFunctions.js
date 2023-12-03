@@ -275,9 +275,81 @@ function sendOrderToServer(code, jwt, order, setSelectedCards) {
 }
 
 
+function sellAnItem(code, jwt, setSelectedCards) {
+  const gold = prompt("Enter the number of gold:");
+  const steal = prompt("Enter the number of steal:");
+  const iron = prompt("Enter the number of iron:");
+
+  const order = {
+    gold: parseInt(gold),
+    steal: parseInt(steal),
+    iron: parseInt(iron),
+  };
+
+  const wantsObject = window.confirm("Do you want to select an object in exchange for the materials?");
+  
+  if (wantsObject) {
+    
+    fetch(`/api/v1/game/play/${code}/availableObjects`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((objects) => {
+        // Let the player choose an object
+        const selectedObject = prompt("Select an object:\n" + objects.join("\n"));
+
+        // Attach the selected object to the order
+        order.selectedObject = selectedObject;
+
+        // Continue with the API call
+        sendSellAnItem(code, jwt, order, setSelectedCards);
+      })
+      .catch((error) => {
+        console.error("Error fetching available objects:", error);
+        alert("An error occurred while fetching available objects. Please try again.");
+      });
+  } else {
+    // Continue with the API call without selecting an object
+    sendSellAnItem(code, jwt, order, setSelectedCards);
+  }
+}
+
+function sendSellAnItem(code, jwt, order, setSelectedCards) {
+  // You can replace the following fetch with your actual API call
+  fetch(`/api/v1/game/play/${code}/specialSellItem`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+      Accept: "application/json",
+    },
+    body: JSON.stringify(order),
+  })
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.success) {
+        // Assuming the server responds with success
+        // Update the selected cards or perform any other necessary actions
+        getAlreadySelectedCardByPlayers(response.dwarves, setSelectedCards);
+      } else {
+        // Handle the case where the special sell item order is not successful
+        alert("Special sell item order failed. Please try again.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error during special sell item order:", error);
+      alert("An error occurred during the special sell item order. Please try again.");
+    });
+}
+
 
 
 export { 
     fetchDwarves, fetchCards, fetchPlayers, 
-    fetchIsMyTurn, isFinished, sendCard,isStart,specialOrder
+    fetchIsMyTurn, isFinished, sendCard,isStart,specialOrder,sellAnItem
 };

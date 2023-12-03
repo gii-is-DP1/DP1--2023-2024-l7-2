@@ -114,7 +114,7 @@ INSERT INTO special_card(id, name, description)
 INSERT INTO special_card(id, name, description) 
                         VALUES (2,'Hold a council','Remove the top card from each location (leaving at least one card) and shuffle them back into The Mountain.');
 INSERT INTO special_card(id, name, description) 
-                        VALUES (3,'Sell an intem','Exchange 1 of your items for 5 resources of your choice.');
+                        VALUES (3,'Sell an item','Exchange 1 of your items for 5 resources of your choice.');
 INSERT INTO special_card(id, name, description) 
                         VALUES (4,'Past Glories','Name a card previously on top in any location and return it to the top of that location.');
 INSERT INTO special_card(id, name, description) 

@@ -452,7 +452,7 @@ public class GameRestController {
     }
 
     @PostMapping("/play/{code}/specialOrder") 
-public ResponseEntity<Void> handleSpecialAction2(
+    public ResponseEntity<Void> SpecialOrder(
         @Valid @RequestBody SpecialCard specialCard,
         @PathVariable("code") String code,
         @RequestParam("selectedGold") Integer selectedGold,
@@ -512,6 +512,44 @@ public ResponseEntity<Void> handleSpecialAction2(
 
     return ResponseEntity.badRequest().build();
 }
+
+
+@PostMapping("/play/{code}/sellAnItem")
+public ResponseEntity<Void> sellAnItem(
+    @Valid @RequestBody SpecialCard specialCard,
+    @PathVariable("code") String code,
+    @RequestParam("selectedGold") Integer selectedGold,
+    @RequestParam("selectedIron") Integer selectedIron,
+    @RequestParam("selectedSteal") Integer selectedSteal,
+    @RequestParam("selectedObject") Object selectedObject) {
+
+    Game game = gs.getGameByCode(code);
+
+    if (!gs.checkPlayerInGameAndGameExists(game)) {
+        return ResponseEntity.notFound().build();
+    }
+
+    if ("Sell an item".equals(specialCard.getName())) {
+        Player currentPlayer = ps.getPlayerByUserAndGame(us.findCurrentUser(), game);
+
+        
+        if (selectedObject != null) {
+           
+            currentPlayer.getObjects().remove(selectedObject);
+            currentPlayer.setGold(currentPlayer.getGold() + selectedGold);
+            currentPlayer.setIron(currentPlayer.getIron() + selectedIron);
+            currentPlayer.setSteal(currentPlayer.getSteal() + selectedSteal);
+
+            
+            ps.savePlayer(currentPlayer);
+
+            return ResponseEntity.ok().build();
+        }
+    }
+
+    return ResponseEntity.badRequest().build();
+}
+
 
 @GetMapping("/play/{code}/isStart")
     public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
