@@ -183,6 +183,7 @@ export default function GamePlay() {
         setSpecialCardToBeConfirmed(!specialCardToBeConfirmed)
       }}
       card={choosedSpecialCard}
+      code={code}
     ></ConfirmSpecialCardModel>
     <div style={{marginTop: "70px"}}>
 

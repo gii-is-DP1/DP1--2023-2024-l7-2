@@ -1,8 +1,30 @@
-
-
 import {Input, FormGroup, Form, Label } from 'reactstrap'
 
-export default function SellAnItemForm(props) {
+
+function resolveSellAnItem(code, jwt, payload) {
+    fetch(`/api/v1/game/play/${code}/specialAction`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        if (!response.success) {
+
+          // Handle the case where the special sell item order is not successful
+          alert("Special sell item order failed. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error during special sell item order:", error);
+      });
+  }
+
+function FormSellAnItem(props) {
 
 
     let steal = props.steal;
@@ -14,13 +36,12 @@ export default function SellAnItemForm(props) {
     function handleChange(event, setParam) {
         const target = event.target;
         const value = target.value;
-        console.log(value)
         setParam(value);
     }
 
     return (
     <Form>
-        <FormGroup>
+        <FormGroup style={{display:'flex',flexDirection:'row'}}>
             <Label for="gold"> Gold </Label>
             <Input
                 type="number"
@@ -32,7 +53,7 @@ export default function SellAnItemForm(props) {
                 className="custom-input"
             />
         </FormGroup>
-        <FormGroup>
+        <FormGroup style={{display:'flex',flexDirection:'row'}}>
             <Label for="steal"> Steal </Label>
             <Input
                 type="number"
@@ -44,7 +65,7 @@ export default function SellAnItemForm(props) {
                 className="custom-input"
             />
         </FormGroup>
-        <FormGroup>
+        <FormGroup style={{display:'flex',flexDirection:'row'}}>
             <Label for="iron"> Iron </Label>
             <Input
                 type="number"
@@ -56,7 +77,26 @@ export default function SellAnItemForm(props) {
                 className="custom-input"
             />
         </FormGroup>
+        <FormGroup style={{display:'flex',flexDirection:'row'}}>
+          <Input
+            id="exampleSelect"
+            name="select"
+            type="select"
+            onChange={(event) => handleChange(event,props.setObjectSelected)}
+          >
+            <option key={0}>-</option>
+            {props.gameObject.map((object) => {
+              return (
+                <option key={object.id}>
+                  {object.name}
+                </option>
+              )
+            })}
+          </Input>
+        </FormGroup>
     </Form>
     )
 
 }
+
+export {FormSellAnItem, resolveSellAnItem};

@@ -318,34 +318,6 @@ function sellAnItem(code, jwt, setSelectedCards) {
     sendSellAnItem(code, jwt, order, setSelectedCards);
   }
 }
-
-function sendSellAnItem(code, jwt, order, setSelectedCards) {
-  // You can replace the following fetch with your actual API call
-  fetch(`/api/v1/game/play/${code}/specialSellItem`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwt}`,
-      Accept: "application/json",
-    },
-    body: JSON.stringify(order),
-  })
-    .then((response) => response.json())
-    .then((response) => {
-      if (response.success) {
-        // Assuming the server responds with success
-        // Update the selected cards or perform any other necessary actions
-        getAlreadySelectedCardByPlayers(response.dwarves, setSelectedCards);
-      } else {
-        // Handle the case where the special sell item order is not successful
-        alert("Special sell item order failed. Please try again.");
-      }
-    })
-    .catch((error) => {
-      console.error("Error during special sell item order:", error);
-      alert("An error occurred during the special sell item order. Please try again.");
-    });
-}
 */
 
 

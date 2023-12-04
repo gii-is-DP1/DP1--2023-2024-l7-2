@@ -401,7 +401,7 @@ public class GameRestController {
 
     }
 
-    @PostMapping("/play/{code}/musterAnArmy") 
+    @PostMapping("/play/{code}/specialAction") 
     public ResponseEntity<Void> handleSpecialAction(@Valid @RequestBody SpecialCardRequestHandler request, 
         @PathVariable("code") String code) {
 
@@ -462,7 +462,7 @@ public class GameRestController {
         // en esa posicion.
         Card reverseCard = specialCard.getTurnedSide();
         List<Dwarf> roundDwarves = g.getDwarves();
-        roundDwarves = roundDwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
+        roundDwarves = roundDwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null && d.getCard() != null).toList();
 
 
         for (Dwarf d:roundDwarves) {
