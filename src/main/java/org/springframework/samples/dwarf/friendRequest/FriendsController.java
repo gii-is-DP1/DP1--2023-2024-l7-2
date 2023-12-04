@@ -10,6 +10,7 @@ import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,9 +70,13 @@ public class FriendsController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<FriendRequest> createRequest(@RequestBody @Valid FriendRequest sendRequest) {
-		FriendRequest result = friendRequestService.saveFriendRequest(sendRequest);
-	
+	public ResponseEntity<FriendRequest> createRequest(@Valid @RequestBody FriendRequest sendRequest, BindingResult br) {
+		FriendRequest result = null;
+		if (!br.hasErrors()){
+		result = friendRequestService.saveFriendRequest(sendRequest);
+		}else{
+			throw new BadRequestException(br.getAllErrors());
+		}
 		return new ResponseEntity<>(result, HttpStatus.CREATED);
 	}
 
@@ -85,15 +90,13 @@ public class FriendsController {
 	}
 
     @PutMapping("/{id}")
-	public ResponseEntity<Void> modifyFriendRequest(@RequestBody @Valid FriendRequest newStatus, @PathVariable("id") Integer id) {
+	public ResponseEntity<Void> modifyFriendRequest(@RequestBody @Valid FriendRequest fr, @PathVariable("id") Integer id) {
 		FriendRequest friendRequestToUpdate = friendRequestService.findById(id);
-		if (!newStatus.getId().equals(id))
-			throw new BadRequestException("Status id is not consistent with resource URL:" + id);
-		else {
-			BeanUtils.copyProperties(newStatus, friendRequestToUpdate, "id");
+		
+			BeanUtils.copyProperties(fr, friendRequestToUpdate, "id");
 			friendRequestService.saveFriendRequest(friendRequestToUpdate);
-		}
-		return new ResponseEntity<>(HttpStatus.OK);
+		
+		return ResponseEntity.noContent().build();
 	}
         
 }
