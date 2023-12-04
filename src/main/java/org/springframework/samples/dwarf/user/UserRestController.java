@@ -80,9 +80,14 @@ class UserRestController {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "{id}")
+	@GetMapping(value ="{id}")
 	public ResponseEntity<User> findById(@PathVariable("id") Integer id) {
-		return new ResponseEntity<>(userService.findUser(id), HttpStatus.OK);
+		return new ResponseEntity<>(userService.findUserById(id), HttpStatus.OK);
+	}
+
+	@GetMapping("/check/{name}")
+	public ResponseEntity<User> findByName(@PathVariable("name") String name) {
+		return new ResponseEntity<>(userService.findUser(name), HttpStatus.OK);
 	}
 
 	@PostMapping
@@ -95,14 +100,14 @@ class UserRestController {
 	@PutMapping(value = "{userId}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<User> update(@PathVariable("userId") Integer id, @RequestBody @Valid User user) {
-		RestPreconditions.checkNotNull(userService.findUser(id), "User", "ID", id);
+		RestPreconditions.checkNotNull(userService.findUserById(id), "User", "ID", id);
 		return new ResponseEntity<>(this.userService.updateUser(user, id), HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "{userId}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<MessageResponse> delete(@PathVariable("userId") int id) {
-		RestPreconditions.checkNotNull(userService.findUser(id), "User", "ID", id);
+		RestPreconditions.checkNotNull(userService.findUserById(id), "User", "ID", id);
 		userService.deleteUser(id);
 		return new ResponseEntity<>(new MessageResponse("User deleted!"), HttpStatus.OK);
 

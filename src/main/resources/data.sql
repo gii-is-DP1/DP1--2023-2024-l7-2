@@ -106,7 +106,7 @@ INSERT INTO friend_request_status(id,name) VALUES (1, 'Sent'), (2,'Accepted'), (
 
 /* Friendes mocks */
 INSERT INTO friend_request(id, receiver_id, sender_id, status_id) VALUES 
-                (1,4,5,1), (2,6,7,1);
+                (1,4,5,1), (2,6,7,1), (3,4,8,2);
 
 
 INSERT INTO special_card(id, turned_side_id, name, description) VALUES 
