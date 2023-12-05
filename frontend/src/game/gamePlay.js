@@ -6,10 +6,12 @@ import { Button, ButtonGroup, Table } from "reactstrap";
 import getIdFromUrl from "./../util/getIdFromUrl";
 import Card from "./../cards/card"
 import SpecialCard from "../cards/specialCard";
-import  { fetchDwarves, fetchCards, fetchPlayers, 
-  fetchIsMyTurn, isFinished, sendCard, isStart, specialOrder}  from "./gameFunctions";
+import  { isFinished, sendCard, isStart}  from "./gameFunctions";
 import ConfirmSpecialCardModel from "./modals/ConfirmSpecialCardModel";
+import useIntervalFetchState from "../util/useIntervalFetchState";
+
 import '../static/css/game/objects.css'; 
+
 
 
 const jwt = tokenService.getLocalAccessToken();
@@ -19,10 +21,11 @@ export default function GamePlay() {
   const code = getIdFromUrl(2);
   //console.log(jwt)
 
-
-  const [gameStarted, setGameStarted] = useState(null);
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
+
+  const [gameStarted, setGameStarted] = useState(null);
+  const [gameRound, setGameRound] = useState(null);
   const [choosedCard, setChoosedCard] = useState(null);
   const [choosedSpecialCard, setChoosedSpecialCard] = useState(null);
   const [specialCardToBeConfirmed, setSpecialCardToBeConfirmed] = useState(false);
@@ -34,7 +37,7 @@ export default function GamePlay() {
     setVisible,
     code
   );
-  const [specialCards, setSpecialCards] = useFetchState(
+  const [specialCards, setSpecialCards] = useIntervalFetchState(
     [],
     `/api/v1/game/play/${code}/getSpecialCards`,
     jwt,
@@ -48,10 +51,16 @@ export default function GamePlay() {
     7: null,8: null,9: null}
   const [selectedCards,setSelectedCards] = useState(emptySelectedCards)
 
-  const emptySelectedSpecialCards = {1: null,2: null,3: null}
-  const [selectedSpecialCards,setSelectedSpecialCards] = useState(emptySelectedSpecialCards)
+  const emptyHistoricalCards = {1: null,2: null,3: null,
+    4: null,5: null,6: null,
+    7: null,8: null,9: null}
+  const [cardsHistorical,setCardsHistorical] = useState(emptyHistoricalCards)
 
-  const [game, setGame] = useFetchState(
+
+  //const emptySelectedSpecialCards = {1: null,2: null,3: null}
+  //const [selectedSpecialCards,setSelectedSpecialCards] = useState(emptySelectedSpecialCards)
+
+  const [game, setGame] = useIntervalFetchState(
       {},
       `/api/v1/game/play/${code}`,
       jwt,
@@ -60,7 +69,7 @@ export default function GamePlay() {
       code
   );
 
-  const [players, setPlayers] = useFetchState(
+  const [players, setPlayers] = useIntervalFetchState(
     [],
     `/api/v1/game/play/${code}/players`,
     jwt,
@@ -70,7 +79,7 @@ export default function GamePlay() {
   );
   const player = players.filter(p => p.name === user.username)[0];
 
-  const [isMyTurn, setIsMyTurn] = useFetchState(
+  const [isMyTurn, setIsMyTurn] = useIntervalFetchState(
     false,
     `/api/v1/game/play/${code}/isMyTurn`,
     jwt,
@@ -79,14 +88,47 @@ export default function GamePlay() {
     code
   );
 
-  const [dwarves, setDwarves] = useFetchState([]);
-  
-  useEffect(() => {
-    setChoosedCard(null)
-  },[])
+  const [dwarves, setDwarves] = useIntervalFetchState(
+    [],
+    `/api/v1/game/play/${code}/dwarves`,
+    jwt,
+    setMessage,
+    setVisible,
+    code
+  );
+
 
   const modal = getErrorModal(setVisible, visible, message);
 
+  useEffect(() => {
+    let updated = {1: null,2: null,3: null,
+      4: null,5: null,6: null,
+      7: null,8: null,9: null};
+    for (const d of dwarves) {
+        const c = d.card;
+        const pacolor = d.player.color;
+        console.log(c.id + " to color => " + pacolor);
+        updated[c.position] = pacolor;  
+    }
+    setSelectedCards(updated)
+
+    if (game.round !== gameRound) {
+      setGameRound(game.round)
+    } 
+  }, [game,dwarves])
+
+  useEffect(() => {
+    fetch(`/api/v1/game/play/${code}/getCards`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: 'application/json',
+      }
+    }).then(response => response.json()).then(response => {
+        setCards(response)
+    })
+  }, [gameRound])
 
   
   function selectCard(id,card) {
@@ -211,22 +253,6 @@ export default function GamePlay() {
                   Finish?
             </Button>
           
-            <Button
-                onClick={() => {fetchCards(code, jwt, cards, setCards)}}
-                title="Finish?"
-                color="#008000"
-                style={{border: '3px solid black',padding: "3px"}}>
-                  Get Cards
-            </Button>
-
-            <Button
-              onClick={() => {fetchIsMyTurn(game, code, jwt, isMyTurn, setIsMyTurn, setSelectedCards, 
-                setChoosedCard, setGame, setDwarves)}}
-              title="Start Game"
-              color="#008000"
-              style={{ border: "3px solid black", padding: "3px" }}>
-              checkTurn
-            </Button>
             {choosedCard && (
               <Button
               onClick={() => {
@@ -243,16 +269,7 @@ export default function GamePlay() {
           { isMyTurn && <h2>Is your turn!</h2>}
         </section>
           }
-            <Button
-              onClick={() => {
-                fetchPlayers(code, jwt, players, setPlayers)
-              }}
-              title="Fetch Players"
-              color="#008000"
-              style={{ border: "3px solid black", padding: "3px" }}
-            >
-              Fetch players
-            </Button>
+
         <section className="generalLayout" style={{display:"flex", flexDirection:"column"}}>
           <section>
             <Table>

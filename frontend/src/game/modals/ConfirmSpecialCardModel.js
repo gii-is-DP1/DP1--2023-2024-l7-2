@@ -65,6 +65,11 @@ export default function ConfirmSpecialCardModel(props) {
         }
     }
 
+    /* 
+        Las cartas que necesitan un 
+        formulario especial son Turn Back, Special Order,
+        Past Glories y Sell an Item 
+    */
     return (
         <Modal
         toggle={props.toggle}
