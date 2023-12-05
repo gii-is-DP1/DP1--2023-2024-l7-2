@@ -1,7 +1,7 @@
 import {Input, FormGroup, Form, Label } from 'reactstrap'
 
 
-function resolveSellAnItem(code, jwt, payload) {
+function resolveSpecialOrder(code, jwt, payload) {
     fetch(`/api/v1/game/play/${code}/specialAction`, {
       method: "POST",
       headers: {
@@ -24,8 +24,7 @@ function resolveSellAnItem(code, jwt, payload) {
       });
   }
 
-function FormSellAnItem(props) {
-
+function FormSpecialOrder(props) {
 
     function handleChange(event, setParam) {
         const target = event.target;
@@ -35,23 +34,6 @@ function FormSellAnItem(props) {
 
     return (
     <Form>
-        <FormGroup style={{display:'flex',flexDirection:'row'}}>
-          <Input
-            id="exampleSelect"
-            name="select"
-            type="select"
-            onChange={(event) => handleChange(event,props.setObjectSelected)}
-          >
-            <option key={0}>-</option>
-            {props.gameObject.map((object) => {
-              return (
-                <option key={object.id}>
-                  {object.name}
-                </option>
-              )
-            })}
-          </Input>
-        </FormGroup>
         <FormGroup style={{display:'flex',flexDirection:'row'}}>
             <Label for="gold"> Gold </Label>
             <Input
@@ -88,8 +70,26 @@ function FormSellAnItem(props) {
                 className="custom-input"
             />
         </FormGroup>
+        <FormGroup style={{display:'flex',flexDirection:'row'}}>
+          <Input
+            id="exampleSelect"
+            name="select"
+            type="select"
+            onChange={(event) => handleChange(event,props.setObjectSelected)}
+          >
+            <option key={0}>-</option>
+            {props.gameObject.map((object) => {
+              return (
+                <option key={object.id}>
+                  {object.name}
+                </option>
+              )
+            })}
+          </Input>
+        </FormGroup>
     </Form>
     )
+
 }
 
 export {FormSellAnItem, resolveSellAnItem};

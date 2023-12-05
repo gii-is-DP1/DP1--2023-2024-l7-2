@@ -12,12 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
-import org.springframework.samples.dwarf.user.Authorities;
-import org.springframework.samples.dwarf.user.AuthoritiesService;
-import org.springframework.samples.dwarf.user.User;
-import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,13 +76,13 @@ class UserServiceTests {
 
 	@Test
 	void shouldFindSingleUser() {
-		User user = this.userService.findUser(4);
+		User user = this.userService.findUserById(4);
 		assertEquals("owner1", user.getUsername());
 	}
 
 	@Test
 	void shouldNotFindSingleUserWithBadID() {
-		assertThrows(ResourceNotFoundException.class, () -> this.userService.findUser(100));
+		assertThrows(ResourceNotFoundException.class, () -> this.userService.findUserById(100));
 	}
 
 	@Test
@@ -103,10 +98,10 @@ class UserServiceTests {
 	@Test
 	@Transactional
 	void shouldUpdateUser() {
-		User user = this.userService.findUser(4);
+		User user = this.userService.findUserById(4);
 		user.setUsername("Change");
 		userService.updateUser(user, 4);
-		user = this.userService.findUser(4);
+		user = this.userService.findUserById(4);
 		assertEquals("Change", user.getUsername());
 	}
 

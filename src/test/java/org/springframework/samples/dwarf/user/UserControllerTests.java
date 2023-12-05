@@ -25,11 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.samples.dwarf.configuration.SecurityConfiguration;
 import org.springframework.samples.dwarf.exceptions.AccessDeniedException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
-import org.springframework.samples.dwarf.user.Authorities;
-import org.springframework.samples.dwarf.user.AuthoritiesService;
-import org.springframework.samples.dwarf.user.User;
-import org.springframework.samples.dwarf.user.UserRestController;
-import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -156,7 +151,7 @@ class UserControllerTests {
 	@Test
 	@WithMockUser("admin")
 	void shouldReturnUser() throws Exception {
-		when(this.userService.findUser(TEST_USER_ID)).thenReturn(user);
+		when(this.userService.findUserById(TEST_USER_ID)).thenReturn(user);
 		mockMvc.perform(get(BASE_URL + "/{id}", TEST_USER_ID)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(TEST_USER_ID))
 				.andExpect(jsonPath("$.username").value(user.getUsername()))
@@ -166,7 +161,7 @@ class UserControllerTests {
 	@Test
 	@WithMockUser("admin")
 	void shouldReturnNotFoundUser() throws Exception {
-		when(this.userService.findUser(TEST_USER_ID)).thenThrow(ResourceNotFoundException.class);
+		when(this.userService.findUserById(TEST_USER_ID)).thenThrow(ResourceNotFoundException.class);
 		mockMvc.perform(get(BASE_URL + "/{id}", TEST_USER_ID)).andExpect(status().isNotFound());
 	}
 
@@ -188,7 +183,7 @@ class UserControllerTests {
 		user.setUsername("UPDATED");
 		user.setPassword("CHANGED");
 
-		when(this.userService.findUser(TEST_USER_ID)).thenReturn(user);
+		when(this.userService.findUserById(TEST_USER_ID)).thenReturn(user);
 		when(this.userService.updateUser(any(User.class), any(Integer.class))).thenReturn(user);
 
 		mockMvc.perform(put(BASE_URL + "/{id}", TEST_USER_ID).with(csrf()).contentType(MediaType.APPLICATION_JSON)
@@ -202,7 +197,7 @@ class UserControllerTests {
 		user.setUsername("UPDATED");
 		user.setPassword("UPDATED");
 
-		when(this.userService.findUser(TEST_USER_ID)).thenThrow(ResourceNotFoundException.class);
+		when(this.userService.findUserById(TEST_USER_ID)).thenThrow(ResourceNotFoundException.class);
 		when(this.userService.updateUser(any(User.class), any(Integer.class))).thenReturn(user);
 
 		mockMvc.perform(put(BASE_URL + "/{id}", TEST_USER_ID).with(csrf()).contentType(MediaType.APPLICATION_JSON)
@@ -214,7 +209,7 @@ class UserControllerTests {
 	void shouldDeleteOtherUser() throws Exception {
 		logged.setId(2);
 
-		when(this.userService.findUser(TEST_USER_ID)).thenReturn(user);
+		when(this.userService.findUserById(TEST_USER_ID)).thenReturn(user);
 		doNothing().when(this.userService).deleteUser(TEST_USER_ID);
 
 		mockMvc.perform(delete(BASE_URL + "/{id}", TEST_USER_ID).with(csrf())).andExpect(status().isOk())
@@ -226,7 +221,7 @@ class UserControllerTests {
 	void shouldNotDeleteLoggedUser() throws Exception {
 		logged.setId(TEST_USER_ID);
 
-		when(this.userService.findUser(TEST_USER_ID)).thenReturn(user);
+		when(this.userService.findUserById(TEST_USER_ID)).thenReturn(user);
 		doNothing().when(this.userService).deleteUser(TEST_USER_ID);
 
 		mockMvc.perform(delete(BASE_URL + "/{id}", TEST_USER_ID).with(csrf())).andExpect(status().isForbidden())
