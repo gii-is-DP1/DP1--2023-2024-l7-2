@@ -4,10 +4,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.samples.dwarf.card.Card;
 import org.springframework.stereotype.Repository;
 
-import jakarta.validation.Valid;
 
 @Repository
 public interface CardDeckRepository extends CrudRepository<CardDeck, Integer> {

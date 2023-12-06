@@ -13,6 +13,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
+import org.springframework.samples.dwarf.location.Location;
+import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.object.Object;
@@ -20,6 +22,7 @@ import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ public class GameService {
     UserService us;
     MainBoardService mbs;
     CardDeckService cds;
+    LocationService ls;
 
     final String helpCard = "HelpCard";
     final String orcCard = "OrcCard";
@@ -39,13 +43,13 @@ public class GameService {
 
     @Autowired
     public GameService(GameRepository gr, PlayerRepository pr, UserService us,
-            MainBoardService mbs, CardDeckService cds) {
+            MainBoardService mbs, CardDeckService cds, LocationService ls) {
         this.gr = gr;
         this.pr = pr;
         this.us = us;
         this.mbs = mbs;
         this.cds = cds;
-
+        this.ls = ls;
     }
 
     @Transactional(readOnly = true)
@@ -141,6 +145,13 @@ public class GameService {
             cd.addAll(twoCards);
         }
 
+
+        List<Location> locations = mb.getLocations();
+        for (Card ca: cd) {
+            Integer position = ca.getPosition();
+            ls.pushCard(locations.get(position),ca);
+        }
+        /*
         for (Card ca : cd) {
             for (int i = 0; i < mbCards.size(); i++) {
                 if (ca.getPosition().equals(mbCards.get(i).getPosition())) {
@@ -150,7 +161,7 @@ public class GameService {
         }
 
         mb.setCards(mbCards);
-        mbs.saveMainBoard(mb);
+        mbs.saveMainBoard(mb);*/
 
         g.setRound(g.getRound() + 1);
 

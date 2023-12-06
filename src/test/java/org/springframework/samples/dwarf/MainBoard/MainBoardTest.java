@@ -48,7 +48,7 @@ public class MainBoardTest {
         Card card2 = mock(Card.class);
         List<Card> cards = Arrays.asList(card1, card2);
 
-        mainBoard.setCards(cards);
+        //mainBoard.setCards(cards);
 
         assertEquals(cards, mainBoard.getCards());
     }
