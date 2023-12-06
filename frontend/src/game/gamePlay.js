@@ -51,9 +51,9 @@ export default function GamePlay() {
     7: null,8: null,9: null}
   const [selectedCards,setSelectedCards] = useState(emptySelectedCards)
 
-  const emptyHistoricalCards = {1: null,2: null,3: null,
-    4: null,5: null,6: null,
-    7: null,8: null,9: null}
+  const emptyHistoricalCards = {1: [],2: [],3: [],
+    4: [],5: [],6: [],
+    7: [],8: [],9: []}
   const [cardsHistorical,setCardsHistorical] = useState(emptyHistoricalCards)
 
 
@@ -126,10 +126,29 @@ export default function GamePlay() {
         Accept: 'application/json',
       }
     }).then(response => response.json()).then(response => {
-        setCards(response)
+        if (cards !== response) {
+          let tmpCardsHistorical = cardsHistorical;
+          setCards(response)
+
+          let i;
+          for (i = 0; i < response.length ; i++) {
+            let positionHistorical = tmpCardsHistorical[i+1]
+            console.log(tmpCardsHistorical)
+            console.log(response)
+            if (positionHistorical.length === 0) {
+              tmpCardsHistorical[i+1].push(response[i])
+            }
+            let positionLen = positionHistorical.length
+
+            if (positionHistorical[positionLen-1].id !== response[i].id) {
+              tmpCardsHistorical[i+1].push(response[i])
+            }
+          }
+
+          setCardsHistorical(tmpCardsHistorical)
+        }
     })
   }, [gameRound])
-
   
   function selectCard(id,card) {
     if (isMyTurn === false) {
@@ -159,7 +178,6 @@ export default function GamePlay() {
   }
 
   function selectSpecialCard(id,specialCard) {
-    console.log("we are here")
     if (isMyTurn === false) {
       console.log("is not your turn")
       return false; // Just a random return to ensure that function exits

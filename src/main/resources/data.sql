@@ -117,7 +117,7 @@ INSERT INTO special_card(id, turned_side_id, name, description) VALUES
                         (5, 5, 'Special order','Return 5 resources of your choice, including at least 1 of each type, to the supply and take 1 item.'),
                         (6, 6, 'Turn back','Remove the top card from 1 location and shuffle it back into the mountain. Immediately place 1 on that location.'),
                         (7, 7, 'Apprentice','Place one worker on a location occupied by the other player.'),
-                        (8, 8, 'Collapse the Shafts ','Remove the top card from each location and place it on the bottom of that stack.'),
+                        (8, 8, 'Collapse the Shafts','Remove the top card from each location and place it on the bottom of that stack.'),
                         (9, 9, 'Run Amok','Collect all of the cards from each location, in turn, shuffle them and return them to that location.');                                                
 
 

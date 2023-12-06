@@ -42,7 +42,7 @@ public class GameServiceTest {
         playerRepository = mock(PlayerRepository.class);
         mbs = mock(MainBoardService.class);
         cds = mock(CardDeckService.class);
-        gameService = new GameService(gameRepository, playerRepository, userService, mbs, cds);
+        gameService = new GameService(gameRepository, playerRepository, userService, mbs, cds, null);
     }
 
     @Test
@@ -220,7 +220,7 @@ public class GameServiceTest {
         l.add(helpCard2);
         l.add(helpCard3);
         l.add(helpCard4);
-        mainBoard.setCards(l);
+        //mainBoard.setCards(l);
         
         helpCards.add(Pair.of(player1, helpCard1));
         helpCards.add(Pair.of(player2, helpCard2));

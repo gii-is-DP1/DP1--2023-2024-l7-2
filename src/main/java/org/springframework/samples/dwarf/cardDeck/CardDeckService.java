@@ -38,6 +38,15 @@ public class CardDeckService {
         return cdr.findById(id).orElseThrow(() -> new ResourceNotFoundException("CardDeck", "Id", id));
     }
 
+
+    @Transactional
+    public CardDeck shuffleAndSaveCards(CardDeck cd, List<Card> cards) {
+
+        Collections.shuffle(cards);
+        cd.setCards(cards);
+        return saveCardDeck(cd);
+    }
+
     @Transactional
     public CardDeck initialiate() throws DataAccessException {
         // Not tested
@@ -51,12 +60,14 @@ public class CardDeckService {
             cards.remove(0);
         }
 
+        /*
         Collections.shuffle(cards);
 
         cd.setCards(cards);
-        cd.setLastCard(cards.get(0));
+        //cd.setLastCard(cards.get(0));
 
-        saveCardDeck(cd);
+        saveCardDeck(cd);*/
+        cd = shuffleAndSaveCards(cd, cards);
         return cd;
     }
 
@@ -84,7 +95,7 @@ public class CardDeckService {
     }
 
     @Transactional
-    public List<Card> getTwoCards(Integer id) {
+    public List<Card> getNewCards(Integer id) {
 
         /*
          * Al inicio de cada ronda se robarán dos cartas del mazo y
@@ -95,30 +106,36 @@ public class CardDeckService {
          * 
          */
 
-        List<Card> cards = getCardDeckById(id).getCards();
-
-        Card lastCard = getCardDeckById(id).getLastCard();
+        CardDeck cd =getCardDeckById(id);
+        
+        List<Card> cards = cd.getCards();
+        Card lastCard = cd.getLastCard();
+        
         Integer lastCardIndex = cards.indexOf(lastCard);
 
-        List<Card> twoCards = List.of();
-
-        Card firstCard = cards.get(lastCardIndex);
-        Card secondCard = cards.get(lastCardIndex + 1);
-        Integer offset = 2;
+        ArrayList<Card> newCards = new ArrayList<>();
+ 
+        Integer offset = 0;
+        Card firstCard = cards.get(offset);
+        offset++;
+        Card secondCard = cards.get(offset);
+        offset++;
+        newCards.add(firstCard);
+        //Integer offset = 2;
         if (firstCard.getPosition().equals(secondCard.getPosition())) {
-            secondCard = cards.get(lastCardIndex + 2);
+            secondCard = cards.get(offset);
             offset++;
 
-            if (firstCard.getPosition().equals(secondCard.getPosition())) {
-                twoCards = List.of(firstCard);
-            } else {
-                twoCards = List.of(firstCard, secondCard);
+            if (!firstCard.getPosition().equals(secondCard.getPosition())) {
+            
+                newCards.add(secondCard);
             }
-
         } else {
-            twoCards = List.of(firstCard, secondCard);
+            newCards.add(secondCard);
         }
 
+        cards.removeAll(newCards);
+        cd.setCards(cards);
         /*
          * while (twoCards.size() < 2 && lastCardIndex < cards.size() - 1) {
          * if (cards.get(lastCardIndex).getPosition() != cards.get(lastCardIndex +
@@ -128,11 +145,11 @@ public class CardDeckService {
          * }
          */
 
-        CardDeck newCd = getCardDeckById(id);
-        newCd.setLastCard(cards.get(lastCardIndex + offset));
-        saveCardDeck(newCd);
+        //CardDeck newCd = getCardDeckById(id);
+        //newCd.setLastCard(cards.get(lastCardIndex + offset));
+        saveCardDeck(cd);
 
-        return twoCards;
+        return newCards;
     }
 
 }

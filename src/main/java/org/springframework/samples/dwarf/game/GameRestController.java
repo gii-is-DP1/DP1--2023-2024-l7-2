@@ -17,6 +17,8 @@ import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.location.Location;
+import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.object.Object;
@@ -51,11 +53,13 @@ public class GameRestController {
     private final MainBoardService mbs;
     private final CardDeckService cds;
     private final SpecialCardDeckService scds;
+    private final LocationService ls;
     private final DwarfService ds;
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayereService ps,
-            MainBoardService mbs, CardDeckService cds, DwarfService ds, SpecialCardDeckService scds) {
+            MainBoardService mbs, CardDeckService cds, DwarfService ds, 
+            SpecialCardDeckService scds, LocationService ls) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
@@ -63,6 +67,7 @@ public class GameRestController {
         this.cds = cds;
         this.scds = scds;
         this.ds = ds;
+        this.ls = ls;
     }
 
     @GetMapping
@@ -475,9 +480,13 @@ public class GameRestController {
             }
         }
 
-        ArrayList<Card> newCards = new ArrayList<>();
+        //ArrayList<Card> newCards = new ArrayList<>();
 
         MainBoard mb = g.getMainBoard();
+        Location locationToUpdate = mb.getLocations().get(reverseCard.getPosition());
+        ls.pushCard(locationToUpdate, reverseCard);
+
+        /* 
         for (Card c: mb.getCards()) {
             if (c.getPosition().equals(reverseCard.getPosition())) {
                 newCards.add(reverseCard);
@@ -486,11 +495,11 @@ public class GameRestController {
             }
         }
 
-        mb.setCards(newCards);
-        mbs.saveMainBoard(mb);
+        //mb.setCards(newCards);
+        //mbs.saveMainBoard(mb);
 
         g.setMainBoard(mb);
-        gs.saveGame(g);
+        gs.saveGame(g);*/
 
 
         // Ahora aplicamos la carta

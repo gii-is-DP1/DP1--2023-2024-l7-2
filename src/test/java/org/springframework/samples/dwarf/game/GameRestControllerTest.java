@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayereService;
@@ -28,14 +29,16 @@ public class GameRestControllerTest {
     private GameService gameService;
     private UserService userService;
     private PlayereService playerService;
+    private LocationService locationService;
 
     @BeforeEach
     public void setUp() {
         gameService = mock(GameService.class);
         userService = mock(UserService.class);
         playerService = mock(PlayereService.class);
+        locationService = mock(LocationService.class);
 
-        gameRestController = new GameRestController(gameService, userService, playerService, null, null, null, null);
+        gameRestController = new GameRestController(gameService, userService, playerService, null, null, null, null, locationService);
     }
 
     @Test
