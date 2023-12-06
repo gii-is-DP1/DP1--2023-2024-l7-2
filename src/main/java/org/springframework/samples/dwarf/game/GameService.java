@@ -136,14 +136,21 @@ public class GameService {
         mbCards.addAll(mb.getCards());
 
         Card c = g.getMainBoard().getCardDeck().getLastCard();
-        Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
+        //Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
         ArrayList<Card> cd = new ArrayList<Card>();
-        if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
+        //if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
             // Returns an empty list
-        } else {
-            List<Card> twoCards = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
+        //} else {
+        try {
+
+            List<Card> twoCards = cds.getNewCards(g.getMainBoard().getCardDeck().getId());
             cd.addAll(twoCards);
+        } catch (Exception e) {
+            System.out.println(e);
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
         }
+        //}
 
 
         List<Location> locations = mb.getLocations();

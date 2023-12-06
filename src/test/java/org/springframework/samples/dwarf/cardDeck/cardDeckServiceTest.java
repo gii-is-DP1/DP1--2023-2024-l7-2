@@ -71,7 +71,7 @@ public class cardDeckServiceTest {
         CardDeck existingCardDeck = cardDeckService.initialiate();
         Integer cardDeckId = existingCardDeck.getId();
 
-        List<Card> twoCards = cardDeckService.getTwoCards(cardDeckId);
+        List<Card> twoCards = cardDeckService.getNewCards(cardDeckId);
         assertNotNull(twoCards);
         // Asegúrate de ajustar las aserciones según la lógica de tu aplicación.
     }

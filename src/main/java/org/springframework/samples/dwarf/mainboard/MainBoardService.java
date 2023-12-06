@@ -23,6 +23,11 @@ import jakarta.validation.Valid;
 @Service
 public class MainBoardService {
 
+    private final Integer MAX_POSITION = 9;
+    private final Integer MIN_POSITION = 1;
+    private final Integer MAX_NUMBER_SPECIAL_CARD_DECK = 3;
+
+
     MainBoardRepository repo;
     private final CardDeckService cds;
     private final SpecialCardDeckService scds;
@@ -68,7 +73,7 @@ public class MainBoardService {
         mb.setSpecialCardDeck(specCardDeck);
 
         ArrayList<Location> locations = new ArrayList<Location>();
-        for (int i = 1; i <= 9; i++) {
+        for (int i = MIN_POSITION; i <= MAX_POSITION; i++) {
             Card initialCard = cs.getById(i);
             
             Location locationI = new Location();
@@ -80,7 +85,8 @@ public class MainBoardService {
         mb.setLocations(locations);
 
         ArrayList<SpecialCard> sCards = new ArrayList<SpecialCard>();
-        for (int i = 1; i <= 3; i++) {
+        // TODO: Give better names to constants
+        for (int i = MIN_POSITION; i <= MAX_NUMBER_SPECIAL_CARD_DECK; i++) {
             SpecialCard a = scs.getById(i);
             System.out.println(a);
             sCards.add(a);
@@ -92,18 +98,35 @@ public class MainBoardService {
         return mb;
     }
 
-    // @Transactional
-    // public MainBoard numberOfSpecialCards(@Valid MainBoard mb, @Valid
-    // SpecialCardDeck sc) {
-    // if (mb.getSpecialCardDeck().size() == 3) {
-    // return mb;
-    // } else {
-    // SpecialCard lastSpecialCard = sc.getLastSpecialCard();
-    // for (SpecialCardDeck specialCardDeck : mb.getSpecialCardDeck()) {
-    // specialCardDeck.getSpecialCards().add(lastSpecialCard);
+    @Transactional
+    public MainBoard holdACouncilAction(MainBoard mb) {
+        CardDeck cd = mb.getCardDeck();
+        ArrayList<Card> cardsRemovedFromLocations = new ArrayList<>();
 
-    // }
-    // return mb;
-    // }
-    // }
+        for (Location lc:mb.getLocations()) {
+            Card removedCard = ls.removeFirstCard(lc);
+            cardsRemovedFromLocations.add(removedCard);
+        }
+
+        cardsRemovedFromLocations.addAll(cd.getCards());
+
+        cd = cds.shuffleAndSaveCards(cd, cardsRemovedFromLocations);
+
+        return saveMainBoard(mb);
+    }
+
+    @Transactional
+    public void collapseTheShaftsAction(MainBoard mb) {
+
+        for (Location lc:mb.getLocations()) {
+            ls.putFirstCardAtEnd(lc);
+        }
+    }
+
+    public void runAmokAction(MainBoard mb) {
+        for (Location lc:mb.getLocations()) {
+            ls.shuffleLocation(lc);
+        }
+    }
+    
 }

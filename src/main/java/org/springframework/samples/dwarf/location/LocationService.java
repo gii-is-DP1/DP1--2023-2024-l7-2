@@ -1,5 +1,6 @@
 package org.springframework.samples.dwarf.location;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +31,70 @@ public class LocationService {
     }
 
     @Transactional
-    public Location save(@Valid Location location) {
+    public Location save( Location location) {
         return repo.save(location);
     }
 
-    public Location pushCard(@Valid Location location, Card c) {
+    @Transactional
+    public Location pushCard( Location location, Card c) {
         List<Card> locationCards = location.getCards();
         locationCards.add(c);
         location.setCards(locationCards);
         return save(location);
+    }
+
+    @Transactional
+    public Location shuffleLocation( Location location) {
+        List<Card> locationCards = location.getCards();
+        Collections.shuffle(locationCards);
+        location.setCards(locationCards);
+        return save(location);
+    }
+
+
+    @Transactional
+    public Location putFirstCardAtEnd( Location location) {
+        List<Card> locationCards = location.getCards();
+        Collections.rotate(locationCards,1);
+        location.setCards(locationCards);
+        return save(location);
+    }
+
+    @Transactional
+    public Card removeFirstCard(Location location) {
+        List<Card> locationCards = location.getCards();
+        Card toRemove = null;
+        if (locationCards.size() > 1){
+            toRemove = locationCards.get(locationCards.size() -1);
+        }
+        locationCards.remove(toRemove);
+        location.setCards(locationCards);
+        return toRemove;
+    }
+/* 
+    @Transactional
+    public List<Card> removeAllCardsExceptOne(Location location) {
+        List<Card> res = location.getCards();
+        Card remainingCard = res.get(0);
+        res.remove(remainingCard);
+
+        location.setCards(List.of(remainingCard));
+        save(location);
+
+        return res;
+    }
+*/
+    @Transactional
+    public Location pastGloriesAction(Location location, Card c) {
+        List<Card> locationCards = location.getCards();
+        if (!locationCards.contains(c)) {
+            // TODO: Create error
+            return null;
+        }
+        locationCards.remove(c);
+        locationCards.add(c);
+        location.setCards(locationCards);
+        save(location);
+        return location;
     }
 }
