@@ -1,5 +1,6 @@
 package org.springframework.samples.dwarf.location;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,12 +37,20 @@ public class LocationService {
     }
 
     @Transactional
-    public Location pushCard( Location location, Card c) {
+    public Location pushCard(Location location, Card c) {
         List<Card> locationCards = location.getCards();
+    
+        
+        if (locationCards == null) {
+            locationCards = new ArrayList<>();
+            location.setCards(locationCards);  
+        }
+    
         locationCards.add(c);
         location.setCards(locationCards);
         return save(location);
     }
+    
 
     @Transactional
     public Location shuffleLocation( Location location) {
