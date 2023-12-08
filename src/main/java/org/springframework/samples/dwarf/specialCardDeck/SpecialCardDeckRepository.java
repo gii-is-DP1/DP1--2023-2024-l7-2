@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.stereotype.Repository;
-
-import jakarta.validation.Valid;
 
 @Repository
 public interface SpecialCardDeckRepository extends CrudRepository<SpecialCardDeck, Integer> {

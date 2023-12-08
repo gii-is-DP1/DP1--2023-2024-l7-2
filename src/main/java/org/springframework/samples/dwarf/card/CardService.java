@@ -20,7 +20,7 @@ public class CardService {
     }
 
     @Transactional(readOnly = true)
-    List<Card> getCards() {
+    public List<Card> getCards() {
         return repo.findAll();
     }
 

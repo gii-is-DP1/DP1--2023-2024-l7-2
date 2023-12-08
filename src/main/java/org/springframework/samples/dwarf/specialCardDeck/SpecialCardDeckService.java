@@ -4,14 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.card.SpecialCardRepository;
-import org.springframework.samples.dwarf.card.SpecialCardService;
-import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +33,12 @@ public class SpecialCardDeckService {
 
     @Transactional(readOnly = true)
     public SpecialCardDeck getSpecialCardDeckById(Integer id) {
-        return scdr.findById(id).orElseThrow(() -> new ResourceNotFoundException("CardDeck", "Id", id));
+        SpecialCardDeck res = scdr.findById(id).orElseThrow(() -> new ResourceNotFoundException("CardDeck", "Id", id));
+        if (res.equals(null)) {
+            throw new NullPointerException();
+        } else {
+            return res;
+        }
     }
 
     @Transactional
@@ -80,7 +81,11 @@ public class SpecialCardDeckService {
 
     @Transactional
     public SpecialCardDeck saveSpecialCardDeck(@Valid SpecialCardDeck scd) {
-        scdr.save(scd);
+        if (scd.equals(null)) {
+            throw new NullPointerException();
+        } else {
+            scdr.save(scd);
+        }
         return scd;
     }
 
