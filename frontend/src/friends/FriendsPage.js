@@ -22,12 +22,12 @@ export default function FriendList() {
     id: null,
     sender: null,
     receiver: null,
-    status: null,
+    status: {id:1, name:"Accepted"},
     sendTime:null
   })
   
   const user = tokenService.getUser();
-  console.log(friends)
+  console.log(req)
   function acceptRequest(url) {
     let confirmMessage = window.confirm("Are you sure you want to accept the request?");
     if (confirmMessage) {
@@ -120,6 +120,42 @@ function deleteFriends(url, id) {
   }
 }
 
+function blockFriend(url) {
+  let confirmMessage = window.confirm("Are you sure you want to block this friend?");
+  if (confirmMessage) {
+    fetch(url, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${jwt}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req)
+    })
+    
+    .then((response) => {
+      console.log('Response:', response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json().catch(() => ({}));
+    })
+    .then((data) => {
+      console.log('Data:', data);
+      if (data && data.message) {
+        setMessage(data.message);
+        setVisible(true);
+      }})
+      .catch((error) => {
+        console.error('Error:', error);
+        if (error instanceof SyntaxError) {
+          console.error('SyntaxError. Response body:', error.body);
+        }
+        alert(error.message);
+      });
+  }
+}
+
 const friendRequest = friends.map((request) => (
   <tr key={request.id}>
     <td>{request.receiver.username === user.username
@@ -137,7 +173,12 @@ const friendRequest = friends.map((request) => (
           <Button outline color="success" margin="10px" >
             <Link
               to="/friends"
-              onClickCapture={() => acceptRequest(`/api/v1/friends/${request.id}`)}
+              onClickCapture={() => {setReq(req.id = request.id)
+                setReq(req.sender = request.sender)
+                setReq(req.receiver = request.receiver)
+                setReq(req.status = {id: 2, name: 'Accepted'})
+                setReq(req.sendTime = request.sendTime)
+              acceptRequest(`/api/v1/friends/${request.id}`)}}
               className="btn sm"
               style={{ textDecoration: "none" }}
             >
@@ -147,7 +188,13 @@ const friendRequest = friends.map((request) => (
           <Button outline color="danger" margin="15px">
             <Link
               to="/friends"
-              onClickCapture={() => deniedRequest(`/api/v1/friends/${request.id}`)}
+              onClickCapture={() => {
+                setReq(req.id = request.id)
+                setReq(req.sender = request.sender)
+                setReq(req.receiver = request.receiver)
+                setReq(req.status = {id: 3, name: 'Denied'})
+                setReq(req.sendTime = request.sendTime)
+                deniedRequest(`/api/v1/friends/${request.id}`)}}
               className="btn sm"
               style={{ textDecoration: "none" }}
             >
@@ -179,6 +226,22 @@ const friendList = friends.map((request) => (
               style={{ textDecoration: "none" }}
             >
               Delete friend
+            </Link>
+          </Button>
+          <Button outline color="danger" margin="15px">
+            <Link
+              to="/friends"
+              onClickCapture={() => {
+                setReq(req.id = request.id)
+                setReq(req.sender = request.sender)
+                setReq(req.receiver = request.receiver)
+                setReq(req.status = {id: 4, name: 'Blocked'})
+                setReq(req.sendTime = request.sendTime)
+                blockFriend(`/api/v1/friends/${request.id}`, request.id)}}
+              className="btn sm"
+              style={{ textDecoration: "none" }}
+            >
+              Block friend
             </Link>
           </Button>
         </h1>
