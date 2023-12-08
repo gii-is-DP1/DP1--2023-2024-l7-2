@@ -7,9 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.samples.dwarf.cardDeck.CardDeck;
-import org.springframework.samples.dwarf.cardDeck.CardDeckController;
-import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.validation.BindingResult;
@@ -31,7 +28,7 @@ public class cardDeckRestControllerTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

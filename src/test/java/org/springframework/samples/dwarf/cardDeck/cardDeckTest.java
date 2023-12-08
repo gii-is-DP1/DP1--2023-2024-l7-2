@@ -42,4 +42,16 @@ public class cardDeckTest {
         assertEquals(cards, cardDeck.getCards());
         assertEquals(lastCard, cardDeck.getLastCard());
     }
+
+    @Test
+    public void testCardAssociation() {
+        CardDeck cardDeck = new CardDeck();
+        assertNull(cardDeck.getLastCard());
+
+        Card card = new Card();
+        cardDeck.setLastCard(card);
+
+        assertNotNull(cardDeck.getLastCard());
+        assertEquals(card, cardDeck.getLastCard());
+    }
 }

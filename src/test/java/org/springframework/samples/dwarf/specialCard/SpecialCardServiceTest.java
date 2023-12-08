@@ -7,22 +7,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.card.SpecialCardRepository;
 import org.springframework.samples.dwarf.card.SpecialCardService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringBootTest
 public class SpecialCardServiceTest {
 
-    @Autowired
+    @Mock
     private SpecialCardService specialCardService;
 
-    @MockBean
+    @Mock
     private SpecialCardRepository specialCardRepository;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     public void testGetSpecialCards() {
@@ -93,7 +100,8 @@ public class SpecialCardServiceTest {
 
     @Test
     public void testGetSpecialCardsEmptyList() {
-        // Configurar el comportamiento del repositorio mock para devolver una lista vacía
+        // Configurar el comportamiento del repositorio mock para devolver una lista
+        // vacía
         when(specialCardRepository.findAll()).thenReturn(new ArrayList<>());
 
         // Ejecutar el método del servicio y verificar que la lista está vacía
@@ -116,7 +124,8 @@ public class SpecialCardServiceTest {
 
     @Test
     public void testGetSpecialCardByIdNotFound() {
-        // Configurar el comportamiento del repositorio mock para devolver un Optional vacío
+        // Configurar el comportamiento del repositorio mock para devolver un Optional
+        // vacío
         when(specialCardRepository.findById(1)).thenReturn(Optional.empty());
 
         // Ejecutar el método del servicio y verificar que devuelve null
@@ -126,7 +135,8 @@ public class SpecialCardServiceTest {
 
     @Test
     public void testDeleteSpecialCardByIdNotFound() {
-        // Configurar el comportamiento del repositorio mock para devolver un Optional vacío
+        // Configurar el comportamiento del repositorio mock para devolver un Optional
+        // vacío
         when(specialCardRepository.findById(1)).thenReturn(Optional.empty());
 
         // Ejecutar el método del servicio y verificar que no se lanza ninguna excepción

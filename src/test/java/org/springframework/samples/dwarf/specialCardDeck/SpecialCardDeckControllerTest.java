@@ -17,9 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckController;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 import org.springframework.validation.BindingResult;
 
 public class SpecialCardDeckControllerTest {
@@ -32,7 +29,7 @@ public class SpecialCardDeckControllerTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

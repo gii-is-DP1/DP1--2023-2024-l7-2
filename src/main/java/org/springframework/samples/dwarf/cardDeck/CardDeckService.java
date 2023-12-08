@@ -1,11 +1,9 @@
 package org.springframework.samples.dwarf.cardDeck;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.dwarf.card.Card;
@@ -38,7 +36,6 @@ public class CardDeckService {
         return cdr.findById(id).orElseThrow(() -> new ResourceNotFoundException("CardDeck", "Id", id));
     }
 
-
     @Transactional
     public CardDeck shuffleAndSaveCards(CardDeck cd, List<Card> cards) {
 
@@ -61,20 +58,24 @@ public class CardDeckService {
         }
 
         /*
-        Collections.shuffle(cards);
-
-        cd.setCards(cards);
-        //cd.setLastCard(cards.get(0));
-
-        saveCardDeck(cd);*/
+         * Collections.shuffle(cards);
+         * 
+         * cd.setCards(cards);
+         * //cd.setLastCard(cards.get(0));
+         * 
+         * saveCardDeck(cd);
+         */
         cd = shuffleAndSaveCards(cd, cards);
         return cd;
     }
 
     @Transactional
     public CardDeck saveCardDeck(@Valid CardDeck cd) throws DataAccessException {
-        cdr.save(cd);
-
+        if (cd.equals(null)) {
+            throw new NullPointerException();
+        } else {
+            cdr.save(cd);
+        }
         return cd;
     }
 
@@ -106,28 +107,28 @@ public class CardDeckService {
          * 
          */
 
-        CardDeck cd =getCardDeckById(id);
-        
+        CardDeck cd = getCardDeckById(id);
+
         List<Card> cards = cd.getCards();
         Card lastCard = cd.getLastCard();
-        
+
         Integer lastCardIndex = cards.indexOf(lastCard);
 
         ArrayList<Card> newCards = new ArrayList<>();
- 
+
         Integer offset = 0;
         Card firstCard = cards.get(offset);
         offset++;
         Card secondCard = cards.get(offset);
         offset++;
         newCards.add(firstCard);
-        //Integer offset = 2;
+        // Integer offset = 2;
         if (firstCard.getPosition().equals(secondCard.getPosition())) {
             secondCard = cards.get(offset);
             offset++;
 
             if (!firstCard.getPosition().equals(secondCard.getPosition())) {
-            
+
                 newCards.add(secondCard);
             }
         } else {
@@ -145,8 +146,8 @@ public class CardDeckService {
          * }
          */
 
-        //CardDeck newCd = getCardDeckById(id);
-        //newCd.setLastCard(cards.get(lastCardIndex + offset));
+        // CardDeck newCd = getCardDeckById(id);
+        // newCd.setLastCard(cards.get(lastCardIndex + offset));
         saveCardDeck(cd);
 
         return newCards;
