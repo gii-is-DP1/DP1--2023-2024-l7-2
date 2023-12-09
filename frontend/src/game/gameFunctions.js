@@ -29,16 +29,14 @@
 
   function isStart(code, jwt) {
     fetch(`/api/v1/game/play/${code}/isStart`, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwt}`,
         Accept: 'application/json',
       }
     }).then(response => response.json()).then(response => {
-        if (response === true) {
-            finDelJuego(code,jwt)
-        }
+        console.log(response)
     })
   }
   

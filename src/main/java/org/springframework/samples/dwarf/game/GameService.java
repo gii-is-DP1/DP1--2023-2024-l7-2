@@ -135,7 +135,7 @@ public class GameService {
         ArrayList<Card> mbCards = new ArrayList<Card>();
         mbCards.addAll(mb.getCards());
 
-        Card c = g.getMainBoard().getCardDeck().getLastCard();
+        //Card c = g.getMainBoard().getCardDeck().getLastCard();
         //Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
         ArrayList<Card> cd = new ArrayList<Card>();
         //if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
@@ -150,25 +150,14 @@ public class GameService {
             System.out.println(e.getMessage());
             System.out.println(e.getStackTrace());
         }
-        //}
 
 
         List<Location> locations = mb.getLocations();
         for (Card ca: cd) {
             Integer position = ca.getPosition();
-            ls.pushCard(locations.get(position),ca);
-        }
-        /*
-        for (Card ca : cd) {
-            for (int i = 0; i < mbCards.size(); i++) {
-                if (ca.getPosition().equals(mbCards.get(i).getPosition())) {
-                    mbCards.set(i, ca);
-                }
-            }
+            ls.pushCard(locations.get(position-1),ca);
         }
 
-        mb.setCards(mbCards);
-        mbs.saveMainBoard(mb);*/
 
         g.setRound(g.getRound() + 1);
 

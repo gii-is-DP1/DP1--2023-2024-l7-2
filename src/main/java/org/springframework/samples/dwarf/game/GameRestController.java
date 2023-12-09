@@ -182,6 +182,12 @@ public class GameRestController {
     public ResponseEntity<Game> joinGame(@PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
+
+        if (g.getStart() != null) {
+            // TODO: Create error
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         User u = us.findCurrentUser();
 
         // if a player already exists in a game he can just join the game :)
@@ -397,7 +403,11 @@ public class GameRestController {
 
         List<Player> remainingTurns = gs.getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
         if (thisRoundDwarves.size() == remainingTurns.size()) {
-            g = gs.handleRoundChange(g);
+            try {
+                g = gs.handleRoundChange(g);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
 
         gs.saveGame(g);
@@ -555,16 +565,24 @@ public class GameRestController {
     }
 
 
-    @GetMapping("/play/{code}/isStart")
+    @PostMapping("/play/{code}/isStart")
     public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             return ResponseEntity.notFound().build();
         }
-        g.setStart(LocalDateTime.now());
-        
-            
-        return new ResponseEntity<>(g.getStart(), HttpStatus.OK);
+
+        User u = us.findCurrentUser();
+        Player playerStarter = g.getPlayerCreator();
+        if (playerStarter.getUser().equals(u) && g.getStart() != null) {
+
+            g.setStart(LocalDateTime.now());
+            gs.saveGame(g);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
     }
     
 

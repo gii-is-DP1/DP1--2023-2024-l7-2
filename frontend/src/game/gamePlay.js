@@ -110,6 +110,11 @@ export default function GamePlay() {
         console.log(c.id + " to color => " + pacolor);
         updated[c.position] = pacolor;  
     }
+
+    if (game.start) {
+      setGameStarted(true)
+    }
+
     setSelectedCards(updated)
 
     if (game.round !== gameRound) {
@@ -231,7 +236,7 @@ export default function GamePlay() {
 
   const buttonStartGame = () => {
     setGameStarted(true);
-    isStart();
+    isStart(code,jwt);
   };
 
   //console.log(choosedCard)
