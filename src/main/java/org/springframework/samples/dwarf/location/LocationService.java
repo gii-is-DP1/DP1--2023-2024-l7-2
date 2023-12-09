@@ -70,7 +70,7 @@ public class LocationService {
     }
 
     @Transactional
-    public Card removeFirstCard(Location location) {
+    public Card removeLastCard(Location location) {
         List<Card> locationCards = location.getCards();
         Card toRemove = null;
         if (locationCards.size() > 1){
@@ -103,7 +103,7 @@ public class LocationService {
         locationCards.remove(c);
         locationCards.add(c);
         location.setCards(locationCards);
-        save(location);
-        return location;
+
+        return save(location);
     }
 }
