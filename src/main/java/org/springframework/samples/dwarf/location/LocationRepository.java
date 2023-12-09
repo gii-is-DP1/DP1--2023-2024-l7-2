@@ -1,6 +1,7 @@
 package org.springframework.samples.dwarf.location;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LocationRepository extends CrudRepository<Location,Integer> {
     
-    List<Location> findAll();
+    public List<Location> findAll();
 
-    Location findById(int id);
+    Optional<Location> findById(int id);
 }

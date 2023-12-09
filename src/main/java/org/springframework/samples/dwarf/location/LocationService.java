@@ -3,9 +3,11 @@ package org.springframework.samples.dwarf.location;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.Card;
+import org.springframework.samples.dwarf.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +29,9 @@ public class LocationService {
     }
 
     @Transactional(readOnly = true)
-    public Location getById(Integer id){
-        return repo.findById(id).get();
+    public Location getById(int id){
+        Optional<Location> result = repo.findById(id);
+        return result.isPresent() ? result.get() : null;
     }
 
     @Transactional

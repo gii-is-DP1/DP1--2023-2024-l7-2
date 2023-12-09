@@ -1,60 +1,61 @@
 package org.springframework.samples.dwarf.location;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.samples.dwarf.player.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.samples.dwarf.location.Location;
-import org.springframework.samples.dwarf.location.LocationRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DataJpaTest
 public class LocationRepositoryTest {
 
+    @Autowired
     private LocationRepository locationRepository;
-
-    @BeforeEach
-    public void setUp() {
-        locationRepository = mock(LocationRepository.class);
-    }
 
     @Test
     public void testFindAll() {
-        List<Location> locations = new ArrayList<>();
-        locations.add(new Location());
-        locations.add(new Location());
+        // Given
+        Location l1 = new Location();
+        l1.setPosition(1); // Establece un valor no nulo para position
+        locationRepository.save(l1);
 
-        when(locationRepository.findAll()).thenReturn(locations);
+        Location l2 = new Location();
+        l2.setPosition(2); // Establece un valor no nulo para position
+        locationRepository.save(l2);
 
-        List<Location> result = locationRepository.findAll();
+        // When
+        List<Location> locations = locationRepository.findAll();
 
-        assertEquals(locations.size(), result.size());
-        assertEquals(locations, result);
+        // Then
+        assertEquals(2, locations.size());
+        assertTrue(locations.contains(l1));
+        assertTrue(locations.contains(l2));
     }
-
     @Test
-    public void testFindById() {
+    public void testFindById_Exists() {
+        // Agrega una ubicación de prueba al repositorio
         Location location = new Location();
-        location.setId(1);
+        Location savedLocation = locationRepository.save(location);
 
-        when(locationRepository.findById(1)).thenReturn((location));
+        // Llama al método que se va a probar
+        Optional<Location> result = locationRepository.findById(savedLocation.getId());
 
-        Optional<Location> result = Optional.ofNullable(locationRepository.findById(1));
-
-        assertTrue(result.isPresent());
-        assertEquals(location.getId(), result.get().getId());
+        // Verificaciones
+        assertTrue(result.isPresent(), "La ubicación debería existir");
+        assertEquals(savedLocation.getId(), result.get().getId(), "El ID de la ubicación no coincide");
     }
 
     @Test
-    public void testFindById_NotFound() {
-        when(locationRepository.findById(1)).thenReturn((null));
+    public void testFindById_NotExists() {
+        // Llama al método que se va a probar con un ID que no existe
+        Optional<Location> result = locationRepository.findById(999);
 
-
-        Optional<Location> result = Optional.ofNullable(locationRepository.findById(1));
-
-        assertFalse(result.isPresent());
+        // Verificaciones
+        assertTrue(result.isEmpty(), "La ubicación no debería existir");
     }
 }
