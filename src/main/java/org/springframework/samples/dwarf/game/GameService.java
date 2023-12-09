@@ -150,7 +150,6 @@ public class GameService {
             System.out.println(e.getMessage());
             System.out.println(e.getStackTrace());
         }
-        //}
 
 
         List<Location> locations = mb.getLocations();
