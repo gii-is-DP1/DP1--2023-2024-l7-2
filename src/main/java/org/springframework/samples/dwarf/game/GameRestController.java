@@ -397,7 +397,11 @@ public class GameRestController {
 
         List<Player> remainingTurns = gs.getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
         if (thisRoundDwarves.size() == remainingTurns.size()) {
-            g = gs.handleRoundChange(g);
+            try {
+                g = gs.handleRoundChange(g);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
 
         gs.saveGame(g);

@@ -112,7 +112,6 @@ public class CardDeckService {
         List<Card> cards = cd.getCards();
         Card lastCard = cd.getLastCard();
 
-        Integer lastCardIndex = cards.indexOf(lastCard);
 
         ArrayList<Card> newCards = new ArrayList<>();
 

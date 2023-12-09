@@ -110,6 +110,7 @@ export default function GamePlay() {
         console.log(c.id + " to color => " + pacolor);
         updated[c.position] = pacolor;  
     }
+    console.log(players)
     setSelectedCards(updated)
 
     if (game.round !== gameRound) {
