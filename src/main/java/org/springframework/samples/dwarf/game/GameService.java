@@ -413,7 +413,10 @@ public class GameService {
         }
 
         if (orcCardsAreDefended) {
-            // Se le debe de dar medallas a los players
+            // Otorgar una medalla al jugador que defendió la carta de orco
+            for (Pair<Player, Card> pc : orcCards) {
+                awardMedalToPlayer(pc.getFirst());
+            }
         } else {
             for (Card pc : currentCards) {
                 switch (pc.getName()) {
@@ -616,6 +619,12 @@ public class GameService {
             payload.add(playerAndCard);
             faseForjar(payload);
         } // TODO: orcCard
-    } 
+    }
+    
+    @Transactional
+    public void awardMedalToPlayer(Player player) {
+        player.setMedal(player.getMedal() + 1);
+        pr.save(player);
+    }
 
 }
