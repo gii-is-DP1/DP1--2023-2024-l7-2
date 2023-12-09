@@ -3,6 +3,7 @@ package org.springframework.samples.dwarf.location;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,17 +40,23 @@ public class LocationServiceTest {
         assertEquals(locations, result);
     }
 
- @Test
-public void testGetById() {
-    Location location = new Location();
-    location.setId(1);
+    @Test
+    public void testGetById() {
+        Location location = new Location();
+        location.setId(1);
+
+        when(locationService.save(location)).thenReturn(location);
+
+        location = locationService.save(location);
+
+        when(locationService.getById(location.getId())).thenReturn(location);
 
 
-    Location result = locationService.getById(1);
+        Location result = locationService.getById(location.getId());
 
-    
-    assertEquals(location.getId(), result.getId());
-}
+        
+        assertEquals(location.getId(), result.getId());
+    }
 
     @Test
     public void testSave() {
@@ -102,35 +109,51 @@ public void testGetById() {
     @Test
     public void testPutFirstCardAtEnd() {
         Location location = new Location();
-        List<Card> originalCards = new ArrayList<>();
+        ArrayList<Card> originalCards = new ArrayList<>();
         Card c1 = new Card();
         Card c2 = new Card();
+        c1.setId(1);
+        c1.setName("name1");
+        c2.setId(2);
+        c2.setName("name2");
+
         originalCards.add(c1);
         originalCards.add(c2);
+
+
+        
         location.setCards(originalCards);
     
         when(locationRepository.save(location)).thenReturn(location);
     
         Location result = locationService.putFirstCardAtEnd(location);
-    
+
         assertNotNull(result);
+        List<Card> resultCards = result.getCards();
     
         // Verificar que las tarjetas se han movido correctamente
-        assertEquals(originalCards.get(0), result.getCards().get(result.getCards().size() - 1));
-        assertEquals(originalCards.get(1), result.getCards().get(0));
+        assertEquals(c1, resultCards.get(1));
+        assertEquals(c2, resultCards.get(0));
     }
     @Test
-    public void testRemoveFirstCard() {
+    public void testRemoveLastCard() {
         Location location = new Location();
+        ArrayList<Card> locationCards = new ArrayList<>();
+
+        Card c1 = new Card();
         Card cardToRemove = new Card();
-        List<Card> cards = new ArrayList<>();
-        cards.add(cardToRemove);
-        cards.add(new Card());
-        location.setCards(cards);
+        c1.setId(1);
+        c1.setName("name1");
+        cardToRemove.setId(2);
+        cardToRemove.setName("name2");
+
+        locationCards.add(c1);
+        locationCards.add(cardToRemove);
+        location.setCards(locationCards);
 
         when(locationRepository.save(location)).thenReturn(location);
 
-        Card result = locationService.removeFirstCard(location);
+        Card result = locationService.removeLastCard(location);
 
         assertNotNull(result);
         assertEquals(cardToRemove, result);
@@ -140,23 +163,38 @@ public void testGetById() {
     @Test
     public void testPastGloriesAction() {
         Location location = new Location();
-        Card card = new Card();
         List<Card> cards = new ArrayList<>();
-        cards.add(card);
-        cards.add(new Card());
+        
+        Card c1 = new Card();
+        Card c2 = new Card();
+        Card c3 = new Card();
+        Card c4 = new Card();
+        c1.setId(1);
+        c1.setName("name1");
+        c2.setId(2);
+        c2.setName("name2");
+        c3.setId(3);
+        c3.setName("name3");
+        c4.setId(4);
+        c4.setName("name4");
+        
+        cards.add(c1);
+        cards.add(c2);
+        cards.add(c3);
+        cards.add(c4);
         location.setCards(cards);
     
         when(locationRepository.save(location)).thenReturn(location);
     
-        Location result = locationService.pastGloriesAction(location, card);
+        Location result = locationService.pastGloriesAction(location, c3);
     
         assertNotNull(result);
     
         // Verificar que la carta original ya no está presente en la lista
-        assertFalse(result.getCards().contains(card));
+        assertTrue(result.getCards().contains(c3));
     
         // Verificar que la última carta en la lista es igual a la carta original
-        assertEquals(card, result.getCards().get(result.getCards().size() - 1));
+        assertEquals(c3, result.getCards().get(result.getCards().size() - 1));
     }
     
 }

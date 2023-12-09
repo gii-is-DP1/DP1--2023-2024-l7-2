@@ -104,7 +104,7 @@ public class MainBoardService {
         ArrayList<Card> cardsRemovedFromLocations = new ArrayList<>();
 
         for (Location lc:mb.getLocations()) {
-            Card removedCard = ls.removeFirstCard(lc);
+            Card removedCard = ls.removeLastCard(lc);
             cardsRemovedFromLocations.add(removedCard);
         }
 
