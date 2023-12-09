@@ -41,21 +41,21 @@ public class LocationServiceTest {
     }
 
     @Test
-    public void testGetById() {
-        Location location = new Location();
-        location.setId(1);
+    public void testGetById_Exists() {
+        // Datos de prueba
+        int locationId = 1;
+        Location expectedLocation = new Location();
+        expectedLocation.setId(locationId);
 
-        when(locationService.save(location)).thenReturn(location);
+        // Configuración del repositorio mock
+        when(locationRepository.findById(locationId)).thenReturn(Optional.of(expectedLocation));
 
-        location = locationService.save(location);
+        // Llamada al método que se va a probar
+        Location result = locationService.getById(locationId);
 
-        when(locationService.getById(location.getId())).thenReturn(location);
-
-
-        Location result = locationService.getById(location.getId());
-
-        
-        assertEquals(location.getId(), result.getId());
+        // Verificaciones
+        assertNotNull(result, "La ubicación no debería ser nula");
+        assertEquals(locationId, result.getId(), "El ID de la ubicación no coincide");
     }
 
     @Test

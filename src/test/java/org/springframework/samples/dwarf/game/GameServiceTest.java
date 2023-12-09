@@ -1,6 +1,8 @@
 package org.springframework.samples.dwarf.game;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
@@ -240,5 +242,20 @@ public class GameServiceTest {
         assertEquals(player4, game.getPlayerStart());
     }
 
+    @Test
+    public void testAwardMedalToPlayer() {
+        // Configuración de datos de prueba
+        Player player = new Player();
+        player.setMedal(0);
+
+        // Configuración del comportamiento del repositorio mock
+        when(playerRepository.save(any(Player.class))).thenReturn(player);
+
+        // Llamada al método que se va a probar
+        gameService.awardMedalToPlayer(player);
+
+        // Verificación de que el método save del repositorio mock fue invocado con el jugador modificado
+        verify(playerRepository, times(1)).save(argThat(savedPlayer -> savedPlayer.getMedal() == 1));
+    }
    
 }
