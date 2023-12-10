@@ -401,15 +401,6 @@ public class GameService {
         // De esta forma obtenemos las cartas que no han sido seleccionadas
         // al eliminar de las cartas del tablero
 
-        ArrayList<Card> selected = new ArrayList<>();
-        selected.addAll(currentCards);
-        if (orcCards != null) {
-            for (Pair<Player, Card> pc : orcCards) {
-                if (currentCards.contains(pc.getSecond())) {
-                    selected.add(pc.getSecond());
-                }
-            }
-        }
         ArrayList<Card> notSelected = new ArrayList<>();
         notSelected.addAll(currentCards);
         if (orcCards != null) {
@@ -420,21 +411,17 @@ public class GameService {
             }
         }
         boolean orcCardsAreDefended = true;
-        boolean orcCardsGiveMedals = false;
+      
         if (notSelected.size() > 0) {
             orcCardsAreDefended = false;
         }
 
-        if (selected.size() > 0) {
-            orcCardsGiveMedals = true;
-        }
+       
 
 
-        if (orcCardsGiveMedals) {
-            // Otorgar una medalla al jugador que defendió la carta de orco
-            for (Pair<Player, Card> pc : orcCards) {
-                awardMedalToPlayer(pc.getFirst());
-            }
+        if (orcCardsAreDefended) {
+  
+            adwardMedal(orcCards);
         } else {
             for (Card pc : currentCards) {
                 switch (pc.getName()) {
@@ -462,6 +449,22 @@ public class GameService {
         return res;
 
     }
+
+    @Transactional
+    public void adwardMedal(ArrayList<Pair<Player, Card>> orcCards) {
+
+        for (Pair<Player, Card> pc : orcCards) {
+            Player p = pc.getFirst();
+            Card c = pc.getSecond();
+
+                p.setMedal(p.getMedal() + 1);
+
+
+                pr.save(p);
+            }
+        }
+
+    
 
     @Transactional
     public void faseForjar(ArrayList<Pair<Player, Card>> playerCards) {
@@ -642,10 +645,6 @@ public class GameService {
         } // TODO: orcCard
     }
     
-    @Transactional
-    public void awardMedalToPlayer(Player player) {
-        player.setMedal(player.getMedal() + 1);
-        pr.save(player);
-    }
+
 
 }
