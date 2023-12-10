@@ -120,10 +120,16 @@ public class MainBoardService {
         }
     }
 
-    public void runAmokAction(MainBoard mb) {
+    public MainBoard runAmokAction(MainBoard mb) {
+        ArrayList<Location> newLocations = new ArrayList<>();
         for (Location lc:mb.getLocations()) {
-            ls.shuffleLocation(lc);
+            System.out.println(lc.getCards());
+            Location newLocation = ls.shuffleLocation(lc);
+            System.out.println(newLocation.getCards());
+            newLocations.add(newLocation);
         }
+        mb.setLocations(newLocations);
+        return saveMainBoard(mb);
     }
     
 }

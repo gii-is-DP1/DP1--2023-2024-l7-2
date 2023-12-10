@@ -106,6 +106,9 @@ export default function GamePlay() {
       7: null,8: null,9: null};
     for (const d of dwarves) {
         const c = d.card;
+        if (c==null) {
+          continue;
+        }
         const pacolor = d.player.color;
         console.log(c.id + " to color => " + pacolor);
         updated[c.position] = pacolor;  

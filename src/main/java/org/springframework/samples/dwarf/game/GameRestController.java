@@ -493,9 +493,15 @@ public class GameRestController {
         //ArrayList<Card> newCards = new ArrayList<>();
 
         MainBoard mb = g.getMainBoard();
-        Location locationToUpdate = mb.getLocations().get(reverseCard.getPosition());
-        ls.pushCard(locationToUpdate, reverseCard);
+        ArrayList<Location> newLocations = new ArrayList<>();
+        newLocations.addAll( mb.getLocations());
+        Location locationToUpdate = newLocations.get(reverseCard.getPosition()-1);
+        locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
+        newLocations.add(reverseCard.getPosition()-1,locationToUpdate);
+        mbs.saveMainBoard(mb);
 
+        g.setMainBoard(mb);
+        gs.saveGame(g);
         /* 
         for (Card c: mb.getCards()) {
             if (c.getPosition().equals(reverseCard.getPosition())) {
@@ -504,9 +510,9 @@ public class GameRestController {
                 newCards.add(c);
             }
         }
-
-        //mb.setCards(newCards);
-        //mbs.saveMainBoard(mb);
+        
+        mb.setCards(newCards);
+        mbs.saveMainBoard(mb);
 
         g.setMainBoard(mb);
         gs.saveGame(g);*/
@@ -557,6 +563,21 @@ public class GameRestController {
                         }
                     }
                 break;
+            case "Hold a council":
+                mb = mbs.holdACouncilAction(mb);
+                break;
+
+            case "Collapse the Shafts":
+                mbs.collapseTheShaftsAction(mb);
+                break;
+
+            case "Run Amok":
+                mb = mbs.runAmokAction(mb);
+                mbs.saveMainBoard(mb);
+                g.setMainBoard(mb);
+                gs.saveGame(g);
+                break;
+                
             default:
                 break;
         }
@@ -574,7 +595,7 @@ public class GameRestController {
 
         User u = us.findCurrentUser();
         Player playerStarter = g.getPlayerCreator();
-        if (playerStarter.getUser().equals(u) && g.getStart() != null) {
+        if (playerStarter.getUser().equals(u) && g.getStart() == null) {
 
             g.setStart(LocalDateTime.now());
             gs.saveGame(g);

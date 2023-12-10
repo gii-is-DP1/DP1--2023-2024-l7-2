@@ -35,7 +35,7 @@
         Authorization: `Bearer ${jwt}`,
         Accept: 'application/json',
       }
-    }).then(response => response.json()).then(response => {
+    }).then(response => {
         console.log(response)
     })
   }

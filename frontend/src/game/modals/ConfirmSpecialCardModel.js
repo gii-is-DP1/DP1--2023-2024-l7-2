@@ -62,6 +62,11 @@ export default function ConfirmSpecialCardModel(props) {
                     selectedObject: objectToSend
                 })
                 break;
+            default:
+                resolveSellAnItem(props.code,jwt, {
+                    specialCard: props.card,
+                    usesBothDwarves: numberOfDwarves === 2,
+                })
         }
     }
 
