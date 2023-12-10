@@ -1,6 +1,7 @@
 package org.springframework.samples.dwarf.mainboard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ public class MainBoardService {
 
     private final Integer MAX_POSITION = 9;
     private final Integer MIN_POSITION = 1;
-    private final Integer MAX_NUMBER_SPECIAL_CARD_DECK = 3;
+    private final Integer MAX_NUMBER_SPECIAL_CARD_DECK = 9;
 
 
     MainBoardRepository repo;
@@ -85,13 +86,9 @@ public class MainBoardService {
         mb.setLocations(locations);
 
         ArrayList<SpecialCard> sCards = new ArrayList<SpecialCard>();
-        // TODO: Give better names to constants
-        for (int i = MIN_POSITION; i <= MAX_NUMBER_SPECIAL_CARD_DECK; i++) {
-            SpecialCard a = scs.getById(i);
-            System.out.println(a);
-            sCards.add(a);
-        }
+        sCards.addAll(specCardDeck.getSpecialCards());
         mb.setSCards(sCards);
+        
         System.out.println(sCards);
         saveMainBoard(mb);
 

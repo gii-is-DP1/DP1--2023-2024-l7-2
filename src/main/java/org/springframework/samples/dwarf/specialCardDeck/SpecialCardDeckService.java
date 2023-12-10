@@ -49,10 +49,11 @@ public class SpecialCardDeckService {
         ArrayList<SpecialCard> cards = new ArrayList<SpecialCard>();
         cards.addAll(scr.findAll());
 
+        /*
         // TODO: test this
         for (int i = 1; i < 4; i++) {
             cards.remove(0);
-        }
+        }*/
 
         Collections.shuffle(cards);
 
