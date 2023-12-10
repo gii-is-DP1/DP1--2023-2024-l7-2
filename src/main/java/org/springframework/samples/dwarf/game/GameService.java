@@ -119,6 +119,9 @@ public class GameService {
         // Se ponen al final porque deben de ser los ultimos en tirar
         // Es decir, cuando se resuelven las acciones
         for (Dwarf d : dwarves) {
+            if (d.getCard() == null) {
+                continue;
+            }
             if (d.getCard().getCardType().getName().equals("HelpCard")) {
                 remaining_turns.add(d.getPlayer());
                 remaining_turns.add(d.getPlayer());
@@ -500,6 +503,9 @@ public class GameService {
         // con su player para despues aplicarselo al player
         ArrayList<Pair<Player, Card>> cards = new ArrayList<Pair<Player, Card>>();
         for (Dwarf d : dwarves) {
+            if (d.getCard() == null) {
+                continue;
+            }
             Pair<Player, Card> playerPair = Pair.of(d.getPlayer(), d.getCard());
             cards.add(playerPair);
         }
