@@ -20,7 +20,7 @@ import UserPage from "./user/userPage";
 import UserEditPage from "./user/userEdit";
 import FriendsPage from "./friends/FriendsPage";
 import SentRequest from "./friendRequest/SentRequest";
-
+import BlockRequest from "./friendRequest/BlockRequest";
 
 import GameList from "./game/gameList";
 import GameEdit from "./game/gameEdit";
@@ -89,6 +89,7 @@ function App() {
           <Route path="/game/:gameId" exact={true} element={<PrivateRoute><GamePlay/></PrivateRoute>} />
           <Route path="/friends" exact={true} element={<PrivateRoute><FriendsPage/></PrivateRoute>}/>
           <Route path="/friendRequest/SentRequest" exact={true} element={<PrivateRoute><SentRequest/></PrivateRoute>}/>
+          <Route path="/friendRequest/BlockRequest" exact={true} element={<PrivateRoute><BlockRequest/></PrivateRoute>}/>
           <Route path="/rules" exact={true} element={<PrivateRoute><RulesText/></PrivateRoute>}/>
           <Route path="/user" exact={true} element={<PrivateRoute><UserPage/></PrivateRoute>}/>
           <Route path="/user/:userId" exact={true} element={<PrivateRoute><UserEditPage/></PrivateRoute>}/>
