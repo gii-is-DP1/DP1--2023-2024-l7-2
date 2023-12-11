@@ -398,35 +398,22 @@ public class GameService {
         if (currentCards.size() == 0)
             return res;
 
-        // De esta forma obtenemos las cartas que no han sido seleccionadas
-        // al eliminar de las cartas del tablero
-
-        ArrayList<Card> notSelected = new ArrayList<>();
-        notSelected.addAll(currentCards);
+        
         if (orcCards != null) {
             for (Pair<Player, Card> pc : orcCards) {
                 if (currentCards.contains(pc.getSecond())) {
-                    notSelected.remove(pc.getSecond());
+                    currentCards.remove(pc.getSecond());
+                    adwardMedal(orcCards);
+                    
                 }
             }
-        }
-        boolean orcCardsAreDefended = true;
-      
-        if (notSelected.size() > 0) {
-            orcCardsAreDefended = false;
-        }
+        } 
 
-       
-
-
-        if (orcCardsAreDefended) {
-  
-            adwardMedal(orcCards);
-        } else {
+        if (currentCards.size() > 0) {
             for (Card pc : currentCards) {
                 switch (pc.getName()) {
                     case "Orc Raiders":
-                        // Si se selecciona esta carta no se hace la fase de recoleccion
+                        // Si se selecciona esta carta no se hace la fase de recolección
                         res = false;
                         break;
                     case "Dragon":
@@ -444,12 +431,10 @@ public class GameService {
                 }
             }
         }
-
         // el return es si se efectua la siguiente fase o no
         return res;
 
-    }
-
+}
     @Transactional
     public void adwardMedal(ArrayList<Pair<Player, Card>> orcCards) {
 

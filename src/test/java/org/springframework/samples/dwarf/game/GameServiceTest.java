@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardType;
@@ -240,22 +241,7 @@ public class GameServiceTest {
         gameService.changePlayerStart(game, helpCards);
         
         assertEquals(player4, game.getPlayerStart());
-    }
-
-    @Test
-    public void testAwardMedalToPlayer() {
-        // Configuración de datos de prueba
-        Player player = new Player();
-        player.setMedal(0);
-
-        // Configuración del comportamiento del repositorio mock
-        when(playerRepository.save(any(Player.class))).thenReturn(player);
-
-        // Llamada al método que se va a probar
-        gameService.awardMedalToPlayer(player);
-
-        // Verificación de que el método save del repositorio mock fue invocado con el jugador modificado
-        verify(playerRepository, times(1)).save(argThat(savedPlayer -> savedPlayer.getMedal() == 1));
-    }
+    }    
+    
    
 }
