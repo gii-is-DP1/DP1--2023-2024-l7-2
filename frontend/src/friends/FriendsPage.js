@@ -27,7 +27,7 @@ export default function FriendList() {
   })
   
   const user = tokenService.getUser();
-  console.log(req)
+
   function acceptRequest(url) {
     let confirmMessage = window.confirm("Are you sure you want to accept the request?");
     if (confirmMessage) {
@@ -43,6 +43,7 @@ export default function FriendList() {
       
       .then((response) => {
         console.log('Response:', response);
+        window.location.reload();
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -81,12 +82,13 @@ export default function FriendList() {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        window.location.reload();
         return response.json().catch(() => ({}));
       })
       .then((data) => {
         if (data && data.message) {
           setMessage(data.message);
-          setVisible(true);
+          setVisible(true); 
         }})
         .catch((error) => {
           console.error('Error:', error);
@@ -111,6 +113,7 @@ function deleteFriends(url, id) {
     })
     .then((response) => {
       setFriends(friends.filter((i) => i.id !== id));
+      window.location.reload();
       return response.text();
     })
       .catch((err) => {
@@ -138,6 +141,7 @@ function blockFriend(url) {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
+      window.location.reload();
       return response.json().catch(() => ({}));
     })
     .then((data) => {
@@ -253,16 +257,21 @@ const friendList = friends.map((request) => (
   return (
     <div className="auth-page-container" style={{ height: "100vh", marginTop: "65px", textAlign: "center" }}>
       <div className="friends" style={{ marginTop: "10px" }}>
-        <Button outline color="success" margin="10px" style = {{fontSize: "12px"}}>
               <Link
                 to={`/friendRequest/SentRequest`}
-                className="btn sm"
+                className="auth-button"
                 style={{ textDecoration: "none" }}
               >
-                To sent request to someone
+                To send request to someone
               </Link>
-            </Button>
-        <h3>Friend Requests</h3>
+              <Link
+                to={`/friendRequest/BlockRequest`}
+                className="auth-button"
+                style={{ textDecoration: "none" }}
+              >
+                To block someone
+              </Link>
+        <h3 style={{ marginTop: "30px" }}>Friend Requests</h3>
         <table>
           <thead>
             <tr>

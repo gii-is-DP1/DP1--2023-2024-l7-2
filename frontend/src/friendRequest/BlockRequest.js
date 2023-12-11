@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { Link} from "react-router-dom";
-import { Form, Input, Label } from "reactstrap";
+import { Link } from "react-router-dom";
+import { Form, Input, Label, Button } from "reactstrap";
 import tokenService from "../services/token.service";
 
 import useFetchState from "../util/useFetchState";
@@ -15,8 +15,8 @@ export default function FormRequest() {
     sender: user,
     receiver: null,
     status: {
-      id: 1,
-      name: "Sent",
+      id: 4,
+      name: "Blocked",
     },
     sendTime: null,
   });
@@ -50,6 +50,8 @@ export default function FormRequest() {
 
   function handleSubmit(event) {
     event.preventDefault();
+    let confirmMessage = window.confirm("Are you sure you want to block this user?");
+    if (confirmMessage) {
     fetch("/api/v1/friends", {
       method: "POST",
       headers: {
@@ -62,25 +64,26 @@ export default function FormRequest() {
       .then((response) => response.text())
       .then((newRequest) => {
         console.log("New Request created:", newRequest);
+        setMessage("Solicitud enviada")
         window.location.reload();
         window.location.href = "/friends";
       })
       .catch((err) => {
         console.log(err);
         alert("Error creating request: " + err.message);
-      });
+      });}
   }
 
   console.log("Request Body:", JSON.stringify(request));
 
   return (
     <div className="auth-page-container" style={{ height: "100vh" }}>
-      <h1 className="text-center">{"Send request"}</h1>
+      <h1 className="text-center">{"Block someone"}</h1>
       <div className="custom-form-input">
         <Form>
           <div className="custom-form-input">
             <Label for="lastName" className="custom-form-input-label">
-              Username to send request:
+              Username to block:
             </Label>
             <Input
               type="text"
@@ -98,11 +101,11 @@ export default function FormRequest() {
           <div className="custom-button-row">
             <Link
               to="/friends"
+              onClick={handleSubmit}
               className="auth-button"
               style={{ textDecoration: "none" }}
-              onClick={handleSubmit}
             >
-              Save
+              Block user
             </Link>
             <Link
               to={`/friends`}
