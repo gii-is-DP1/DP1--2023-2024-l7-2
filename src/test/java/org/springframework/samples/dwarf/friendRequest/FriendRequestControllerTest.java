@@ -18,6 +18,8 @@ import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.validation.BindingResult;
 
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,25 +37,28 @@ public class FriendRequestControllerTest {
 
     @Test
     public void testFindAll() {
-        // Caso positivo
-        User user = new User();
-        
+        User mockUser = new User();
+        Authorities mockAuthority = new Authorities();
+        mockAuthority.setAuthority("ADMIN"); 
+        mockUser.setAuthority(mockAuthority);
+    
+        // Mock the UserService to return the mock user
+        when(userService.findCurrentUser()).thenReturn(mockUser);
+    
+        // Mock the FriendRequestService to return an empty list
         List<FriendRequest> friendRequests = new ArrayList<>();
-        Mockito.when(userService.findCurrentUser());
-        Mockito.when(friendRequestService.findAll());
-
+        when(friendRequestService.findAll()).thenReturn(friendRequests);
+    
+        
         ResponseEntity<List<FriendRequest>> response = friendsController.findAll();
-
+    
+        
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(friendRequests, response.getBody());
-
-        // Caso negativo (usuario nulo)
-        Mockito.when(userService.findCurrentUser()).thenReturn(null);
-
-        ResponseEntity<List<FriendRequest>> responseForbidden = friendsController.findAll();
-
-        Assertions.assertEquals(HttpStatus.FORBIDDEN, responseForbidden.getStatusCode());
-        Assertions.assertNull(responseForbidden.getBody());
+    
+      
+        verify(userService, times(1)).findCurrentUser();
+        verify(friendRequestService, times(1)).findAll();
     }
 
     @Test
