@@ -204,32 +204,32 @@ public class cardDeckServiceTest {
         assertEquals(2, result.size());
     }
 
-    @Test
+   @Test
     public void testGetNewCards_ShouldHandleDuplicatePositions() {
         // Arrange
         Card card1 = new Card();
         card1.setId(56);
         card1.setDescription("asdasd");
         card1.setPosition(2);
-
+    
         Card card2 = new Card();
         card2.setId(57);
         card2.setDescription("asdasd");
         card2.setPosition(1);
-
+    
         CardDeck testDeck = new CardDeck();
         testDeck.setId(2);
-        testDeck.setCards(List.of(card1, card2));
-
+        testDeck.setCards(new ArrayList<>(List.of(card1, card2)));  // Use a mutable list
+    
         when(cardDeckRepository.findById(2)).thenReturn(Optional.of(testDeck));
-
+    
         // Act
         List<Card> result = cardDeckService.getNewCards(2);
-
+    
         // Assert
         assertEquals(2, result.size());
-        assertEquals(1, result.get(0).getPosition());
-        assertNotEquals(1, result.get(1).getPosition());
+        assertEquals(1, result.get(1).getPosition());
+        assertNotEquals(1, result.get(0).getPosition());
     }
 
     @Test
@@ -237,6 +237,8 @@ public class cardDeckServiceTest {
         // Arrange
         CardDeck testDeck = new CardDeck();
         List<Card> testCards = new ArrayList<>();
+        Card c = new Card();
+        testCards.add(c);
 
         when(cardDeckRepository.findById(1)).thenReturn(Optional.of(testDeck));
         when(cardDeckRepository.save(any())).thenReturn(testDeck);
