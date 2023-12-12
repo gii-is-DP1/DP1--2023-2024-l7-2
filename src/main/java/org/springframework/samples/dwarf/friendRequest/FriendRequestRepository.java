@@ -11,9 +11,11 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
+
 public interface FriendRequestRepository extends CrudRepository<FriendRequest,Integer> {
 
-	public List<FriendRequest> findAll();	
+	@Query("SELECT fr FROM FriendRequest fr")
+	public List<FriendRequest> findAll();
     
 	public FriendRequest findById(int id);
 
