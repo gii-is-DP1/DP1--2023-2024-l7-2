@@ -8,7 +8,10 @@ import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
 import org.springframework.samples.dwarf.user.User;
+import org.springframework.samples.dwarf.user.UserRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -20,6 +23,7 @@ public class PlayerRepositoryTest {
 
     @Autowired
     private PlayerRepository playerRepository;
+    private UserRepository us;
 
     @Test
     public void testFindAll() {
@@ -78,29 +82,35 @@ public class PlayerRepositoryTest {
     }
 
     @Test
+    @Transactional
     public void testFindByUserAndGame() {
         // Given
         Game game = new Game();
 
-        User user = new User();
-        user.setUsername("Pepe");
+        User user1 = new User();
+        user1.setUsername("Pepe");
+        user1.setId(1);
 
         Player player = new Player();
         player.setName("Player4");
         player.setColor("Purple");
         player.setGame(game);
-        player.setUser(user);
+        player.setUser(user1);
+
+        // Save the User entity first
+        us.save(user1);
 
         // When
         playerRepository.save(player);
 
         // Then
-        Player result = playerRepository.findByUserAndGame(user, game);
+        Player result = playerRepository.findByUserAndGame(user1, game);
 
         assertNotNull(result);
         assertEquals("Player4", result.getName());
         assertEquals("Purple", result.getColor());
-        assertEquals(user, result.getUser());
+        assertEquals(user1, result.getUser());
         assertEquals(game, result.getGame());
     }
+
 }

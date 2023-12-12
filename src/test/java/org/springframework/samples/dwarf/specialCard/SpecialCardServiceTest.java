@@ -68,6 +68,8 @@ public class SpecialCardServiceTest {
 
     @Test
     public void testDeleteSpecialCardById() {
+        SpecialCard mockCard = new SpecialCard();
+        mockCard.setId(1);
         // Ejecutar el método del servicio
         specialCardService.deleteSpecialCardById(1);
 

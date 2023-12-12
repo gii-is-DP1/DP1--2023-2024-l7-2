@@ -128,11 +128,17 @@ public class cardDeckServiceTest {
     // -----------------------------------------------------------------------
     @Test
     public void testInitialize() {
+        // Arrange
         List<Card> testCards = cardRepository.findAll();
         when(cardService.getCards()).thenReturn(testCards);
-
+    
+        // Ensure that testCards has at least 9 cards
+        assertTrue(testCards.size() <= 9);
+    
+        // Act
         CardDeck result = cardDeckService.initialiate();
-
+    
+        // Assert
         assertEquals(testCards.size() - 9, result.getCards().size());
     }
 
