@@ -41,13 +41,14 @@ public class SpecialCardTest {
         specialCard.setId(1);
         specialCard.setName("TestCard");
         specialCard.setDescription("TestDescription");
+        specialCard.setTurnedSide(null);
 
         // Convertir SpecialCard a JSON
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(specialCard);
 
         // Verificar que el JSON resultante tenga los valores esperados
-        assertEquals("{\"id\":1,\"name\":\"TestCard\",\"description\":\"TestDescription\"}", json);
+        assertEquals("{\"id\":1,\"name\":\"TestCard\",\"description\":\"TestDescription\",\"turnedSide\":null}", json);
     }
 
     @Test

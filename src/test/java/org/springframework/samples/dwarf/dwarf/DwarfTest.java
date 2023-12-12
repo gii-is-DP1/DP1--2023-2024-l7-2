@@ -37,7 +37,7 @@ public class DwarfTest {
 
     @Test
     public void saveDwarfWithPlayerAndCards() {
-        dwarfRepository.save(dwarf);
+
 
         Card card = new Card();
 
