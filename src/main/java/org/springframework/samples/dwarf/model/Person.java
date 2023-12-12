@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotEmpty;
 @MappedSuperclass
 public class Person extends BaseEntity {
 
+	@NotEmpty
 	@Column(name = "first_name")
 	protected String firstName;
 

@@ -23,8 +23,11 @@ public class PlayerTest {
         Player player = new Player();
         player.setColor("");
 
-        // This should throw an IllegalArgumentException due to @NotBlank validation
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
         validatePlayerColor(player.getColor());
+    });
+
+    assertEquals("Color cannot be blank", exception.getMessage());
     }
 
     private void validatePlayerColor(String color) {
