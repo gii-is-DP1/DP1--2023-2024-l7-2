@@ -83,6 +83,7 @@ function App() {
     if (role === "USER") {
       registeredUserRoutes = (
         <>
+          <Route path="/games/" exact={true} element={<PrivateRoute><GameList/></PrivateRoute>} />
           <Route path="/game/" exact={true} element={<PrivateRoute><GameJoin/></PrivateRoute>} />
           <Route path="/game/edit/:gameId" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
           <Route path="/game/edit/" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
