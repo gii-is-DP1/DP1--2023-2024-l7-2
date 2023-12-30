@@ -1,5 +1,6 @@
 package org.springframework.samples.dwarf.card;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -9,8 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -30,11 +29,15 @@ public class CardServiceTest {
     @Test
     public void testGetById() {
 
-        Card existingCard = cardService.getCards().get(0);
+        Integer id = 1;
+        String name = "Iron Seam";
+        Integer position = 1;
 
-        Card retrievedCard = cardService.getById(existingCard.getId());
+        Card retrievedCard = cardService.getById(id);
         assertNotNull(retrievedCard);
-        assertEquals(existingCard.getId(), retrievedCard.getId());
+        assertEquals(id, retrievedCard.getId());
+        assertEquals(name, retrievedCard.getName());
+        assertEquals(position, retrievedCard.getPosition());
 
     }
 
@@ -42,17 +45,28 @@ public class CardServiceTest {
     public void testSaveCard() {
         Card newCard = new Card();
 
+        CardType newCardType = cardService.getById(1).getCardType();
+
+        newCard.setName("sample name");
+        newCard.setDescription("sample description");
+        newCard.setPosition(2);
+        newCard.setCardType(newCardType);
+
         Card savedCard = cardService.saveCard(newCard);
 
         assertNotNull(savedCard.getId());
+
+        assertEquals(savedCard.getId(),100);
 
     }
 
     @Test
     public void testDeleteCardById() {
 
-        Card existingCard = cardService.getCards().get(0);
-        int existingCardId = existingCard.getId();
+        int existingCardId = 1;
+        Card existingCard = cardService.getById(existingCardId);
+
+        assertNotNull(existingCard);
 
         cardService.deleteCardById(existingCardId);
 

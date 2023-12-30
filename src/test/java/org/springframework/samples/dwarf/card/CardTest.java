@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.card.CardType;
 
 @SpringBootTest
 public class CardTest {
@@ -26,7 +24,6 @@ public class CardTest {
         card.setPosition(1);
 
         CardType cardType = new CardType();
-        // Configura el objeto CardType según tus necesidades
         card.setCardType(cardType);
 
         card.setTotalIron(10);
@@ -34,7 +31,6 @@ public class CardTest {
         card.setTotalSteal(5);
         card.setTotalMedals(3);
 
-        // Asegúrate de que las propiedades se hayan establecido correctamente
         assertEquals("Test Card", card.getName());
         assertEquals("Description", card.getDescription());
         assertEquals(1, card.getPosition());
@@ -51,7 +47,6 @@ public class CardTest {
         assertNull(card.getCardType());
 
         CardType cardType = new CardType();
-        // Configura el objeto CardType según tus necesidades
 
         card.setCardType(cardType);
 
