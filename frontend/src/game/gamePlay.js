@@ -135,9 +135,10 @@ export default function GamePlay() {
       }
     }).then(response => response.json()).then(response => {
         if (cards !== response) {
-          let tmpCardsHistorical = cardsHistorical;
+          //let tmpCardsHistorical = cardsHistorical;
           setCards(response)
-
+          console.log("THE RESPONSE ",response)
+          /*
           let i;
           for (i = 0; i < response.length ; i++) {
             let positionHistorical = tmpCardsHistorical[i+1]
@@ -153,10 +154,10 @@ export default function GamePlay() {
             }
           }
 
-          setCardsHistorical(tmpCardsHistorical)
+          setCardsHistorical(tmpCardsHistorical)*/
         }
     })
-  }, [gameRound])
+  }, [gameRound, specialCardToBeConfirmed])
   
   function selectCard(id,card) {
     if (isMyTurn === false) {
