@@ -6,7 +6,7 @@ import { Button, ButtonGroup, Table } from "reactstrap";
 import getIdFromUrl from "./../util/getIdFromUrl";
 import Card from "./../cards/card"
 import SpecialCard from "../cards/specialCard";
-import  { isFinished, sendCard, isStart}  from "./gameFunctions";
+import  { isFinished, sendCard, isStart, resign}  from "./gameFunctions";
 import ConfirmSpecialCardModel from "./modals/ConfirmSpecialCardModel";
 import useIntervalFetchState from "../util/useIntervalFetchState";
 
@@ -123,6 +123,7 @@ export default function GamePlay() {
     if (game.round !== gameRound) {
       setGameRound(game.round)
     } 
+    isFinished(code, jwt);
   }, [game,dwarves])
 
   useEffect(() => {
@@ -273,11 +274,11 @@ export default function GamePlay() {
         <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
 
             <Button
-                onClick={() => {isFinished(code, jwt)}}
-                title="Finish?"
+                onClick={() => {resign(code, jwt)}}
+                title="Resign"
                 color="#008000"
                 style={{border: '3px solid black',padding: "3px"}}>
-                  Finish?
+                  Resign
             </Button>
           
             {choosedCard && (
