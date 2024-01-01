@@ -56,6 +56,24 @@ function sendCard(code, jwt, choosedCard) {
     .then((data) => console.log(data))
     .catch((message) => alert(message));
 }
+
+
+function resign(code, jwt) {
+  fetch(`/api/v1/game/play/${code}/resign`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+      Accept: 'application/json',
+    }
+  })
+  .then(() => {
+    window.location.href = `/game/${code}/finish`;
+  })
+}
+
+
+
 /*
 function specialOrder(code, jwt, setSelectedCards) {
   const gold = prompt("Enter the number of gold:");
@@ -177,5 +195,5 @@ function sellAnItem(code, jwt, setSelectedCards) {
 
 
 export { 
-    isFinished, sendCard,isStart
+    isFinished, sendCard,isStart, resign
 };

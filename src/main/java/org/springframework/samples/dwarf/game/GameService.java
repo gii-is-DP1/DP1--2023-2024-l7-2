@@ -138,12 +138,12 @@ public class GameService {
         ArrayList<Card> mbCards = new ArrayList<Card>();
         mbCards.addAll(mb.getCards());
 
-        //Card c = g.getMainBoard().getCardDeck().getLastCard();
-        //Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
+        // Card c = g.getMainBoard().getCardDeck().getLastCard();
+        // Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
         ArrayList<Card> cd = new ArrayList<Card>();
-        //if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-            // Returns an empty list
-        //} else {
+        // if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
+        // Returns an empty list
+        // } else {
         try {
 
             List<Card> twoCards = cds.getNewCards(g.getMainBoard().getCardDeck().getId());
@@ -154,13 +154,11 @@ public class GameService {
             System.out.println(e.getStackTrace());
         }
 
-
         List<Location> locations = mb.getLocations();
-        for (Card ca: cd) {
+        for (Card ca : cd) {
             Integer position = ca.getPosition();
-            ls.pushCard(locations.get(position-1),ca);
+            ls.pushCard(locations.get(position - 1), ca);
         }
-
 
         g.setRound(g.getRound() + 1);
 
@@ -398,16 +396,15 @@ public class GameService {
         if (currentCards.size() == 0)
             return res;
 
-        
         if (orcCards != null) {
             for (Pair<Player, Card> pc : orcCards) {
                 if (currentCards.contains(pc.getSecond())) {
                     currentCards.remove(pc.getSecond());
                     adwardMedal(orcCards);
-                    
+
                 }
             }
-        } 
+        }
 
         if (currentCards.size() > 0) {
             for (Card pc : currentCards) {
@@ -434,7 +431,8 @@ public class GameService {
         // el return es si se efectua la siguiente fase o no
         return res;
 
-}
+    }
+
     @Transactional
     public void adwardMedal(ArrayList<Pair<Player, Card>> orcCards) {
 
@@ -442,14 +440,11 @@ public class GameService {
             Player p = pc.getFirst();
             Card c = pc.getSecond();
 
-                p.setMedal(p.getMedal() + 1);
+            p.setMedal(p.getMedal() + 1);
 
-
-                pr.save(p);
-            }
+            pr.save(p);
         }
-
-    
+    }
 
     @Transactional
     public void faseForjar(ArrayList<Pair<Player, Card>> playerCards) {
@@ -614,22 +609,29 @@ public class GameService {
     }
 
     @Transactional
-    public void applySingleCardWhenSpecialCardAction(Player p, Card c){
+    public void applySingleCardWhenSpecialCardAction(Player p, Card c) {
         String cardType = c.getCardType().getName();
         if (cardType.equals(otherCard)) {
-            Pair<Player, Card> playerAndCard = Pair.of(p,c);
-            ArrayList<Pair<Player,Card>> payload = new ArrayList<>();
+            Pair<Player, Card> playerAndCard = Pair.of(p, c);
+            ArrayList<Pair<Player, Card>> payload = new ArrayList<>();
             payload.add(playerAndCard);
             updateMaterials(payload);
 
         } else if (cardType.equals(objectCard)) {
-            Pair<Player, Card> playerAndCard = Pair.of(p,c);
-            ArrayList<Pair<Player,Card>> payload = new ArrayList<>();
+            Pair<Player, Card> playerAndCard = Pair.of(p, c);
+            ArrayList<Pair<Player, Card>> payload = new ArrayList<>();
             payload.add(playerAndCard);
             faseForjar(payload);
         } // TODO: orcCard
     }
-    
 
+    @Transactional
+    public void resign(Game g, Player p) {
+        p.setGold(0);
+        p.setIron(0);
+        p.setMedal(null);
+        p.setObjects(null);
+        p.setSteal(0);
+    }
 
 }
