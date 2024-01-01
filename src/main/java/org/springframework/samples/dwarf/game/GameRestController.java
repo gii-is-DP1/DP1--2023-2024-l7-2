@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,7 @@ public class GameRestController {
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayereService ps,
-            MainBoardService mbs, CardDeckService cds, DwarfService ds, 
+            MainBoardService mbs, CardDeckService cds, DwarfService ds,
             SpecialCardDeckService scds, LocationService ls) {
         this.gs = gs;
         this.us = us;
@@ -216,7 +215,7 @@ public class GameRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Game> createGame(@Valid @RequestBody Game g) {
-        
+
         User u = us.findCurrentUser();
 
         MainBoard mb = mbs.initialize();
@@ -362,12 +361,15 @@ public class GameRestController {
 
         // tiene que terminar si un jugador consigue 4 objetos
         for (Player p : plys) {
-            if (p.getObjects().size() >= 4)
+            if (p.getObjects() != null && p.getObjects().size() >= 4)
                 finished = true;
         }
 
         // tiene que terminar en 6 rondas
         if (g.getRound() >= 2)
+            finished = true;
+
+        if (g.getFinish() != null)
             finished = true;
 
         return new ResponseEntity<>(finished, HttpStatus.OK);
@@ -416,9 +418,9 @@ public class GameRestController {
 
     }
 
-    @PostMapping("/play/{code}/specialAction") 
-    public ResponseEntity<Void> handleSpecialAction(@Valid @RequestBody SpecialCardRequestHandler request, 
-        @PathVariable("code") String code) {
+    @PostMapping("/play/{code}/specialAction")
+    public ResponseEntity<Void> handleSpecialAction(@Valid @RequestBody SpecialCardRequestHandler request,
+            @PathVariable("code") String code) {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
@@ -427,9 +429,8 @@ public class GameRestController {
 
         SpecialCard specialCard = request.getSpecialCard();
         Boolean usesBothDwarves = request.getUsesBothDwarves();
-        
-        Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
 
+        Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
 
         if (usesBothDwarves) {
             Dwarf dwarf1 = new Dwarf();
@@ -470,17 +471,17 @@ public class GameRestController {
             gameDwarves.add(dwarf1);
         }
 
-        // Ahora vamos a darle la vuelta a la carta. Si hay 
+        // Ahora vamos a darle la vuelta a la carta. Si hay
         // un jugador en esa posicion, es decir, si se hay una entidad
         // dwarf en la base de datos con esa carta, se resuelve automaticamente.
         // Despues, se coloca el dwarf del jugador que ha tirado la carta especial
         // en esa posicion.
         Card reverseCard = specialCard.getTurnedSide();
         List<Dwarf> roundDwarves = g.getDwarves();
-        roundDwarves = roundDwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null && d.getCard() != null).toList();
+        roundDwarves = roundDwarves.stream()
+                .filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null && d.getCard() != null).toList();
 
-
-        for (Dwarf d:roundDwarves) {
+        for (Dwarf d : roundDwarves) {
             Card dwarfCard = d.getCard();
             if (reverseCard.getPosition().equals(dwarfCard.getPosition())) {
                 // Solo tiene sentido resolver esta situacion
@@ -490,40 +491,40 @@ public class GameRestController {
             }
         }
 
-        //ArrayList<Card> newCards = new ArrayList<>();
+        // ArrayList<Card> newCards = new ArrayList<>();
 
         MainBoard mb = g.getMainBoard();
         ArrayList<Location> newLocations = new ArrayList<>();
-        newLocations.addAll( mb.getLocations());
-        Location locationToUpdate = newLocations.get(reverseCard.getPosition()-1);
+        newLocations.addAll(mb.getLocations());
+        Location locationToUpdate = newLocations.get(reverseCard.getPosition() - 1);
         locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
-        newLocations.add(reverseCard.getPosition()-1,locationToUpdate);
+        newLocations.add(reverseCard.getPosition() - 1, locationToUpdate);
         mbs.saveMainBoard(mb);
 
         g.setMainBoard(mb);
         gs.saveGame(g);
-        /* 
-        for (Card c: mb.getCards()) {
-            if (c.getPosition().equals(reverseCard.getPosition())) {
-                newCards.add(reverseCard);
-            } else {
-                newCards.add(c);
-            }
-        }
-        
-        mb.setCards(newCards);
-        mbs.saveMainBoard(mb);
-
-        g.setMainBoard(mb);
-        gs.saveGame(g);*/
-
+        /*
+         * for (Card c: mb.getCards()) {
+         * if (c.getPosition().equals(reverseCard.getPosition())) {
+         * newCards.add(reverseCard);
+         * } else {
+         * newCards.add(c);
+         * }
+         * }
+         * 
+         * mb.setCards(newCards);
+         * mbs.saveMainBoard(mb);
+         * 
+         * g.setMainBoard(mb);
+         * gs.saveGame(g);
+         */
 
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case "Muster an army":
                 List<Card> gameCards = g.getMainBoard().getCards();
                 ArrayList<Dwarf> gameDwarves = new ArrayList<>(g.getDwarves());
-                for (Card c:gameCards) {
+                for (Card c : gameCards) {
                     if (c.getCardType().getName().equals("orcCard")) {
                         Dwarf d = new Dwarf();
                         d.setCard(c);
@@ -539,29 +540,29 @@ public class GameRestController {
                 Integer selectedIron = request.getSelectedIron();
                 Integer selectedSteal = request.getSelectedSteal();
                 Object selectedObject = request.getSelectedObject();
-                if (selectedGold != null  && selectedIron != null
-                    && selectedSteal != null && selectedObject != null) {
-                        // Check if the sum of gold, iron, and steel is 5
-                        if (selectedGold + selectedIron + selectedSteal == 5) {
+                if (selectedGold != null && selectedIron != null
+                        && selectedSteal != null && selectedObject != null) {
+                    // Check if the sum of gold, iron, and steel is 5
+                    if (selectedGold + selectedIron + selectedSteal == 5) {
 
-                            // Check if at least one of each material is selected
-                            if (selectedGold > 0&& selectedIron > 0&& selectedSteal > 0) {
+                        // Check if at least one of each material is selected
+                        if (selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
 
-                                // Update player's state
-                                p.setGold(p.getGold() - selectedGold);
-                                p.setIron(p.getIron() - selectedIron);
-                                p.setSteal(p.getSteal() - selectedSteal);
+                            // Update player's state
+                            p.setGold(p.getGold() - selectedGold);
+                            p.setIron(p.getIron() - selectedIron);
+                            p.setSteal(p.getSteal() - selectedSteal);
 
-                                // Add the selected object
-                                p.getObjects().add(selectedObject);
+                            // Add the selected object
+                            p.getObjects().add(selectedObject);
 
-                                // Save the updated player
-                                ps.savePlayer(p);
+                            // Save the updated player
+                            ps.savePlayer(p);
 
-                                return ResponseEntity.ok().build();
-                            }
+                            return ResponseEntity.ok().build();
                         }
                     }
+                }
                 break;
             case "Hold a council":
                 mb = mbs.holdACouncilAction(mb);
@@ -577,14 +578,13 @@ public class GameRestController {
                 g.setMainBoard(mb);
                 gs.saveGame(g);
                 break;
-                
+
             default:
                 break;
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 
     @PostMapping("/play/{code}/isStart")
     public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
@@ -605,7 +605,6 @@ public class GameRestController {
         }
 
     }
-    
 
     @PostMapping("/play/{code}/finish")
     public ResponseEntity<Void> finishGameSetWinner(@PathVariable("code") String code) {
@@ -633,6 +632,29 @@ public class GameRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(ps.getById(g.getWinner_id()), HttpStatus.OK);
+    }
+
+    @PostMapping("/play/{code}/resign")
+    public ResponseEntity<Void> resignSetWinner(@PathVariable("code") String code) {
+
+        Game g = gs.getGameByCode(code);
+        User u = us.findCurrentUser();
+        Player p = ps.getPlayerByUserAndGame(u, g);
+
+        if (!gs.checkPlayerInGameAndGameExists(g)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        g.setFinish(LocalDateTime.now());
+        gs.resign(g, p);
+
+        Player winner = gs.getGameWinner(g);
+        System.out.println(winner);
+
+        g.setWinner_id(winner.getId());
+
+        gs.saveGame(g);
+        return ResponseEntity.noContent().build();
     }
 
 }
