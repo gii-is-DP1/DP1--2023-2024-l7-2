@@ -318,6 +318,11 @@ public class GameRestController {
 
         List<Dwarf> dwarves = g.getDwarves();
         dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
+        if (gs.checkRoundNeedsChange(g, dwarves)) {
+            gs.handleRoundChange(g);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        }
+
 
         List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
         System.out.println(dwarves_players);
@@ -383,8 +388,7 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
-        List<Player> plys = plys_optional.get();
+
 
         Dwarf dwarf = new Dwarf();
         Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
@@ -399,18 +403,14 @@ public class GameRestController {
         dwarves.add(dwarf);
         g.setDwarves(dwarves);
 
-        Integer round = g.getRound();
-        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
-                && d.getPlayer() != null).toList();
-
-        List<Player> remainingTurns = gs.getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
-        if (thisRoundDwarves.size() == remainingTurns.size()) {
+/*
+        if (gs.checkRoundNeedsChange(g,dwarves)) {
             try {
                 g = gs.handleRoundChange(g);
             } catch (Exception e) {
                 System.out.println(e);
             }
-        }
+        }*/
 
         gs.saveGame(g);
 
@@ -498,7 +498,8 @@ public class GameRestController {
         newLocations.addAll(mb.getLocations());
         Location locationToUpdate = newLocations.get(reverseCard.getPosition() - 1);
         locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
-        newLocations.add(reverseCard.getPosition() - 1, locationToUpdate);
+        newLocations.set(reverseCard.getPosition()-1,locationToUpdate);
+        mb.setLocations(newLocations);
         mbs.saveMainBoard(mb);
 
         g.setMainBoard(mb);

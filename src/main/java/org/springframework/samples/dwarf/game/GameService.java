@@ -130,6 +130,20 @@ public class GameService {
         return remaining_turns;
     }
 
+    @Transactional(readOnly = true)
+    public Boolean checkRoundNeedsChange(Game g, List<Dwarf> dwarves) {
+        Optional<List<Player>> plys_optional = getPlayers(g.getId());
+        List<Player> plys = plys_optional.get();
+
+        Integer round = g.getRound();
+        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
+                && d.getPlayer() != null).toList();
+
+        List<Player> remainingTurns = getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
+
+        return thisRoundDwarves.size() == remainingTurns.size();
+    }
+
     @Transactional
     public Game handleRoundChange(Game g) {
         faseResolucionAcciones(g);
@@ -624,6 +638,11 @@ public class GameService {
             faseForjar(payload);
         } // TODO: orcCard
     }
+
+    public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p){
+
+    }
+
 
     @Transactional
     public void resign(Game g, Player p) {
