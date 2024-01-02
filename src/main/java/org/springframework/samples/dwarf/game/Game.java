@@ -14,6 +14,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,11 +31,6 @@ public class Game extends NamedEntity {
     private LocalDateTime start;
     private LocalDateTime finish;
 
-    /*
-     * @ManyToOne(optional=true)
-     * private User winner_id;
-     */
-
     Integer winner_id;
     Integer round;
 
@@ -49,5 +45,8 @@ public class Game extends NamedEntity {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Player playerStart;
+
+    @NotNull
+    Boolean isPublic = false;
 
 }

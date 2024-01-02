@@ -274,11 +274,13 @@ export default function GamePlay() {
         <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
 
             <Button
-                onClick={() => {resign(code, jwt)}}
-                title="Resign"
-                color="#008000"
-                style={{border: '3px solid black',padding: "3px"}}>
-                  Resign
+              onClick={() => {
+                let confirmMessage = window.confirm("Are you sure you want resing? You will loose all your cards and your points");
+                if(confirmMessage) resign(code, jwt);}}
+              title="Resign"
+              color="#008000"
+              style={{border: '3px solid black',padding: "3px"}}>
+              Resign
             </Button>
           
             {choosedCard && (
