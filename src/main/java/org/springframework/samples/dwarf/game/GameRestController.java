@@ -323,7 +323,6 @@ public class GameRestController {
             return new ResponseEntity<>(res, HttpStatus.OK);
         }
 
-
         List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
         System.out.println(dwarves_players);
 
@@ -388,8 +387,6 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-
-
         Dwarf dwarf = new Dwarf();
         Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
 
@@ -403,14 +400,15 @@ public class GameRestController {
         dwarves.add(dwarf);
         g.setDwarves(dwarves);
 
-/*
-        if (gs.checkRoundNeedsChange(g,dwarves)) {
-            try {
-                g = gs.handleRoundChange(g);
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }*/
+        /*
+         * if (gs.checkRoundNeedsChange(g,dwarves)) {
+         * try {
+         * g = gs.handleRoundChange(g);
+         * } catch (Exception e) {
+         * System.out.println(e);
+         * }
+         * }
+         */
 
         gs.saveGame(g);
 
@@ -498,7 +496,7 @@ public class GameRestController {
         newLocations.addAll(mb.getLocations());
         Location locationToUpdate = newLocations.get(reverseCard.getPosition() - 1);
         locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
-        newLocations.set(reverseCard.getPosition()-1,locationToUpdate);
+        newLocations.set(reverseCard.getPosition() - 1, locationToUpdate);
         mb.setLocations(newLocations);
         mbs.saveMainBoard(mb);
 

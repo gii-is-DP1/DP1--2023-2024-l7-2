@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import tokenService from "../services/token.service";
 import useFetchState from "../util/useFetchState";
 import getErrorModal from "../util/getErrorModal";
-import { Button, ButtonGroup, Table } from "reactstrap";
+import { Button, ButtonGroup, Table, Form} from "reactstrap";
 import { Link } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 
@@ -27,60 +27,137 @@ export default function GameList() {
           setUsername(jwt_decode(jwt).sub);
       }
     }, [jwt])
-    console.log(role);
 
+    function handleSubmit(game) {
+      
+      fetch(
+          "/api/v1/game/check" + (game ? "/" + game : ""),
+          {
+              method: "GET",
+              headers: {
+                  Authorization: `Bearer ${jwt}`,
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+              }
+          }
+      )
+      .then((response) => {
+          if (response.ok) {
+              fetch(
+                  "/api/v1/game/join" + (game ? "/" + game : ""),
+                  {
+                      method: "POST",
+                      headers: {
+                          Authorization: `Bearer ${jwt}`,
+                          Accept: "application/json",
+                          "Content-Type": "application/json",
+                      }
+                  }
+              ).then((response) => {
+                  console.log(response.text)
+                  if (response.ok) {
+                      window.location.href = `/game/${game}`
+                  } else {
+                      console.log("error", response)
+                  }
+              })
+          }
+      })
+      .catch((message) => alert(message));
+
+  }
+
+    
     function showGame(game) {
       return (
         <tr key={game.id}>
           <td className="text-center">{game.name}</td>
-          <td className="text-center">{game.code?"private":"public"}</td>
-          <td className="text-center">{game.start?'waiting':game.start}</td>
+          <td className="text-center">{game.isPublic?"Public":"Private"}</td>
+          <td className="text-center">{game.start==null?'Waiting':(game.finish==null?'Playing':'Finished')}</td>
           <td className="text-center">{game.finish?game.finish:'not finished'}</td>
-          <td className="text-center">{game.finish?game.winer_id:'not finished'}</td>
-          <td className="text-center">{game.finish?'ongoing':game.round}</td>
+          <td className="text-center">{game.finish!=null?(game.winner_id==null?'"Tie"':game.winner_id):'-'}</td>
+          <td className="text-center">{game.finish?'-':game.round}</td>
           <td className="text-center">
-            <ButtonGroup>
-              <Button
-                size="sm"
-                color="primary"
-                aria-label={"edit-" + game.name}
-                tag={Link}
-                to={"/game/edit/" + game.id}
-              >
-                  <Link to={`/game/edit/${game.id}`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
-              </Button>
-              <Button
-                size="sm"
-                color="danger"
-                aria-label={"delete-" + game.name}
-                onClick={() => {
-                  let confirmMessage = window.confirm("Are you sure you want to delete it?");
+            {username==game.playerCreator || role=="ADMIN"?
+              <ButtonGroup>
+                <Button
+                  size="sm"
+                  color="primary"
+                  aria-label={"edit-" + game.name}
+                  tag={Link}
+                  to={"/game/edit/" + game.id}
+                >
+                    <Link to={`/game/edit/${game.id}`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
+                </Button>
+                <Button
+                  size="sm"
+                  color="danger"
+                  aria-label={"delete-" + game.name}
+                  onClick={() => {
+                    let confirmMessage = window.confirm("Are you sure you want to delete it?");
 
-                  if(!confirmMessage) return;
+                    if(!confirmMessage) return;
 
-                  fetch(`/api/v1/game/${game.id}`, {
-                    method: "DELETE",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${jwt}`,
-                    },
-                  })
-                    .then((res) => {
-                      if (res.status === 204) {
-                        setMessage("Deleted successfully");
-                        setVisible(true);
-                        setGames(games.filter((g) => g.id!=game.id));
-                      }
+                    fetch(`/api/v1/game/${game.id}`, {
+                      method: "DELETE",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${jwt}`,
+                      },
                     })
-                    .catch((err) => {
-                      setMessage(err.message);
-                      setVisible(true);
-                    });
-                }}
-              >
-                Delete
-              </Button>
-            </ButtonGroup>
+                      .then((res) => {
+                        if (res.status === 204) {
+                          setMessage("Deleted successfully");
+                          setVisible(true);
+                          setGames(games.filter((g) => g.id!=game.id));
+                        }
+                      })
+                      .catch((err) => {
+                        setMessage(err.message);
+                        setVisible(true);
+                      });
+                  }}
+                >
+                  Delete
+                </Button>
+              </ButtonGroup>
+            : <tb></tb>}
+            {role!="ADMIN" && game.finish==null?
+              <div className="custom-button-row">
+                <Button className="btn btn-dark btn-lg" outline color="warning" size="lg"
+                  onClick={() => {
+                    fetch(`/api/v1/game/check/${game.id}`, {
+                      method: "GET",
+                      headers: {
+                          Authorization: `Bearer ${jwt}`,
+                          Accept: "application/json",
+                          "Content-Type": "application/json",
+                      }
+                    }).then((response) => {
+                    if (response.ok) {
+                      fetch(`/api/v1/game/join/${game.id}`, {
+                        method: "POST",
+                        headers: {
+                          Authorization: `Bearer ${jwt}`,
+                          Accept: "application/json",
+                          "Content-Type": "application/json",
+                        }
+                      }).then((response) => {
+                          console.log(response.text)
+                          if (response.ok) {
+                              window.location.href = `/game/${game.id}`
+                          } else {
+                              console.log("error", response)
+                          }
+                      })
+                    }
+                    }).catch((message) => alert(message));
+      
+                  }}>
+                  Join
+                </Button>
+              </div>
+            : <tb></tb>}
           </td>
         </tr>
       );
@@ -90,8 +167,8 @@ export default function GameList() {
       if(role === "ADMIN")
         return showGame(game)
       else if (role === "USER")
-      console.log(game);
-        if(game.playerCreator && game.playerCreator.user.username === username)
+        console.log(game);
+        if(game.playerCreator && game.playerCreator.user.username === username || game.isPublic)
           return showGame(game) 
     });
 

@@ -100,7 +100,8 @@ public class GameService {
 
     @Transactional
     public void delete(Integer id) {
-        gr.deleteById(id);
+        Game toDelete = getGameById(id).get();
+        this.gr.delete(toDelete);
     }
 
     @Transactional(readOnly = true)
@@ -639,10 +640,9 @@ public class GameService {
         } // TODO: orcCard
     }
 
-    public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p){
+    public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p) {
 
     }
-
 
     @Transactional
     public void resign(Game g, Player p) {
