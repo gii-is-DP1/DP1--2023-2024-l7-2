@@ -194,6 +194,7 @@ public class GameRestController {
         System.out.println(p);
         if (p == null) {
             if (g == null || u == null) {
+                // TODO: Create error
                 return ResponseEntity.notFound().build();
             }
             p = ps.initialize(u.getUsername());
@@ -209,8 +210,86 @@ public class GameRestController {
         }
 
         return ResponseEntity.ok(g);
+    }
+
+    @PostMapping("/join/{id}")
+    public ResponseEntity<Game> joinPublicGame(@PathVariable("id") Integer id) {
+
+        Optional<Game> g_tmp = gs.getGameById(id);
+
+        if (g_tmp.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Game g = g_tmp.get();
+
+        if (g.getStart() != null) {
+            // TODO: Create error
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User u = us.findCurrentUser();
+
+        // if a player already exists in a game he can just join the game :)
+        Player p = ps.getPlayerByUserAndGame(u, g);
+        System.out.println(p);
+        if (p == null) {
+            if (g == null || u == null) {
+                // TODO: Create error
+                return ResponseEntity.notFound().build();
+            }
+            p = ps.initialize(u.getUsername());
+            p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
+            p.setGame(g);
+            p.setUser(u);
+            p.setObjects(new ArrayList<Object>());
+
+            ps.savePlayer(p);
+        } else {
+            // TODO: Create error
+            System.out.println("This player already in game");
+        }
+
+        return ResponseEntity.ok(g);
+    }
+
+    @PostMapping("/spectate/{code}")
+    public ResponseEntity<Game> spectateGame(@PathVariable("code") String code) {
+
+        Game g = gs.getGameByCode(code);
+
+        if (g.getStart() != null) {
+            // TODO: Create error
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User u = us.findCurrentUser();
+
+        // if a player already exists in a game he can just join the game :)
+        Player p = ps.getPlayerByUserAndGame(u, g);
+        System.out.println(p);
+        if (p == null) {
+            if (g == null || u == null) {
+                // TODO: Create error
+                return ResponseEntity.notFound().build();
+            }
+            p = ps.initialize(u.getUsername());
+            p.setIsEspectator(true);
+            p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
+            p.setGame(g);
+            p.setUser(u);
+            p.setObjects(new ArrayList<Object>());
+
+            ps.savePlayer(p);
+        } else {
+            // TODO: Create error
+            System.out.println("This player already in game");
+        }
+
+        return ResponseEntity.ok(g);
 
     }
+
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
