@@ -735,4 +735,11 @@ public class GameRestController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/publics")
+      public ResponseEntity<List<Game>> publicGames(@PathVariable("code") String code){
+            List<Game> listGame= gs.getAllPublicGames();
+            return new ResponseEntity<>(listGame, HttpStatus.OK);
+      }
+
+    
 }
