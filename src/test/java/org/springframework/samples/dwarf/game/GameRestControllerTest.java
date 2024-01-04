@@ -18,7 +18,7 @@ import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
-import org.springframework.samples.dwarf.player.PlayereService;
+import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
 
@@ -28,17 +28,17 @@ public class GameRestControllerTest {
 
     private GameService gameService;
     private UserService userService;
-    private PlayereService playerService;
+    private PlayerService playerService;
     private LocationService locationService;
 
     @BeforeEach
     public void setUp() {
         gameService = mock(GameService.class);
         userService = mock(UserService.class);
-        playerService = mock(PlayereService.class);
+        playerService = mock(PlayerService.class);
         locationService = mock(LocationService.class);
 
-        gameRestController = new GameRestController(gameService, userService, playerService, null, null, null, null, locationService);
+        gameRestController = new GameRestController(gameService, userService, playerService, null, null, null, null, locationService,null);
     }
 
     @Test

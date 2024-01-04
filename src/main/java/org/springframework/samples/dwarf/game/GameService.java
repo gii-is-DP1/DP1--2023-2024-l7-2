@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
+import org.springframework.samples.dwarf.Spectator.Spectator;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
@@ -75,10 +76,6 @@ public class GameService {
         return gr.findById(id);
     }
 
-    @Transactional
-    public Optional<List<Player>> getPlayers(Integer id) {
-        return gr.getPlayersByGameId(id);
-    }
 
     @Transactional(readOnly = true)
     public Game getGameByCode(String code) {
@@ -112,6 +109,51 @@ public class GameService {
         return gr.findAllPublicGames();
     }
 
+    @Transactional
+    public Game addPlayer(Game g, Player p) {
+        ArrayList<Player> players = new ArrayList<Player>();
+        players.addAll(g.getPlayers());
+        players.add(p);
+        g.setPlayers(players);
+        return saveGame(g);
+    }
+
+    @Transactional
+    public Game addSpectator(Game g, Spectator s) {
+        ArrayList<Spectator> spectators = new ArrayList<Spectator>();
+        spectators.addAll(g.getSpectators());
+        spectators.add(s);
+        g.setSpectators(spectators);
+        return saveGame(g);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean gameContainsPlayer(Game g, User u) {
+        Boolean res = false;
+
+        for (Player p: g.getPlayers()) {
+            if (p.getUser().equals(u)) {
+                res = true;
+                break;
+            }
+        }
+        return res;
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean gameContainsSpectator(Game g, User u) {
+        Boolean res = false;
+
+        for (Spectator s: g.getSpectators()) {
+            if (s.getUser().equals(u)) {
+                res = true;
+                break;
+            }
+        }
+        return res;
+    }
+    
+
     @Transactional(readOnly = true)
     public List<Player> getRemainingTurns(List<Player> plys, List<Dwarf> dwarves, Player starter) {
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
@@ -131,7 +173,7 @@ public class GameService {
             if (d.getCard() == null) {
                 continue;
             }
-            if (d.getCard().getCardType().getName().equals("HelpCard")) {
+            if (d.getCard().getCardType().getName().equals(helpCard)) {
                 remaining_turns.add(d.getPlayer());
                 remaining_turns.add(d.getPlayer());
             }
@@ -141,8 +183,7 @@ public class GameService {
 
     @Transactional(readOnly = true)
     public Boolean checkRoundNeedsChange(Game g, List<Dwarf> dwarves) {
-        Optional<List<Player>> plys_optional = getPlayers(g.getId());
-        List<Player> plys = plys_optional.get();
+        List<Player> plys = g.getPlayers();
 
         Integer round = g.getRound();
         List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
@@ -191,8 +232,7 @@ public class GameService {
     @Transactional(readOnly = true)
     public Player getGameWinner(Game g) {
 
-        Optional<List<Player>> plys_optional = getPlayers(g.getId());
-        List<Player> plys = plys_optional.get();
+        List<Player> plys = g.getPlayers();
 
         Map<Player, Integer> totalScore = new HashMap<Player, Integer>();
         plys.stream().forEach(p -> totalScore.put(p, 0));
@@ -305,12 +345,18 @@ public class GameService {
 
     }
 
-
-
-    @Transactional(readOnly = true)
-    public Optional<List<Player>> getPlayersByGameId(Integer gameId) {
-        return gr.getPlayersByGameId(gameId);
+    @Transactional(readOnly = true) 
+    public Player getPlayerByUserAndGame(User u, Game g) {
+        Player res = null;
+        for (Player p: g.getPlayers()) {
+            if (p.getUser().equals(u)) {
+                res = p;
+                break;
+            }
+        }
+        return res;
     }
+
 
     @Transactional(readOnly = true)
     public boolean checkPlayerInGameAndGameExists(Game g) {
@@ -321,11 +367,8 @@ public class GameService {
         }
 
         User currentUser = us.findCurrentUser();
-        Optional<List<Player>> l = getPlayersByGameId(g.getId());
-        for (Player p : l.get()) {
-            if (p.getUser().equals(currentUser)) {
-                return true;
-            }
+        if (gameContainsPlayer(g, currentUser)) {
+            check = true;
         }
         return check;
     }

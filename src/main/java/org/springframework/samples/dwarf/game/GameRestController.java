@@ -10,6 +10,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.samples.dwarf.Spectator.Spectator;
+import org.springframework.samples.dwarf.Spectator.SpectatorService;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
@@ -22,7 +24,7 @@ import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
-import org.springframework.samples.dwarf.player.PlayereService;
+import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
@@ -48,17 +50,18 @@ public class GameRestController {
 
     private final GameService gs;
     private final UserService us;
-    private final PlayereService ps;
+    private final PlayerService ps;
     private final MainBoardService mbs;
     private final CardDeckService cds;
     private final SpecialCardDeckService scds;
     private final LocationService ls;
     private final DwarfService ds;
+    private final SpectatorService specservice;
 
     @Autowired
-    public GameRestController(GameService gs, UserService us, PlayereService ps,
+    public GameRestController(GameService gs, UserService us, PlayerService ps,
             MainBoardService mbs, CardDeckService cds, DwarfService ds,
-            SpecialCardDeckService scds, LocationService ls) {
+            SpecialCardDeckService scds, LocationService ls, SpectatorService specservice) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
@@ -67,6 +70,7 @@ public class GameRestController {
         this.scds = scds;
         this.ds = ds;
         this.ls = ls;
+        this.specservice = specservice;
     }
 
     @GetMapping
@@ -190,20 +194,21 @@ public class GameRestController {
         User u = us.findCurrentUser();
 
         // if a player already exists in a game he can just join the game :)
-        Player p = ps.getPlayerByUserAndGame(u, g);
-        System.out.println(p);
-        if (p == null) {
-            if (g == null || u == null) {
-                // TODO: Create error
-                return ResponseEntity.notFound().build();
-            }
-            p = ps.initialize(u.getUsername());
-            p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
-            p.setGame(g);
+        if (g == null || u == null) {
+            // TODO: Create error
+            return ResponseEntity.notFound().build();
+        }
+
+        
+        if (!gs.gameContainsPlayer(g, u)) {
+            Player p = ps.initialize(u.getUsername());
+            p.setColor(ps.getRandomColor(g.getPlayers()));
+            
             p.setUser(u);
             p.setObjects(new ArrayList<Object>());
 
             ps.savePlayer(p);
+            gs.addPlayer(g, p);
         } else {
             // TODO: Create error
             System.out.println("This player already in game");
@@ -212,7 +217,7 @@ public class GameRestController {
         return ResponseEntity.ok(g);
     }
 
-    @PostMapping("/join/{id}")
+    @PostMapping("/joinPublic/{id}")
     public ResponseEntity<Game> joinPublicGame(@PathVariable("id") Integer id) {
 
         Optional<Game> g_tmp = gs.getGameById(id);
@@ -224,26 +229,26 @@ public class GameRestController {
 
         if (g.getStart() != null) {
             // TODO: Create error
+            // El juego ya ha comenzado
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         User u = us.findCurrentUser();
 
+        if (g == null || u == null) {
+            // TODO: Create error
+            return ResponseEntity.notFound().build();
+        }
         // if a player already exists in a game he can just join the game :)
-        Player p = ps.getPlayerByUserAndGame(u, g);
-        System.out.println(p);
-        if (p == null) {
-            if (g == null || u == null) {
-                // TODO: Create error
-                return ResponseEntity.notFound().build();
-            }
-            p = ps.initialize(u.getUsername());
-            p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
-            p.setGame(g);
+
+        if (!gs.gameContainsPlayer(g, u)) {
+            Player p = ps.initialize(u.getUsername());
+            p.setColor(ps.getRandomColor(g.getPlayers()));
             p.setUser(u);
             p.setObjects(new ArrayList<Object>());
 
             ps.savePlayer(p);
+            gs.addPlayer(g, p);
         } else {
             // TODO: Create error
             System.out.println("This player already in game");
@@ -265,21 +270,20 @@ public class GameRestController {
         User u = us.findCurrentUser();
 
         // if a player already exists in a game he can just join the game :)
-        Player p = ps.getPlayerByUserAndGame(u, g);
-        System.out.println(p);
-        if (p == null) {
-            if (g == null || u == null) {
-                // TODO: Create error
-                return ResponseEntity.notFound().build();
-            }
-            p = ps.initialize(u.getUsername());
-            p.setIsEspectator(true);
-            p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
-            p.setGame(g);
-            p.setUser(u);
-            p.setObjects(new ArrayList<Object>());
 
-            ps.savePlayer(p);
+        if (g == null || u == null) {
+            // TODO: Create error
+            return ResponseEntity.notFound().build();
+        }
+        if (!gs.gameContainsSpectator(g, u)) {
+            Spectator s = specservice.initialize(u.getUsername());
+
+            s.setColor(ps.getRandomColor(g.getPlayers()));
+
+            s.setUser(u);
+
+            specservice.saveSpectator(s);
+            gs.addSpectator(g, s);
         } else {
             // TODO: Create error
             System.out.println("This player already in game");
@@ -288,8 +292,6 @@ public class GameRestController {
         return ResponseEntity.ok(g);
 
     }
-
-
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -301,11 +303,11 @@ public class GameRestController {
         g.setMainBoard(mb);
 
         Player p = ps.initialize(u.getUsername());
-        p.setColor(ps.getRandomColor(gs.getPlayers(g.getId())));
+        p.setColor(ps.getRandomColor(List.of()));
         // p.setGame(g);
         p.setUser(u);
         p.setObjects(new ArrayList<Object>());
-        ps.savePlayer(p);
+        p = ps.savePlayer(p);
 
         // Si no se hace asi da error porque
         // al guardarse el game en player, el game todavia no existe
@@ -313,8 +315,8 @@ public class GameRestController {
 
         g.setPlayerCreator(p);
         g.setPlayerStart(p);
-        p = ps.savePlayer(p);
         g.setPlayers(List.of(p));
+
         gs.saveGame(g);
 
         // TODO: revisar
@@ -363,12 +365,7 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        Optional<List<Player>> plys = gs.getPlayers(g.getId());
-        if (plys.isPresent()) {
-            return new ResponseEntity<>(plys.get(), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(g.getPlayers(), HttpStatus.OK);
     }
 
     @GetMapping("/play/{code}/isMyTurn")
@@ -380,15 +377,14 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
-        if (plys_optional.isEmpty()) {
+        List<Player> plys = g.getPlayers();
+        if (plys.size() < 1) {
             System.out.println("No players");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<Player> plys = plys_optional.get();
 
         User u = us.findCurrentUser();
-        Player p = ps.getPlayerByUserAndGame(u, g);
+        Player p = gs.getPlayerByUserAndGame(u, g);
         if (p == null) {
             System.out.println("no player");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -436,8 +432,7 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        Optional<List<Player>> plys_optional = gs.getPlayers(g.getId());
-        List<Player> plys = plys_optional.get();
+        List<Player> plys = g.getPlayers();
 
         Boolean finished = false;
 
@@ -466,7 +461,7 @@ public class GameRestController {
         }
 
         Dwarf dwarf = new Dwarf();
-        Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
+        Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
 
         dwarf.setPlayer(p);
         dwarf.setRound(g.getRound());
@@ -506,7 +501,7 @@ public class GameRestController {
         SpecialCard specialCard = request.getSpecialCard();
         Boolean usesBothDwarves = request.getUsesBothDwarves();
 
-        Player p = ps.getPlayerByUserAndGame(us.findCurrentUser(), g);
+        Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
 
         if (usesBothDwarves) {
             Dwarf dwarf1 = new Dwarf();
@@ -699,7 +694,7 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
         User u = us.findCurrentUser();
-        Player p = ps.getPlayerByUserAndGame(u, g);
+        Player p = gs.getPlayerByUserAndGame(u, g);
 
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             return ResponseEntity.notFound().build();

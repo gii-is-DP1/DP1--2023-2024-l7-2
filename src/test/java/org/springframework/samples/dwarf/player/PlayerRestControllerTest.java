@@ -16,7 +16,7 @@ import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRestController;
-import org.springframework.samples.dwarf.player.PlayereService;
+import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.validation.BindingResult;
 
 @SpringBootTest
@@ -26,7 +26,7 @@ public class PlayerRestControllerTest {
     private PlayerRestController playerRestController;
 
     @MockBean
-    private PlayereService playerService;
+    private PlayerService playerService;
 
     @Test
     public void testFindAll() {

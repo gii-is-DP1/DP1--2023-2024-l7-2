@@ -26,10 +26,10 @@ import jakarta.validation.Valid;
 @SecurityRequirement(name = "bearerAuth")
 public class PlayerRestController {
 
-	private final PlayereService playerService;
+	private final PlayerService playerService;
 
 	@Autowired
-	public PlayerRestController(PlayereService playerService) {
+	public PlayerRestController(PlayerService playerService) {
 		this.playerService = playerService;
 	}
 

@@ -59,6 +59,7 @@ public class PlayerTest {
         assertNotNull(player.getUser());
     }
 
+    /*
     @Test
     public void testPlayerGameNotNull() {
         Player player = new Player();
@@ -66,7 +67,7 @@ public class PlayerTest {
         player.setGame(mockGame);
 
         assertNotNull(player.getGame());
-    }
+    }*/
 
     @Test
     public void testPlayerInitialization() {
@@ -107,6 +108,7 @@ public class PlayerTest {
         assertEquals(mockUser, player.getUser());
     }
 
+    /*
     @Test
     public void testPlayerGame() {
         Player player = new Player();
@@ -114,6 +116,6 @@ public class PlayerTest {
         player.setGame(mockGame);
 
         assertEquals(mockGame, player.getGame());
-    }
+    }*/
 
 }

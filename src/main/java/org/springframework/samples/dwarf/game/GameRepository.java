@@ -2,10 +2,7 @@ package org.springframework.samples.dwarf.game;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.samples.dwarf.player.Player;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,8 +22,6 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     List<Game> findByFinishIsNullAndStartIsNotNull();
 
-    @Query("SELECT p FROM Player p WHERE p.game.id = :gameId")
-    Optional<List<Player>> getPlayersByGameId(Integer gameId);
 
     @Query("SELECT g FROM Game g WHERE g.isPublic = true")
     List<Game> findAllPublicGames();

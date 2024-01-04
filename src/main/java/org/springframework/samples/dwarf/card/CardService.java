@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
-import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.object.Object;
-import org.springframework.samples.dwarf.player.PlayereService;
+import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +17,10 @@ import jakarta.validation.Valid;
 public class CardService {
 
     CardRepository repo;
-    PlayereService ps;
+    PlayerService ps;
 
     @Autowired
-    public CardService(CardRepository repo, PlayereService ps) {
+    public CardService(CardRepository repo, PlayerService ps) {
         this.repo = repo;
         this.ps = ps;
     }

@@ -1,15 +1,10 @@
-package org.springframework.samples.dwarf.player;
-
-
-import java.util.List;
+package org.springframework.samples.dwarf.Spectator;
 
 import org.springframework.samples.dwarf.model.NamedEntity;
-import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.user.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,20 +12,11 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Player extends NamedEntity {
+public class Spectator extends NamedEntity {
     @NotBlank
     private String color;
-    private Integer steal;
-    private Integer gold;
-    private Integer iron;
-    private Integer medal;
-
-    private Boolean isEspectator;
 
     @ManyToOne(optional = true)
     private User user;
-
-    @OneToMany
-    List<Object> objects;
 
 }
