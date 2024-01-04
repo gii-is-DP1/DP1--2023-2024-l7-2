@@ -313,10 +313,9 @@ public class GameRestController {
 
         g.setPlayerCreator(p);
         g.setPlayerStart(p);
+        p = ps.savePlayer(p);
+        g.setPlayers(List.of(p));
         gs.saveGame(g);
-
-        p.setGame(g);
-        ps.savePlayer(p);
 
         // TODO: revisar
         g.setMainBoard(null);
@@ -566,11 +565,9 @@ public class GameRestController {
                 // Solo tiene sentido resolver esta situacion
                 // cuando la carta es de forja o una carta normal
                 // El dwarf tiene que permanecer para seguir con el recuento de turnos
-                gs.applySingleCardWhenSpecialCardAction(p, dwarfCard);
+                mbs.applySingleCardWhenSpecialCardAction(p, dwarfCard);
             }
         }
-
-        // ArrayList<Card> newCards = new ArrayList<>();
 
         MainBoard mb = g.getMainBoard();
         ArrayList<Location> newLocations = new ArrayList<>();
@@ -583,21 +580,6 @@ public class GameRestController {
 
         g.setMainBoard(mb);
         gs.saveGame(g);
-        /*
-         * for (Card c: mb.getCards()) {
-         * if (c.getPosition().equals(reverseCard.getPosition())) {
-         * newCards.add(reverseCard);
-         * } else {
-         * newCards.add(c);
-         * }
-         * }
-         * 
-         * mb.setCards(newCards);
-         * mbs.saveMainBoard(mb);
-         * 
-         * g.setMainBoard(mb);
-         * gs.saveGame(g);
-         */
 
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {

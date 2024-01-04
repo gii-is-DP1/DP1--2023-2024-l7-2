@@ -33,10 +33,11 @@ public class Player extends NamedEntity {
     @ManyToOne(optional = true)
     private User user;
 
+    /* 
     @JsonSerialize(using = gameSerializer.class)
     @JsonDeserialize(using = gameDeserializer.class)
     @ManyToOne(optional = true)
-    private Game game;
+    private Game game;*/
 
     /*
      * @OneToMany(mappedBy="player")
