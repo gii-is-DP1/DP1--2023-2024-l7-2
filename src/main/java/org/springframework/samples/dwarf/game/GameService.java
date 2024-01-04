@@ -105,6 +105,11 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
+    public List<Game> getAllPublicGames() {
+        return gr.findAllPublicGames();
+    }
+
+    @Transactional(readOnly = true)
     public List<Player> getRemainingTurns(List<Player> plys, List<Dwarf> dwarves, Player starter) {
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
 
@@ -652,5 +657,7 @@ public class GameService {
         p.setObjects(null);
         p.setSteal(0);
     }
+
+    
 
 }
