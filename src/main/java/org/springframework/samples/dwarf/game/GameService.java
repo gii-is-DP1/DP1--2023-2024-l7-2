@@ -103,7 +103,13 @@ public class GameService {
 
     @Transactional
     public void delete(Integer id) {
-        gr.deleteById(id);
+        Game toDelete = getGameById(id).get();
+        this.gr.delete(toDelete);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Game> getAllPublicGames() {
+        return gr.findAllPublicGames();
     }
 
     @Transactional(readOnly = true)
@@ -376,10 +382,9 @@ public class GameService {
 
 
 
-    public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p){
+    public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p) {
 
     }
-
 
     @Transactional
     public void resign(Game g, Player p) {
@@ -389,5 +394,7 @@ public class GameService {
         p.setObjects(null);
         p.setSteal(0);
     }
+
+    
 
 }

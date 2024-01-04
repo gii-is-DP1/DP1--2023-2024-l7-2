@@ -27,4 +27,7 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     @Query("SELECT p FROM Player p WHERE p.game.id = :gameId")
     Optional<List<Player>> getPlayersByGameId(Integer gameId);
+
+    @Query("SELECT g FROM Game g WHERE g.isPublic = true")
+    List<Game> findAllPublicGames();
 }

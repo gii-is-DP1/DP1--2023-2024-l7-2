@@ -30,24 +30,13 @@ export default function Home(){
             </>
         )
     } else {
-        if (role === "ADMIN") {
-            userLinks = (
-                <>
-                    <Button outline color="warning" size="lg">
-                        <Link to={`/games`} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
-                    </Button>
-                </>
-            )
-        } else if (role === "USER") {
-            userLinks = (
+        userLinks = (
                 <>
                     <Button outline color="warning" size="lg">
                         <Link to={`/game`} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
                     </Button>
                 </>
             )
-        } 
-
     }
 
     return(

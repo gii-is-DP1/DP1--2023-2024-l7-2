@@ -56,7 +56,7 @@ function AppNavbar() {
             registeredUserLinks = (
                 <>
                     <NavItem>
-                        <NavLink style={{ color: "white" }} tag={Link} to="/games">My Games</NavLink>
+                        <NavLink style={{ color: "white" }} tag={Link} to="/games">Games</NavLink>
                     </NavItem>
                     <NavItem>
                         <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/">Stats</NavLink>

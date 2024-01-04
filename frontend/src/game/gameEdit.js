@@ -120,9 +120,21 @@ export default function GameEdit() {
                             className="custom-input"
                         />
                     </div>
+                    <div className="custom-form-input">
+                        <Label for="isPublic" className="custom-form-input-label">Public</Label>
+                        <Input
+                            type="checkbox"
+                            name="isPublic"
+                            checked={game.isPublic === true}
+                            unselectable="on"
+                            onChange={(e) => setGame({ ...game, isPublic: e.target.checked })}
+                        />
+                    </div>
+
+                    <br></br>
                     <div className="custom-button-row">
                         <button className="auth-button">Save</button>
-                        <Link to={role=="USER" ? `/game` : `/games`} className="auth-button" style={{ textDecoration: "none" }}> Cancel </Link>
+                        <Link to={`/game`} className="auth-button" style={{ textDecoration: "none" }}> Cancel </Link>
                     </div>
                 </Form>
             </div>
