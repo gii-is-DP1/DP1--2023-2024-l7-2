@@ -8,26 +8,21 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
-import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.game.GameService;
-import org.springframework.samples.dwarf.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.validation.Valid;
 
 @Service
-public class PlayereService {
+public class PlayerService {
 
     PlayerRepository repo;
-    CardService cs;
-    GameService gs;
 
     @Autowired
-    public PlayereService(PlayerRepository repo, CardService cs, GameService gs) {
+    public PlayerService(PlayerRepository repo) {
         this.repo = repo;
-        this.cs = cs;
-        this.gs = gs;
+        //this.cs = cs;
     }
 
     @Transactional(readOnly = true)
@@ -38,11 +33,6 @@ public class PlayereService {
     @Transactional(readOnly = true)
     public Player getByName(String name) {
         return repo.findByName(name);
-    }
-
-    @Transactional(readOnly = true)
-    public Player getPlayerByUserAndGame(User u, Game g) {
-        return repo.findByUserAndGame(u, g);
     }
 
     @Transactional
@@ -69,17 +59,13 @@ public class PlayereService {
      */
 
     @Transactional(readOnly = true)
-    public String getRandomColor(Optional<List<Player>> players) {
+    public String getRandomColor(List<Player> players) {
 
         ArrayList<String> colours = new ArrayList<String>();
         colours.addAll(List.of("red", "blue", "green", "magenta", "orange", "pink", "purple", "pink", "cyan", "brown"));
         Collections.shuffle(colours);
 
-        if (players.isEmpty()) {
-            return colours.get(0);
-        }
-
-        players.get().forEach(p -> colours.remove(p.getColor()));
+        players.forEach(p -> colours.remove(p.getColor()));
         return colours.get(0);
     }
 
@@ -96,6 +82,7 @@ public class PlayereService {
             return p;
     }
 
+    /*
     @Transactional
     public Player statusChangeMC(@Valid Player p, @Valid Card c) {
         if (c.getCardType().toString().equals("Other")) {
@@ -128,6 +115,6 @@ public class PlayereService {
         }
 
         return repo.save(p);
-    }
+    }*/
 
 }

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.player.Player;
-import org.springframework.samples.dwarf.player.PlayereService;
+import org.springframework.samples.dwarf.player.PlayerService;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 public class PlayerDeserializer extends JsonDeserializer<Player> {
 
     @Autowired
-    private PlayereService ps;
+    private PlayerService ps;
 
     @Override
     public Player deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {

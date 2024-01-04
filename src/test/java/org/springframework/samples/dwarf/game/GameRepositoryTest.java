@@ -104,16 +104,4 @@ public class GameRepositoryTest {
         assertEquals(mockGames, result,
                 "La lista de juegos por fecha de finalización nula y fecha de inicio no nula no coincide");
     }
-
-    @Test
-    public void testGetPlayersByGameId() {
-        // Configurar el comportamiento del repositorio mock
-        Integer gameId = 1;
-        Optional<List<Player>> mockPlayers = Optional.of(new ArrayList<>());
-        when(gameRepository.getPlayersByGameId(gameId)).thenReturn(mockPlayers);
-
-        // Ejecutar el método del repositorio y verificar el resultado
-        Optional<List<Player>> result = gameRepository.getPlayersByGameId(gameId);
-        assertEquals(mockPlayers, result, "La lista de jugadores por ID de juego no coincide");
-    }
 }
