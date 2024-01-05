@@ -59,7 +59,7 @@ class UserRestController {
 
 	@GetMapping
 	public ResponseEntity<List<User>> findAll(@RequestParam(required = false) String auth) {
-		List<User> res = null;
+		List<User> res;
 		if (auth != null) {
 			res = (List<User>) userService.findAllByAuthority(auth);
 		} else
@@ -121,11 +121,9 @@ class UserRestController {
 	}
 
 	@GetMapping(value = "/{username}/loggedIn")
-	public List<User> getLoggedInUser(@PathVariable("username") String username,
-			@RequestParam(required = false) String auth) {
+	public List<User> getLoggedInUser(@PathVariable("username") String username) {
 		List<User> res = null;
-		if (auth != "ADMIN")
-			res = (List<User>) userService.findIsLogged(username);
+		res = (List<User>) userService.findIsLogged(username);
 		return res;
 	}
 
