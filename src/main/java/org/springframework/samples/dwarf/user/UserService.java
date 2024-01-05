@@ -17,10 +17,14 @@ package org.springframework.samples.dwarf.user;
 
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.friendRequest.FriendRequest;
+import org.springframework.samples.dwarf.friendRequest.FriendRequestRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,10 +34,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
 	private UserRepository userRepository;
+	private FriendRequestRepository friendRequestRepository;
 
 	@Autowired
-	public UserService(UserRepository userRepository) {
+	public UserService(UserRepository userRepository, FriendRequestRepository friendRequestRepository) {
 		this.userRepository = userRepository;
+		this.friendRequestRepository = friendRequestRepository;
 	}
 
 	@Transactional
@@ -107,6 +113,31 @@ public class UserService {
 				break;
 		}
 
+	}
+
+	public User userIsLoogedIn(String username) {
+		User toUpdate = findUser(username);
+		toUpdate.setIsLoggedIn(true);
+		userRepository.save(toUpdate);
+
+		return toUpdate;
+	}
+
+	public User userIsNotLoogedIn(String username) {
+		User toUpdate = findUser(username);
+		toUpdate.setIsLoggedIn(false);
+		userRepository.save(toUpdate);
+
+		return toUpdate;
+	}
+
+	@Transactional(readOnly = true)
+	public List<User> findIsLogged(String username) {
+		User currentUser = findUser(username);
+
+		List<User> res = userRepository.findByIsLoggedIn(true);
+
+		return res.stream().filter(u -> friendRequestRepository.areFriends(currentUser, u)).toList();
 	}
 
 }
