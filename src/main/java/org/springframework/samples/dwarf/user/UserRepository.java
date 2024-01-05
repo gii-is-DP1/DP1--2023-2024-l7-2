@@ -1,5 +1,6 @@
 package org.springframework.samples.dwarf.user;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -32,5 +33,8 @@ public interface UserRepository extends CrudRepository<User, String> {
 	Pageable pageable = PageRequest.of(0, 5, Sort.by(Order.asc("username")));
 
 	Page<User> findAll(Pageable pageable);
+
+	@Query("SELECT u FROM User u WHERE u.isLoggedIn = :b")
+	List<User> findByIsLoggedIn(boolean b);
 
 }

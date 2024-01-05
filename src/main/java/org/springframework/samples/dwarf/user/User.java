@@ -1,5 +1,7 @@
 package org.springframework.samples.dwarf.user;
 
+import java.util.Optional;
+
 import org.springframework.samples.dwarf.model.NamedEntity;
 
 import jakarta.persistence.Column;
@@ -41,5 +43,7 @@ public class User extends NamedEntity {
 		}
 		return cond;
 	}
+
+	public Boolean isLoggedIn;
 
 }
