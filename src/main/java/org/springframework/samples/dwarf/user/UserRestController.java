@@ -120,7 +120,7 @@ class UserRestController {
 
 	}
 
-	@GetMapping(value = "/{username}/loggedIn")
+	@GetMapping(value = "{username}/loggedIn")
 	public List<User> getLoggedInUser(@PathVariable("username") String username) {
 		List<User> res = null;
 		res = (List<User>) userService.findIsLogged(username);

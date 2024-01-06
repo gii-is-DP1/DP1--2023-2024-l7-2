@@ -16,7 +16,7 @@ export default function Home(){
     const [visible, setVisible] = useState(false);
     const [users, setUsers] = useFetchState(
         [],
-        `/api/v1/users/${tokenService.getUserName()}/loggedIn"`,
+        `/api/v1/users/${tokenService.getUserName()}/loggedIn`,
         jwt,
         setMessage,
         setVisible
