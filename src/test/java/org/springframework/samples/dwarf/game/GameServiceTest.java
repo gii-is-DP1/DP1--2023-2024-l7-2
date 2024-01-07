@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardType;
@@ -23,6 +24,7 @@ import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.game.GameRepository;
 import org.springframework.samples.dwarf.game.GameService;
+import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.player.Player;
@@ -85,8 +87,12 @@ public class GameServiceTest {
     }
 
 
-    @Test
+
+ @Test
     void testChangePlayerStart() {
+        // Initialize mocks
+        MockitoAnnotations.openMocks(this);
+
         // Arrange
         Game game = new Game();
         MainBoard mainBoard = new MainBoard();
@@ -94,15 +100,20 @@ public class GameServiceTest {
         Player player1 = new Player();
         Player player2 = new Player();
         Player player3 = new Player();
-        Player player4 = new Player();
+
         player1.setName("Player1");
         player2.setName("Player2");
         player3.setName("Player3");
-        player4.setName("Player4");
+
         player1.setId(1);
         player2.setId(2);
         player3.setId(3);
-        player4.setId(4);
+
+        Location location = new Location();
+        location.setPosition(1);
+        List<Location> locat = new ArrayList<>();
+        locat.add(location);
+        mainBoard.setLocations(locat);
 
         game.setPlayerCreator(player1);
         ArrayList<Pair<Player, Card>> helpCards = new ArrayList<>();
@@ -119,30 +130,28 @@ public class GameServiceTest {
         Card helpCard4 = new Card();
         helpCard4.setCardType(cardType1);
 
-        List <Card> l = new ArrayList<>();
+        List<Card> l = new ArrayList<>();
         l.add(helpCard1);
         l.add(helpCard2);
         l.add(helpCard3);
         l.add(helpCard4);
-        //mainBoard.setCards(l);
-        
+        location.setCards(l);
+
         helpCards.add(Pair.of(player1, helpCard1));
         helpCards.add(Pair.of(player2, helpCard2));
         helpCards.add(Pair.of(player3, helpCard3));
-        helpCards.add(Pair.of(player4, helpCard4));
 
+        game.setPlayerStart(player2);
 
-        game.setPlayerStart(player3);
-
-        List<Player> players = Arrays.asList(player1, player2, player3, player4);
+        List<Player> players = Arrays.asList(player1, player2, player3);
         when(playerRepository.findAll()).thenReturn(players);
-        
 
         // Act
         gameService.changePlayerStart(game, helpCards);
-        
-        assertEquals(player4, game.getPlayerStart());
-    }    
+
+        // Assert
+        assertEquals(player3, game.getPlayerStart());
+    }
     
    
 }

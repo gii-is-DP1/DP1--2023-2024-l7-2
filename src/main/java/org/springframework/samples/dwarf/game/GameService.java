@@ -408,9 +408,11 @@ public class GameService {
                     if (nextIndex < players.size()) {
                         Player nextPlayer = players.get(nextIndex);
                         g.setPlayerStart(nextPlayer);
+                        gr.save(g);
                         break; // Terminar el bucle después de cambiar el playerStart
                     } else {
                         g.setPlayerStart(g.getPlayerCreator());
+                        gr.save(g);
                         break; // Terminar el bucle después de cambiar el playerStart al creador del juego
                     }
                 } else {
