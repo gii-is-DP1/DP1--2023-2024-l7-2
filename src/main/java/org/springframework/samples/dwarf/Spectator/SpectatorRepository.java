@@ -1,4 +1,4 @@
-package org.springframework.samples.dwarf.Spectator;
+package org.springframework.samples.dwarf.spectator;
 
 import java.util.List;
 
