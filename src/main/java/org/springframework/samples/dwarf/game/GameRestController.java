@@ -633,6 +633,38 @@ public class GameRestController {
                 g.setMainBoard(mb);
                 gs.saveGame(g);
                 break;
+            
+            case "Sell an Item":
+                
+                Object selectedObject2 = request.getSelectedObject();
+                Integer selectedGold2 = request.getSelectedGold();
+                Integer selectedIron2 = request.getSelectedIron();
+                Integer selectedSteal2 = request.getSelectedSteal();
+                if (selectedGold2 != null && selectedIron2 != null
+                        && selectedSteal2 != null && selectedObject2 != null) {
+                    // Check if the sum of gold, iron, and steel is 5
+                    if (selectedGold2 + selectedIron2 + selectedSteal2 == 5) {
+
+                        // Check if at least one of each material is selected
+                        if (selectedGold2 > 0 && selectedIron2 > 0 && selectedSteal2 > 0) {
+
+                            // Update player's state
+                            p.setGold(p.getGold() + selectedGold2);
+                            p.setIron(p.getIron() + selectedIron2);
+                            p.setSteal(p.getSteal() + selectedSteal2);
+
+                            // Remove the selected object
+                            p.getObjects().remove(selectedObject2);
+
+                            // Save the updated player
+                            ps.savePlayer(p);
+
+                            return ResponseEntity.ok().build();
+                        }
+                    }
+                }
+
+                break;
 
             default:
                 break;
