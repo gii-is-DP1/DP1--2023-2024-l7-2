@@ -78,17 +78,6 @@ public class SecurityConfiguration {
 						.requestMatchers("/api/v1/game").authenticated()
 						.requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/game/**")).authenticated()
 
-						// online users
-						// .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET,
-						// "/api/v1/users/**"))
-						// .permitAll()
-						// .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT,
-						// "/api/v1/users/**"))
-						// .permitAll()
-						// .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST,
-						// "/api/v1/users/**"))
-						// .permitAll()
-
 						.anyRequest().authenticated())
 
 				.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
