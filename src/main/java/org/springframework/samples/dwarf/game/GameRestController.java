@@ -155,17 +155,6 @@ public class GameRestController {
         List<Card> cd = g.getMainBoard().getCards();
 
         return new ResponseEntity<>(cd, HttpStatus.OK);
-        /*
-         * // Si se ha acabado el mazo, se caba el juego
-         * Card c = g.getMainBoard().getCardDeck().getLastCard();
-         * Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
-         * if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-         * // Returns an empty list
-         * return new ResponseEntity<>(List.of(), HttpStatus.OK);
-         * }
-         * 
-         * List<Card> cd = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
-         */
     }
 
     @GetMapping("/play/{code}/getSpecialCards")
@@ -186,11 +175,6 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
 
-        if (g.getStart() != null) {
-            // TODO: Create error
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
         User u = us.findCurrentUser();
 
         // if a player already exists in a game he can just join the game :)
@@ -199,6 +183,10 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
+        if (g.getStart() != null) {
+            // TODO: Create error
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         
         if (!gs.gameContainsPlayer(g, u)) {
             Player p = ps.initialize(u.getUsername());
@@ -227,19 +215,14 @@ public class GameRestController {
         }
         Game g = g_tmp.get();
 
-        if (g.getStart() != null) {
+        if (g.getIsPublic() == false || g.getStart() != null) {
             // TODO: Create error
             // El juego ya ha comenzado
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         User u = us.findCurrentUser();
-
-        if (g == null || u == null) {
-            // TODO: Create error
-            return ResponseEntity.notFound().build();
-        }
-        // if a player already exists in a game he can just join the game :)
+        // if a player already exists in a game he cant just join the game :)
 
         if (!gs.gameContainsPlayer(g, u)) {
             Player p = ps.initialize(u.getUsername());
@@ -262,11 +245,6 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
 
-        if (g.getStart() != null) {
-            // TODO: Create error
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
         User u = us.findCurrentUser();
 
         // if a player already exists in a game he can just join the game :)
@@ -275,6 +253,11 @@ public class GameRestController {
             // TODO: Create error
             return ResponseEntity.notFound().build();
         }
+        if (g.getStart() != null) {
+            // TODO: Create error
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         if (!gs.gameContainsSpectator(g, u)) {
             Spectator s = specservice.initialize(u.getUsername());
 

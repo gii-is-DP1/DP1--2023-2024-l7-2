@@ -24,11 +24,7 @@ export default function GameJoin() {
     function handleSubmit(event) {
 
         event.preventDefault();
-
-        
-
     }
-
 
     function handleSubmit(event) {
 
