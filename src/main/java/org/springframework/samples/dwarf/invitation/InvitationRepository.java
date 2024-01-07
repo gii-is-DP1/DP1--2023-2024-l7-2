@@ -11,9 +11,10 @@ import org.springframework.stereotype.Repository;
 public interface InvitationRepository extends CrudRepository<Invitation, Integer>{
     
     public List<Invitation> findAll();
-
-    public Invitation findById();
-
-    @Query("SELECT inv FROM Invitation iv WHERE iv.sender = :u OR iv.receiver = :u")
-	public List<Invitation> findByUser(User u);
+    /*
+     * public Invitation findById();
+     */
+    
+   
 }
+   
