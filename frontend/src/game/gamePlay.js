@@ -164,21 +164,19 @@ export default function GamePlay() {
   
   function selectCard(id,card) {
     if (isMyTurn === false) {
-      console.log("is not your turn")
+      setMessage("It is not your turn");
+      setVisible(true);
       return false; // Just a random return to ensure that function exits
     }
 
     if (selectedCards[id] !== null && selectedCards[id] !== undefined) {
       // Card is already selected, you can't select it
-      console.log(selectedCards)
-      console.log(id);
-      console.log(selectedCards[id])
+      setMessage("Card already selected");
+      setVisible(true);
       return false;
     }
     
     if (choosedCard === card) {
-      //console.log("we are filtering")
-      //setChoosedCard(choosedCard.filter((c) => c.position !== card.position))
       setChoosedCard(null);
     } else {
       if (choosedCard === null) {
@@ -191,7 +189,8 @@ export default function GamePlay() {
 
   function selectSpecialCard(id,specialCard) {
     if (isMyTurn === false) {
-      console.log("is not your turn")
+      setMessage("It is not your turn");
+      setVisible(true);
       return false; // Just a random return to ensure that function exits
     }
     setSpecialCardToBeConfirmed(true);
@@ -265,6 +264,8 @@ export default function GamePlay() {
       }}
       code={code}
     ></ChatModel>
+
+    {getErrorModal(setVisible,visible,message)}
     <div style={{marginTop: "70px"}}>
 
       <div className="admin-page-container">
