@@ -21,14 +21,7 @@ export default function GameJoin() {
 
     const modal = getErrorModal(setVisible, visible, message);
 
-    function handleSubmit(event) {
-
-        event.preventDefault();
-
-        
-
-    }
-
+    
 
     function handleSubmit(event) {
 
@@ -86,6 +79,10 @@ export default function GameJoin() {
 
     }
 
+    function handlePublicGamesClick() {
+        window.location.href = '/game/publics';
+    }
+
     function handleChange(event) {
         const target = event.target;
         const value = target.value;
@@ -121,6 +118,12 @@ export default function GameJoin() {
                                         </Button>
                                     </div>
                                 </Form>
+                                {/* Botón para redirigir a /games/publics */}
+                                <div className="custom-button-row">
+                                    <Button className="btn btn-dark btn-lg" outline color="warning" size="lg" onClick={handlePublicGamesClick}>
+                                        Ver Juegos Públicos
+                                    </Button>
+                            </div>
                     </div>
                     <div className="col game-create-container">
                             <h1 className="text-center" style={{ color: 'white'}}>
@@ -135,4 +138,11 @@ export default function GameJoin() {
             </div>
         </div>
     );
+
+    
+    
+
+
+
+
 }
