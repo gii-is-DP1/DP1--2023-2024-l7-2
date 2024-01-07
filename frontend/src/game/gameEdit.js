@@ -50,7 +50,7 @@ export default function GameEdit() {
     function handleSubmit(event) {
 
         event.preventDefault();
-
+        
         fetch(
             "/api/v1/game" + (game.id ? "/" + game.id : ""),
             {

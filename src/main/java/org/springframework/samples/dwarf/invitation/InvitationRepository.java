@@ -13,8 +13,11 @@ public interface InvitationRepository extends CrudRepository<Invitation, Integer
 
     public List<Invitation> findAll();
 
+
     public Optional<Invitation> findById(Integer id);
 
     @Query("SELECT fr FROM Invitation fr WHERE fr.sender = :u OR fr.receiver = :u")
     public List<Invitation> findByUser(User u);
+
 }
+   

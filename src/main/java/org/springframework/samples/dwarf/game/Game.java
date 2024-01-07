@@ -54,4 +54,5 @@ public class Game extends NamedEntity {
     @NotNull
     Boolean isPublic = false;
 
+    
 }

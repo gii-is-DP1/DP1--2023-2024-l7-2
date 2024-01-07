@@ -30,7 +30,7 @@ import GameEnd from "./game/gameEnd";
 
 import CardViewer from "./cards/cardViewer";
 import CardList from "./cards/cardList";
-
+import GamesPublics from "./game/gamesPublics";
 
 
 
@@ -94,9 +94,9 @@ function App() {
           <Route path="/rules" exact={true} element={<PrivateRoute><RulesText/></PrivateRoute>}/>
           <Route path="/user" exact={true} element={<PrivateRoute><UserPage/></PrivateRoute>}/>
           <Route path="/user/:userId" exact={true} element={<PrivateRoute><UserEditPage/></PrivateRoute>}/>
-
           <Route path="/game/:gameId/finish" exact={true} element={<PrivateRoute><GameEnd/></PrivateRoute>} />
-         
+          <Route path="/game/publics" exact={true} element={<PrivateRoute><GamesPublics/></PrivateRoute>} />
+
 
           
 
@@ -108,6 +108,7 @@ function App() {
       <>        
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        
       </>
     )
   } else {

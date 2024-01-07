@@ -28,6 +28,7 @@ import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -744,10 +745,15 @@ public class GameRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/publics")
-      public ResponseEntity<List<Game>> publicGames(@PathVariable("code") String code){
-            List<Game> listGame= gs.getAllPublicGames();
+    @GetMapping("/publics")
+      public ResponseEntity<List<Game>> publicGames(){
+        try {
+            List<Game> listGame = gs.getAllPublicGames();
             return new ResponseEntity<>(listGame, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
       }
 
     
