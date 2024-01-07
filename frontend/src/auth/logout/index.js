@@ -5,9 +5,28 @@ import "../../static/css/auth/authPage.css";
 import tokenService from "../../services/token.service";
 
 const Logout = () => {
+
+  const jwt = tokenService.getLocalAccessToken();
+
+  async function logout() {
+    await fetch(`/api/users/${tokenService.getUserName()}/logout`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      }
+    })
+    .then(function (data) {
+      tokenService.setUser(data);
+      tokenService.updateLocalAccessToken(data.token);
+    });      
+
+  }
   function sendLogoutRequest() {
     const jwt = window.localStorage.getItem("jwt");
     if (jwt || typeof jwt === "undefined") {
+      logout();
       tokenService.removeUser();
       window.location.href = "/";
     } else {

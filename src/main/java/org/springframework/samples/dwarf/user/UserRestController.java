@@ -19,6 +19,7 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -80,7 +81,7 @@ class UserRestController {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
-	@GetMapping(value ="{id}")
+	@GetMapping(value = "{id}")
 	public ResponseEntity<User> findById(@PathVariable("id") Integer id) {
 		return new ResponseEntity<>(userService.findUserById(id), HttpStatus.OK);
 	}
@@ -104,6 +105,12 @@ class UserRestController {
 		return new ResponseEntity<>(this.userService.updateUser(user, id), HttpStatus.OK);
 	}
 
+	@PutMapping(value = "{username}/logout")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<User> userIsNotLoogedIn(@PathVariable("username") String username) {
+		return new ResponseEntity<>(this.userService.userIsNotLoogedIn(username), HttpStatus.OK);
+	}
+
 	@DeleteMapping(value = "{userId}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<MessageResponse> delete(@PathVariable("userId") int id) {
@@ -111,6 +118,13 @@ class UserRestController {
 		userService.deleteUser(id);
 		return new ResponseEntity<>(new MessageResponse("User deleted!"), HttpStatus.OK);
 
+	}
+
+	@GetMapping(value = "{username}/loggedIn")
+	public List<User> getLoggedInUser(@PathVariable("username") String username) {
+		List<User> res = null;
+		res = (List<User>) userService.findIsLogged(username);
+		return res;
 	}
 
 }

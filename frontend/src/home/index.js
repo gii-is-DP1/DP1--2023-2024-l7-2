@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css';
 import '../static/css/home/home.css'; 
-import { Button } from "reactstrap";
+import useFetchState from "../util/useFetchState";
+import { Button, Table} from "reactstrap";
 import { Link } from "react-router-dom";
 import tokenService from '../services/token.service.js';
 import jwt_decode from "jwt-decode";
 
+const jwt = tokenService.getLocalAccessToken();
+
 export default function Home(){
 
-    const jwt = tokenService.getLocalAccessToken();
     const [role, setRole] = useState([]);
+    const [message, setMessage] = useState(null);
+    const [visible, setVisible] = useState(false);
+    const [users, setUsers] = useFetchState(
+        [],
+        `/api/v1/users/${tokenService.getUserName()}/loggedIn`,
+        jwt,
+        setMessage,
+        setVisible
+    );
 
     useEffect(() => {
         if (jwt) {
@@ -18,8 +29,16 @@ export default function Home(){
     }, [jwt])
 
 
+    const userList = users.map((user) => {
+        return (
+        <tr key={user.id}>
+            <td>{user.username}</td>
+        </tr>
+        );
+    });
     let userLinks = <></>;
     let publicLinks = <></>;
+    console.log(users)
 
     if (!jwt) {
         publicLinks = (
@@ -41,10 +60,25 @@ export default function Home(){
 
     return(
         <div className="home-page-container">
-            <div className="hero-div" style={{marginTop: "150px"}}>
-                    {publicLinks}
-                    {userLinks}
-            </div>
+                    <div className="row-6">
+                        <div className="hero-div" style={{ marginTop: "150px" }}>
+                            {publicLinks}
+                            {userLinks}
+                        </div>
+                    </div>
+                    {jwt?<div className="row-6">
+                        <div className="text-center">
+                            <Table aria-label="users" className="mt-4">
+                                <thead>
+                                    <tr>
+                                        <th>Online players</th>
+                                    </tr>
+                                </thead>
+                                <tbody>{userList}</tbody>
+                            </Table>
+                        </div>
+                    </div>
+                    :<br></br>}
         </div>
     );
 }
