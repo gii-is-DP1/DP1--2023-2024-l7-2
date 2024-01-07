@@ -1,4 +1,4 @@
-package org.springframework.samples.dwarf.Spectator;
+package org.springframework.samples.dwarf.spectator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,7 +63,6 @@ public class SpectatorService {
         colours.addAll(List.of("red", "blue", "green", "magenta", "orange", "pink", "purple", "pink", "cyan", "brown"));
         Collections.shuffle(colours);
 
-
         players.forEach(p -> colours.remove(p.getColor()));
         return colours.get(0);
     }
@@ -72,7 +71,7 @@ public class SpectatorService {
     @Transactional(readOnly = true)
     public Spectator initialize(String username) {
         Spectator p = new Spectator();
-            
+
         p.setName(username);
         return p;
     }

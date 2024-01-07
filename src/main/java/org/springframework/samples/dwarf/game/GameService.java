@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
-import org.springframework.samples.dwarf.Spectator.Spectator;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
@@ -19,9 +18,9 @@ import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
-import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
+import org.springframework.samples.dwarf.spectator.Spectator;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
 
@@ -75,7 +74,6 @@ public class GameService {
     public Optional<Game> getGameById(Integer id) {
         return gr.findById(id);
     }
-
 
     @Transactional(readOnly = true)
     public Game getGameByCode(String code) {
@@ -131,7 +129,7 @@ public class GameService {
     public Boolean gameContainsPlayer(Game g, User u) {
         Boolean res = false;
 
-        for (Player p: g.getPlayers()) {
+        for (Player p : g.getPlayers()) {
             if (p.getUser().equals(u)) {
                 res = true;
                 break;
@@ -144,7 +142,7 @@ public class GameService {
     public Boolean gameContainsSpectator(Game g, User u) {
         Boolean res = false;
 
-        for (Spectator s: g.getSpectators()) {
+        for (Spectator s : g.getSpectators()) {
             if (s.getUser().equals(u)) {
                 res = true;
                 break;
@@ -152,7 +150,6 @@ public class GameService {
         }
         return res;
     }
-    
 
     @Transactional(readOnly = true)
     public List<Player> getRemainingTurns(List<Player> plys, List<Dwarf> dwarves, Player starter) {
@@ -345,10 +342,10 @@ public class GameService {
 
     }
 
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Player getPlayerByUserAndGame(User u, Game g) {
         Player res = null;
-        for (Player p: g.getPlayers()) {
+        for (Player p : g.getPlayers()) {
             if (p.getUser().equals(u)) {
                 res = p;
                 break;
@@ -356,7 +353,6 @@ public class GameService {
         }
         return res;
     }
-
 
     @Transactional(readOnly = true)
     public boolean checkPlayerInGameAndGameExists(Game g) {
@@ -425,8 +421,6 @@ public class GameService {
         gr.save(g);
     }
 
-
-
     public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p) {
 
     }
@@ -439,7 +433,5 @@ public class GameService {
         p.setObjects(null);
         p.setSteal(0);
     }
-
-    
 
 }

@@ -3,11 +3,12 @@ package org.springframework.samples.dwarf.game;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.samples.dwarf.Spectator.Spectator;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.model.NamedEntity;
 import org.springframework.samples.dwarf.player.Player;
+import org.springframework.samples.dwarf.spectator.Spectator;
+import org.springframework.samples.dwarf.chat.Chat;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -53,5 +54,8 @@ public class Game extends NamedEntity {
 
     @NotNull
     Boolean isPublic = false;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    Chat chat;
 
 }

@@ -10,11 +10,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.samples.dwarf.Spectator.Spectator;
-import org.springframework.samples.dwarf.Spectator.SpectatorService;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
+import org.springframework.samples.dwarf.chat.Chat;
+import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
@@ -26,8 +26,11 @@ import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
+import org.springframework.samples.dwarf.spectator.Spectator;
+import org.springframework.samples.dwarf.spectator.SpectatorService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,11 +60,12 @@ public class GameRestController {
     private final LocationService ls;
     private final DwarfService ds;
     private final SpectatorService specservice;
+    private final ChatService chatservice;
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayerService ps,
             MainBoardService mbs, CardDeckService cds, DwarfService ds,
-            SpecialCardDeckService scds, LocationService ls, SpectatorService specservice) {
+            SpecialCardDeckService scds, LocationService ls, SpectatorService specservice, ChatService chatservice) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
@@ -71,6 +75,7 @@ public class GameRestController {
         this.ds = ds;
         this.ls = ls;
         this.specservice = specservice;
+        this.chatservice = chatservice;
     }
 
     @GetMapping
@@ -191,7 +196,7 @@ public class GameRestController {
         if (!gs.gameContainsPlayer(g, u)) {
             Player p = ps.initialize(u.getUsername());
             p.setColor(ps.getRandomColor(g.getPlayers()));
-            
+
             p.setUser(u);
             p.setObjects(new ArrayList<Object>());
 
@@ -299,6 +304,9 @@ public class GameRestController {
         g.setPlayerCreator(p);
         g.setPlayerStart(p);
         g.setPlayers(List.of(p));
+
+        Chat chat = chatservice.initialize();
+        g.setChat(chat);
 
         gs.saveGame(g);
 
@@ -616,9 +624,9 @@ public class GameRestController {
                 g.setMainBoard(mb);
                 gs.saveGame(g);
                 break;
-            
+
             case "Sell an Item":
-                
+
                 Object selectedObject2 = request.getSelectedObject();
                 Integer selectedGold2 = request.getSelectedGold();
                 Integer selectedIron2 = request.getSelectedIron();
@@ -727,11 +735,24 @@ public class GameRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/publics")
-      public ResponseEntity<List<Game>> publicGames(@PathVariable("code") String code){
-            List<Game> listGame= gs.getAllPublicGames();
+    @GetMapping("/publics")
+    public ResponseEntity<List<Game>> publicGames() {
+        try {
+            List<Game> listGame = gs.getAllPublicGames();
             return new ResponseEntity<>(listGame, HttpStatus.OK);
-      }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-    
+    @GetMapping("/play/{code}/chat")
+    public ResponseEntity<Chat> getChat(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(g.getChat(), HttpStatus.OK);
+    }
+
 }

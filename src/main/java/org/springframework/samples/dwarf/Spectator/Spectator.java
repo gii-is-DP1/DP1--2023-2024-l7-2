@@ -1,4 +1,4 @@
-package org.springframework.samples.dwarf.Spectator;
+package org.springframework.samples.dwarf.spectator;
 
 import org.springframework.samples.dwarf.model.NamedEntity;
 import org.springframework.samples.dwarf.user.User;
