@@ -162,6 +162,23 @@ export default function GamePlay() {
     })
   }, [gameRound, specialCardToBeConfirmed])
   
+  function checkResourcesSelectCard(card) {
+    
+    if (card.totalGold * -1 > player.gold) {
+      return false;
+    }
+
+    if (card.totalIron * -1 > player.iron) {
+      return false;
+    }
+
+    if (card.totalSteal * -1 > player.gold) {
+      return false;
+    }
+
+    return true;
+  }
+
   function selectCard(id,card) {
     if (isMyTurn === false) {
       setMessage("It is not your turn");
@@ -172,6 +189,12 @@ export default function GamePlay() {
     if (selectedCards[id] !== null && selectedCards[id] !== undefined) {
       // Card is already selected, you can't select it
       setMessage("Card already selected");
+      setVisible(true);
+      return false;
+    }
+
+    if (!checkResourcesSelectCard(card)) {
+      setMessage("You don't have enough resources to select this card");
       setVisible(true);
       return false;
     }
