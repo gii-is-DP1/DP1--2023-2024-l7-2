@@ -47,10 +47,18 @@ export default function GameEdit() {
     const modal = getErrorModal(setVisible, visible, message);
     const role = jwt_decode(jwt).authorities[0];
 
+    function getRandomCode(name) {
+        return Math.random()*550050+name+Math.random()*110010
+    }
+
     function handleSubmit(event) {
 
         event.preventDefault();
-        
+
+        if(game.isPublic) {
+            game.code = getRandomCode(game.name)
+        }
+
         fetch(
             "/api/v1/game" + (game.id ? "/" + game.id : ""),
             {
@@ -109,17 +117,20 @@ export default function GameEdit() {
                             className="custom-input"
                         />
                     </div>
-                    <div  className="custom-form-input">
-                        <Label for="code" className="custom-form-input-label"> Code </Label>
-                        <Input
-                            type="text"
-                            name="code"
-                            id="code"
-                            value={game.code || ""}
-                            onChange={(e) => setGame({ ...game, code: e.target.value })}
-                            className="custom-input"
-                        />
-                    </div>
+                    {
+                        !game.isPublic &&
+                        <div  className="custom-form-input">
+                            <Label for="code" className="custom-form-input-label"> Code </Label>
+                            <Input
+                                type="text"
+                                name="code"
+                                id="code"
+                                value={game.code || ""}
+                                onChange={(e) => setGame({ ...game, code: e.target.value })}
+                                className="custom-input"
+                            />
+                        </div>
+                    }
                     <div className="custom-form-input">
                         <Label for="isPublic" className="custom-form-input-label">Public</Label>
                         <Input

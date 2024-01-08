@@ -38,7 +38,7 @@ public class GameRestControllerTest {
         playerService = mock(PlayerService.class);
         locationService = mock(LocationService.class);
 
-        gameRestController = new GameRestController(gameService, userService, playerService, null, null, null, null,
+        gameRestController = new GameRestController(gameService, userService, playerService, null, null,
                 locationService, null, null);
     }
 

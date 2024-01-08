@@ -8,6 +8,7 @@ import Card from "./../cards/card"
 import SpecialCard from "../cards/specialCard";
 import  { isFinished, sendCard, isStart, resign}  from "./gameFunctions";
 import ConfirmSpecialCardModel from "./modals/ConfirmSpecialCardModel";
+import ChatModel from "./modals/ChatModel";
 import useIntervalFetchState from "../util/useIntervalFetchState";
 
 import '../static/css/game/objects.css'; 
@@ -29,6 +30,7 @@ export default function GamePlay() {
   const [choosedCard, setChoosedCard] = useState(null);
   const [choosedSpecialCard, setChoosedSpecialCard] = useState(null);
   const [specialCardToBeConfirmed, setSpecialCardToBeConfirmed] = useState(false);
+  const [showChat,setShowChat] = useState(false);
   const [cards, setCards] = useFetchState(
     [],
     `/api/v1/game/play/${code}/getCards`,
@@ -160,23 +162,44 @@ export default function GamePlay() {
     })
   }, [gameRound, specialCardToBeConfirmed])
   
+  function checkResourcesSelectCard(card) {
+    
+    if (card.totalGold * -1 > player.gold) {
+      return false;
+    }
+
+    if (card.totalIron * -1 > player.iron) {
+      return false;
+    }
+
+    if (card.totalSteal * -1 > player.gold) {
+      return false;
+    }
+
+    return true;
+  }
+
   function selectCard(id,card) {
     if (isMyTurn === false) {
-      console.log("is not your turn")
+      setMessage("It is not your turn");
+      setVisible(true);
       return false; // Just a random return to ensure that function exits
     }
 
     if (selectedCards[id] !== null && selectedCards[id] !== undefined) {
       // Card is already selected, you can't select it
-      console.log(selectedCards)
-      console.log(id);
-      console.log(selectedCards[id])
+      setMessage("Card already selected");
+      setVisible(true);
+      return false;
+    }
+
+    if (!checkResourcesSelectCard(card)) {
+      setMessage("You don't have enough resources to select this card");
+      setVisible(true);
       return false;
     }
     
     if (choosedCard === card) {
-      //console.log("we are filtering")
-      //setChoosedCard(choosedCard.filter((c) => c.position !== card.position))
       setChoosedCard(null);
     } else {
       if (choosedCard === null) {
@@ -189,7 +212,8 @@ export default function GamePlay() {
 
   function selectSpecialCard(id,specialCard) {
     if (isMyTurn === false) {
-      console.log("is not your turn")
+      setMessage("It is not your turn");
+      setVisible(true);
       return false; // Just a random return to ensure that function exits
     }
     setSpecialCardToBeConfirmed(true);
@@ -255,6 +279,17 @@ export default function GamePlay() {
       card={choosedSpecialCard}
       code={code}
     ></ConfirmSpecialCardModel>
+
+    <ChatModel
+      isOpen={showChat}
+      toggle={() => {
+        setShowChat(!showChat)
+      }}
+      code={code}
+      player={player}
+    ></ChatModel>
+
+    {getErrorModal(setVisible,visible,message)}
     <div style={{marginTop: "70px"}}>
 
       <div className="admin-page-container">
@@ -270,8 +305,12 @@ export default function GamePlay() {
             </Button>
         }
 
+        <Button onClick={() => {
+          setShowChat(!showChat)
+        }}>Show Chat</Button>
         { (gameStarted || game != {} && game.playerCreator && game.playerCreator.name !== user.username) &&
         <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
+
 
             <Button
               onClick={() => {

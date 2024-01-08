@@ -21,7 +21,6 @@ public class Message extends BaseEntity {
     @NotBlank
     String text;
 
-    @NotNull
     LocalDateTime sentTime;
 
     @ManyToOne(optional = false)

@@ -15,6 +15,7 @@ import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
+import org.springframework.samples.dwarf.chat.Message;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
@@ -30,7 +31,6 @@ import org.springframework.samples.dwarf.spectator.Spectator;
 import org.springframework.samples.dwarf.spectator.SpectatorService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,8 +55,6 @@ public class GameRestController {
     private final UserService us;
     private final PlayerService ps;
     private final MainBoardService mbs;
-    private final CardDeckService cds;
-    private final SpecialCardDeckService scds;
     private final LocationService ls;
     private final DwarfService ds;
     private final SpectatorService specservice;
@@ -64,14 +62,12 @@ public class GameRestController {
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayerService ps,
-            MainBoardService mbs, CardDeckService cds, DwarfService ds,
-            SpecialCardDeckService scds, LocationService ls, SpectatorService specservice, ChatService chatservice) {
+            MainBoardService mbs, DwarfService ds,
+            LocationService ls, SpectatorService specservice, ChatService chatservice) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
         this.mbs = mbs;
-        this.cds = cds;
-        this.scds = scds;
         this.ds = ds;
         this.ls = ls;
         this.specservice = specservice;
@@ -160,17 +156,6 @@ public class GameRestController {
         List<Card> cd = g.getMainBoard().getCards();
 
         return new ResponseEntity<>(cd, HttpStatus.OK);
-        /*
-         * // Si se ha acabado el mazo, se caba el juego
-         * Card c = g.getMainBoard().getCardDeck().getLastCard();
-         * Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
-         * if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-         * // Returns an empty list
-         * return new ResponseEntity<>(List.of(), HttpStatus.OK);
-         * }
-         * 
-         * List<Card> cd = cds.getTwoCards(g.getMainBoard().getCardDeck().getId());
-         */
     }
 
     @GetMapping("/play/{code}/getSpecialCards")
@@ -191,11 +176,6 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
 
-        if (g.getStart() != null) {
-            // TODO: Create error
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
         User u = us.findCurrentUser();
 
         // if a player already exists in a game he can just join the game :)
@@ -204,6 +184,11 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
+        if (g.getStart() != null) {
+            // TODO: Create error
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
         if (!gs.gameContainsPlayer(g, u)) {
             Player p = ps.initialize(u.getUsername());
             p.setColor(ps.getRandomColor(g.getPlayers()));
@@ -231,19 +216,14 @@ public class GameRestController {
         }
         Game g = g_tmp.get();
 
-        if (g.getStart() != null) {
+        if (g.getIsPublic() == false || g.getStart() != null) {
             // TODO: Create error
             // El juego ya ha comenzado
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         User u = us.findCurrentUser();
-
-        if (g == null || u == null) {
-            // TODO: Create error
-            return ResponseEntity.notFound().build();
-        }
-        // if a player already exists in a game he can just join the game :)
+        // if a player already exists in a game he cant just join the game :)
 
         if (!gs.gameContainsPlayer(g, u)) {
             Player p = ps.initialize(u.getUsername());
@@ -266,11 +246,6 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
 
-        if (g.getStart() != null) {
-            // TODO: Create error
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
         User u = us.findCurrentUser();
 
         // if a player already exists in a game he can just join the game :)
@@ -279,6 +254,11 @@ public class GameRestController {
             // TODO: Create error
             return ResponseEntity.notFound().build();
         }
+        if (g.getStart() != null) {
+            // TODO: Create error
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         if (!gs.gameContainsSpectator(g, u)) {
             Spectator s = specservice.initialize(u.getUsername());
 
@@ -763,11 +743,28 @@ public class GameRestController {
     }
 
     @GetMapping("/play/{code}/chat")
-    public ResponseEntity<Chat> getChat(@PathVariable("code") String code) {
+    public ResponseEntity<List<Message>> getChat(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
         if (g == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(g.getChat().getMessages(), HttpStatus.OK);
+    }
+
+    @PostMapping("/play/{code}/chat")
+    public ResponseEntity<Chat> receiveMessage(@PathVariable("code") String code, @Valid @RequestBody Message msg) {
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        User u = us.findCurrentUser();
+
+        msg.setSentTime(LocalDateTime.now());
+        msg.setSender(u);
+
+        chatservice.saveMessage(g.getChat(), msg);
+
         return new ResponseEntity<>(g.getChat(), HttpStatus.OK);
     }
 
