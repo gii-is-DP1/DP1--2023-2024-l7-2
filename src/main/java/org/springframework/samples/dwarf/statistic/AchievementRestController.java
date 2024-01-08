@@ -1,5 +1,7 @@
 package org.springframework.samples.dwarf.statistic;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -8,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.game.Game;
+import org.springframework.samples.dwarf.user.User;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -80,4 +84,38 @@ public class AchievementRestController {
 		achievementService.deleteAchievementById(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
+
+	@GetMapping("/{name}")
+	public ResponseEntity<Integer> findAllWinnedGames(@PathVariable("name") String name) {
+		List<Game> gamesToGet = achievementService.getAllWinnedGames(name);
+		Integer res = gamesToGet.size();
+		if (gamesToGet == null)
+			throw new ResourceNotFoundException("Games with name " + name + " not found!");
+		return new ResponseEntity<Integer>(res, HttpStatus.OK);
+	}
+
+	@GetMapping("/{user}")
+	public ResponseEntity<Integer> findAllPlayedGames(@PathVariable("user") User user) {
+		List<Game> gamesToGet = achievementService.getPlayedGames(user);
+		Integer res = gamesToGet.size();
+		if (gamesToGet == null)
+			throw new ResourceNotFoundException("Games with name " + user + " not found!");
+		return new ResponseEntity<Integer>(res, HttpStatus.OK);
+	}
+
+	@GetMapping("/{user}")
+	public ResponseEntity<Long> findAllGameTime(@PathVariable("user") User user) {
+		List<Game> gamesToGet = achievementService.getPlayedGames(user);
+		List<Long> gameTimes = null;
+		for(Game g : gamesToGet){
+			gameTimes.add(ChronoUnit.HOURS.between(g.getStart(), g.getFinish()));
+			
+		}
+		long res = gameTimes.stream().mapToLong(Long::longValue).sum();
+		if (gameTimes == null)
+			throw new ResourceNotFoundException("Games with name " + user + " not found!");
+		return new ResponseEntity<Long>(res, HttpStatus.OK);
+	}
+
+
 }

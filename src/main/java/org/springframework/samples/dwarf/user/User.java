@@ -1,13 +1,16 @@
 package org.springframework.samples.dwarf.user;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import org.springframework.samples.dwarf.model.NamedEntity;
+import org.springframework.samples.dwarf.statistic.Achievement;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -30,6 +33,9 @@ public class User extends NamedEntity {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "authority")
 	Authorities authority;
+
+	@OneToMany
+ 	private Collection<Achievement> achievements;
 
 	public Boolean hasAuthority(String auth) {
 		return authority.getAuthority().equals(auth);
