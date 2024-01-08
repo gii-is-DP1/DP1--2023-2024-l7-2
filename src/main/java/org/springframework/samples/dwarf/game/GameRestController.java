@@ -536,8 +536,9 @@ public class GameRestController {
         // en esa posicion.
         Card reverseCard = specialCard.getTurnedSide();
         List<Dwarf> roundDwarves = g.getDwarves();
+        Integer round = g.getRound();
         roundDwarves = roundDwarves.stream()
-                .filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null && d.getCard() != null).toList();
+                .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
 
         for (Dwarf d : roundDwarves) {
             Card dwarfCard = d.getCard();
@@ -549,18 +550,12 @@ public class GameRestController {
             }
         }
 
-        MainBoard mb = g.getMainBoard();
-        ArrayList<Location> newLocations = new ArrayList<>();
-        newLocations.addAll(mb.getLocations());
-        Location locationToUpdate = newLocations.get(reverseCard.getPosition() - 1);
-        locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
-        newLocations.set(reverseCard.getPosition() - 1, locationToUpdate);
-        mb.setLocations(newLocations);
-        mbs.saveMainBoard(mb);
 
-        g.setMainBoard(mb);
+        g = mbs.applyReverseSpecialCard(g, reverseCard);
         gs.saveGame(g);
+        MainBoard mb = g.getMainBoard();
 
+        
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case "Muster an army":

@@ -9,6 +9,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.card.SpecialCardRepository;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.game.Game;
+import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,26 +60,25 @@ public class SpecialCardDeckService {
         Collections.shuffle(cards);
 
         scd.setSpecialCards(cards);
-        scd.setLastSpecialCard(cards.get(0));
 
         saveSpecialCardDeck(scd);
         return scd;
     }
 
     @Transactional
-    public SpecialCard getSpecialCard(Integer id) {
-        List<SpecialCard> cards = getSpecialCardDeckById(id).getSpecialCards();
+    public SpecialCard getSpecialCard(MainBoard mb) {
+        SpecialCardDeck speccarddeck = mb.getSpecialCardDeck(); 
 
-        // Collections.shuffle(cards);
+        ArrayList<SpecialCard> cards = new ArrayList<>();
+        cards.addAll(speccarddeck.getSpecialCards());
 
-        SpecialCard lastCard = getSpecialCardDeckById(id).getLastSpecialCard();
-        Integer lastCardIndex = cards.indexOf(lastCard);
+        SpecialCard res = cards.get(0);
+        cards.remove(res);
 
-        SpecialCardDeck newScd = getSpecialCardDeckById(id);
-        newScd.setLastSpecialCard(cards.get(lastCardIndex + 1));
-        updateSpecialCardDeck(newScd, id);
+        speccarddeck.setSpecialCards(cards);
+        saveSpecialCardDeck(speccarddeck);
 
-        return cards.get(lastCardIndex);
+        return res;
     }
 
     @Transactional

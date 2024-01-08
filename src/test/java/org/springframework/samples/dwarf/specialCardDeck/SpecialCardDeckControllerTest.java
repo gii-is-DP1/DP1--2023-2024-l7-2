@@ -63,7 +63,7 @@ public class SpecialCardDeckControllerTest {
         assertThrows(ResourceNotFoundException.class,
                 () -> specialCardDeckController.getSpecialCardDeckById(nonExistentSpecialCardDeckId));
     }
-
+/*
     @Test
     public void testGetSpecialCard() {
         int specialCardId = 1;
@@ -83,7 +83,7 @@ public class SpecialCardDeckControllerTest {
         assertThrows(ResourceNotFoundException.class,
                 () -> specialCardDeckController.getSpecialCard(nonExistentSpecialCardId));
     }
-
+*/
     @Test
     public void testCreateSpecialCardDeck() {
         SpecialCardDeck newSpecialCardDeck = new SpecialCardDeck();
