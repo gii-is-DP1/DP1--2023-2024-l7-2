@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import tokenService from "../services/token.service";
 import jwtDecode from 'jwt-decode';
+import { Button } from 'reactstrap';
 
 const jwt = tokenService.getLocalAccessToken();
 
@@ -68,6 +69,7 @@ const GamesPublics = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
       <h1 style={{ marginBottom: '20px' }}>Lista de Juegos Públicos</h1>
+      <Button onClick={() => { window.location.href = '/game/'}}>Crear juego o unirse a partida privada</Button>
       {message && <p>{message}</p>}
       <ul style={{ listStyle: 'none', padding: '0' }}>
         {publicGames
