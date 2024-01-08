@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.dwarf.game.Game;
+import org.springframework.samples.dwarf.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,5 +45,20 @@ public class AchievementService {
     @Transactional(readOnly = true)
     public Achievement getAchievementByName(String name) {
         return repo.findByName(name);
+    }
+
+    @Transactional(readOnly = true)
+    public Achievement getAchievementByUserName(String name) {
+        return repo.findByUserName(name);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Game> getAllWinnedGames(String name) {
+        return repo.findAllWinnedGames(name);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Game> getPlayedGames(User user) {
+        return repo.findAllPlayedGames(user);
     }
 }
