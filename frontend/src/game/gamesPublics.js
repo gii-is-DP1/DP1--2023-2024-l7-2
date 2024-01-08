@@ -36,7 +36,7 @@ const GamesPublics = () => {
 
   const handleJoinClick = (gameId) => {
     fetch(
-      "/api/v1/game/join" + (gameId ? "/" + gameId : ""),
+      "/api/v1/game/joinPublic/" + gameId,
       {
         method: "POST",
         headers: {
@@ -45,10 +45,17 @@ const GamesPublics = () => {
           "Content-Type": "application/json",
         }
       }
-    )
-    .then((response) => {
+    ).then((response) => {
       if (response.ok) {
-        window.location.href = `/game/${gameId}`;
+        return response.json()
+      } else {
+        throw new Error("Failed to join the game");
+      }
+    })
+    .then((response) => {
+      console.log(response)
+      if (response.code) {
+        window.location.href = `/game/${response.code}`;
       } else {
         throw new Error("Failed to join the game");
       }
@@ -64,7 +71,6 @@ const GamesPublics = () => {
       {message && <p>{message}</p>}
       <ul style={{ listStyle: 'none', padding: '0' }}>
         {publicGames
-          .filter(publicGame => publicGame.start === null)
           .map((publicGame) => (
             <li key={publicGame.id} style={{ border: '2px solid #000', borderRadius: '8px', marginBottom: '10px', padding: '10px' }}>
               {publicGame.name} - Jugadores: {publicGame.players.length}
