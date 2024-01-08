@@ -311,7 +311,23 @@ public class MainBoardService {
             default:
                 break;
         }
-
     }
 
+    @Transactional
+    public Game applyReverseSpecialCard(Game g, Card reverseCard) {
+        MainBoard mb = g.getMainBoard();
+        ArrayList<Location> newLocations = new ArrayList<>();
+        newLocations.addAll(mb.getLocations());
+        Location locationToUpdate = newLocations.get(reverseCard.getPosition() - 1);
+        locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
+        newLocations.set(reverseCard.getPosition() - 1, locationToUpdate);
+        mb.setLocations(newLocations);
+        saveMainBoard(mb);
+
+        scds.getSpecialCard(mb);
+
+        g.setMainBoard(mb);
+        return g;
+
+    }
 }

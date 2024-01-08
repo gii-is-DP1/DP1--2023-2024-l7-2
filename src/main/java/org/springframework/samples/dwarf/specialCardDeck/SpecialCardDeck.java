@@ -17,16 +17,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "specialCardDeck")
 public class SpecialCardDeck extends BaseEntity {
 
     @ManyToMany()
     @JoinColumn(name = "special_card")
     List<SpecialCard> specialCards;
-
-    @ManyToOne
-    // @Transient
-    @JoinColumn(name = "special_card_id")
-    SpecialCard lastSpecialCard;
-
 }

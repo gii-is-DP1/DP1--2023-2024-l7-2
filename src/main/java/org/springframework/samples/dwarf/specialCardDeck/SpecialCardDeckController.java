@@ -48,13 +48,14 @@ public class SpecialCardDeckController {
 
     }
 
+    /*
     @GetMapping("/getSpecialCard/{id}")
     public ResponseEntity<SpecialCard> getSpecialCard(@PathVariable("id") Integer id) {
         SpecialCard scd = scds.getSpecialCard(id);
         if (scd == null)
             throw new ResourceNotFoundException("No encuentro el cardDeck que me has pedido con id:" + id);
         return new ResponseEntity<>(scd, HttpStatus.OK);
-    }
+    }*/
 
     @PostMapping
     public ResponseEntity<SpecialCardDeck> createSpecialCardDeck(@RequestBody @Valid SpecialCardDeck newSpecialCardDeck,
