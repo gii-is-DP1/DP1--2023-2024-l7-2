@@ -4,12 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.card.SpecialCard;
-import org.springframework.samples.dwarf.cardDeck.CardDeck;
-import org.springframework.samples.dwarf.location.Location;
-import org.springframework.samples.dwarf.mainboard.MainBoard;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +46,22 @@ public class ChatService {
         return chat;
     }
 
+    @Transactional
     public void delete(Integer id) {
         chatRepository.deleteById(id);
     }
+
+
+    @Transactional
+    public void saveMessage(Chat c, Message msg) {
+        msg = messageRepository.save(msg);
+
+        ArrayList<Message> msgs = new ArrayList<>();
+        msgs.addAll(c.getMessages());
+        msgs.add(msg);
+
+        c.setMessages(msgs);
+        chatRepository.save(c);
+    }
+
 }

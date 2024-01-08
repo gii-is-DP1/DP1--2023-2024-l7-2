@@ -15,6 +15,7 @@ import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
+import org.springframework.samples.dwarf.chat.Message;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
@@ -30,7 +31,6 @@ import org.springframework.samples.dwarf.spectator.Spectator;
 import org.springframework.samples.dwarf.spectator.SpectatorService;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,8 +55,6 @@ public class GameRestController {
     private final UserService us;
     private final PlayerService ps;
     private final MainBoardService mbs;
-    private final CardDeckService cds;
-    private final SpecialCardDeckService scds;
     private final LocationService ls;
     private final DwarfService ds;
     private final SpectatorService specservice;
@@ -64,14 +62,12 @@ public class GameRestController {
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayerService ps,
-            MainBoardService mbs, CardDeckService cds, DwarfService ds,
-            SpecialCardDeckService scds, LocationService ls, SpectatorService specservice, ChatService chatservice) {
+            MainBoardService mbs, DwarfService ds,
+            LocationService ls, SpectatorService specservice, ChatService chatservice) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
         this.mbs = mbs;
-        this.cds = cds;
-        this.scds = scds;
         this.ds = ds;
         this.ls = ls;
         this.specservice = specservice;
@@ -747,11 +743,28 @@ public class GameRestController {
     }
 
     @GetMapping("/play/{code}/chat")
-    public ResponseEntity<Chat> getChat(@PathVariable("code") String code) {
+    public ResponseEntity<List<Message>> getChat(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
         if (g == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(g.getChat().getMessages(), HttpStatus.OK);
+    }
+
+    @PostMapping("/play/{code}/chat")
+    public ResponseEntity<Chat> receiveMessage(@PathVariable("code") String code, @Valid @RequestBody Message msg) {
+        Game g = gs.getGameByCode(code);
+        if (g == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        User u = us.findCurrentUser();
+
+        msg.setSentTime(LocalDateTime.now());
+        msg.setSender(u);
+
+        chatservice.saveMessage(g.getChat(), msg);
+
         return new ResponseEntity<>(g.getChat(), HttpStatus.OK);
     }
 

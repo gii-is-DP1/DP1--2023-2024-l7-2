@@ -286,6 +286,7 @@ export default function GamePlay() {
         setShowChat(!showChat)
       }}
       code={code}
+      player={player}
     ></ChatModel>
 
     {getErrorModal(setVisible,visible,message)}
