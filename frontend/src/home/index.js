@@ -52,7 +52,7 @@ export default function Home(){
         userLinks = (
                 <>
                     <Button outline color="warning" size="lg">
-                        <Link to={`/game`} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
+                        <Link to={`/game/publics`} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
                     </Button>
                 </>
             )
