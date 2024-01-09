@@ -3,6 +3,9 @@ package org.springframework.samples.dwarf.game;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.samples.dwarf.player.Player;
+import org.springframework.samples.dwarf.user.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,4 +28,11 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     @Query("SELECT g FROM Game g WHERE g.isPublic = true")
     List<Game> findAllPublicGames();
+
+    @Query("SELECT g FROM Game g WHERE g.winner_id =?1")
+    List<Game> findAllWinnedGames(String userId);
+
+    @Query("SELECT DISTINCT g FROM Game g JOIN g.players p WHERE p.user.username = :username")
+    List<Game> findGamesByUserName(String username);
+
 }
