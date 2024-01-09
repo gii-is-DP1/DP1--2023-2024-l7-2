@@ -193,18 +193,18 @@ public class GameService {
 
     @Transactional
     public Game handleRoundChange(Game g) {
-        mbs.faseResolucionAcciones(g);
+        ArrayList<Pair<Player, Card>> helpCards = mbs.faseResolucionAcciones(g);
+
+        if (helpCards != null) {
+            g = changePlayerStart(g, helpCards);
+        }
 
         MainBoard mb = g.getMainBoard();
         ArrayList<Card> mbCards = new ArrayList<Card>();
         mbCards.addAll(mb.getCards());
 
-        // Card c = g.getMainBoard().getCardDeck().getLastCard();
-        // Integer lastCard = g.getMainBoard().getCardDeck().getCards().indexOf(c);
         ArrayList<Card> cd = new ArrayList<Card>();
-        // if (lastCard >= g.getMainBoard().getCardDeck().getCards().size() - 2) {
-        // Returns an empty list
-        // } else {
+        
         try {
 
             List<Card> twoCards = cds.getNewCards(g.getMainBoard().getCardDeck().getId());
@@ -370,55 +370,25 @@ public class GameService {
     }
 
     @Transactional
-    public void changePlayerStart(Game g, ArrayList<Pair<Player, Card>> helpCards) {
-        List<Player> players = pr.findAll();
-
-        // Obtemenemos las cartas del juego actual
-        ArrayList<Card> currentCards = new ArrayList<>();
-        for (Card c : g.getMainBoard().getCards()) {
-            // Solo guardamos las cartas que son de orcos
-            if (c.getCardType().getName().equals(helpCard)) {
-                currentCards.add(c);
-            }
-        }
-
-        // De esta forma obtenemos las cartas que no han sido seleccionadas
-        // al eliminar de las cartas del tablero
-        ArrayList<Pair<Player, Card>> selected = new ArrayList<>();
+    public Game changePlayerStart(Game g, ArrayList<Pair<Player, Card>> helpCards) {
+        // ArrayList<Player> players = new ArrayList<>();
+        // players.addAll(g.getPlayers());
+        List<Player> players = g.getPlayers();
+        
+        Integer playerStarterId = g.getPlayerStart().getId();
         for (Pair<Player, Card> pc : helpCards) {
-            if (currentCards.contains(pc.getSecond())) {
-                selected.add(pc);
+            Player p = pc.getFirst();
+            if (p.getId().equals(playerStarterId)) {
+                Integer position = players.indexOf(p);
+                Player newStarter = players.get((position + 1) % players.size());
+                g.setPlayerStart(newStarter);
+
+                break;
             }
         }
+        g = saveGame(g);
 
-        // Verificar si el jugador actual (playerStart) seleccionó una carta de tipo
-        // "HelpCard"
-        for (Pair<Player, Card> pc : selected) {
-            if (pc.getFirst().getId().equals(g.getPlayerStart().getId())
-                    && pc.getSecond().getCardType().getName().equals(helpCard)) {
-                int currentIndex = players.indexOf(pc.getFirst());
-                // Asignar el siguiente jugador en la lista como playerStart
-                if (currentIndex != -1) {
-                    int nextIndex = (currentIndex + 1) % players.size();
-
-                    if (nextIndex < players.size()) {
-                        Player nextPlayer = players.get(nextIndex);
-                        g.setPlayerStart(nextPlayer);
-                        gr.save(g);
-                        break; // Terminar el bucle después de cambiar el playerStart
-                    } else {
-                        g.setPlayerStart(g.getPlayerCreator());
-                        gr.save(g);
-                        break; // Terminar el bucle después de cambiar el playerStart al creador del juego
-                    }
-                } else {
-                    // TODO: Crear error
-                    System.out.println("Error: No se encontró el jugador actual en la lista.");
-                }
-            }
-        }
-
-        gr.save(g);
+        return g;
     }
 
     public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p) {

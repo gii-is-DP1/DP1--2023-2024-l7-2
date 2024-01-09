@@ -73,9 +73,7 @@ public class MainBoardService {
         return result.isPresent() ? result.get() : null;
     }
 
-
-
-    @Transactional()
+    @Transactional
     public MainBoard initialize() {
 
         CardDeck cardDecks = cds.initialiate();
@@ -132,9 +130,7 @@ public class MainBoardService {
     public MainBoard runAmokAction(MainBoard mb) {
         ArrayList<Location> newLocations = new ArrayList<>();
         for (Location lc:mb.getLocations()) {
-            System.out.println(lc.getCards());
             Location newLocation = ls.shuffleLocation(lc);
-            System.out.println(newLocation.getCards());
             newLocations.add(newLocation);
         }
         mb.setLocations(newLocations);
@@ -173,8 +169,8 @@ public class MainBoardService {
 
     }
 
-        @Transactional
-    public void faseResolucionAcciones(Game g) {
+    @Transactional
+    public ArrayList<Pair<Player, Card>> faseResolucionAcciones(Game g) {
         /*
          * 1. Recibir ayuda
          * 2. Defenter
@@ -219,7 +215,6 @@ public class MainBoardService {
 
         // Las cartas de la fase anterior pueden hacer que no se haga la siguiente fase
         Boolean canContinue = true;
-        // Las cartas de ayuda todavia no estan implementadas
 
         // Acciones de las cartas de orcos
         if (canContinue) {
@@ -231,12 +226,13 @@ public class MainBoardService {
         // Fase de recoleccion
         if (canContinue && normalCards != null) {
             updateMaterials(normalCards);
-        }
-        canContinue = true;
+        } 
 
-        if (objectCards != null) {
+        if (canContinue && objectCards != null) {
             faseForjar(objectCards);
         }
+
+        return helpCards;
     }
 
     @Transactional

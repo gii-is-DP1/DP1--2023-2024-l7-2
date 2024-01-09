@@ -57,14 +57,6 @@ public class CardDeckService {
             cards.remove(0);
         }
 
-        /*
-         * Collections.shuffle(cards);
-         * 
-         * cd.setCards(cards);
-         * //cd.setLastCard(cards.get(0));
-         * 
-         * saveCardDeck(cd);
-         */
         cd = shuffleAndSaveCards(cd, cards);
         return cd;
     }
@@ -89,10 +81,6 @@ public class CardDeckService {
         } else {
             return null;
         }
-        /*
-         * BeanUtils.copyProperties(cd, carddeck);
-         * return saveCardDeck(carddeck);
-         */
     }
 
     @Transactional
@@ -110,8 +98,6 @@ public class CardDeckService {
         CardDeck cd = getCardDeckById(id);
 
         List<Card> cards = cd.getCards();
-        //Card lastCard = cd.getLastCard();
-
 
         ArrayList<Card> newCards = new ArrayList<>();
 
@@ -136,17 +122,7 @@ public class CardDeckService {
 
         cards.removeAll(newCards);
         cd.setCards(cards);
-        /*
-         * while (twoCards.size() < 2 && lastCardIndex < cards.size() - 1) {
-         * if (cards.get(lastCardIndex).getPosition() != cards.get(lastCardIndex +
-         * 1).getPosition())
-         * twoCards.add(cards.get(lastCardIndex + 1));
-         * lastCardIndex++;
-         * }
-         */
 
-        // CardDeck newCd = getCardDeckById(id);
-        // newCd.setLastCard(cards.get(lastCardIndex + offset));
         saveCardDeck(cd);
 
         return newCards;

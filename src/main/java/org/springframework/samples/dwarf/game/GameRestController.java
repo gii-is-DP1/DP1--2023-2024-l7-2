@@ -425,15 +425,17 @@ public class GameRestController {
 
         // tiene que terminar si un jugador consigue 4 objetos
         for (Player p : plys) {
-            if (p.getObjects() != null && p.getObjects().size() >= 4)
+            if (p.getObjects() != null && p.getObjects().size() >= 4){
                 finished = true;
+                break;
+            }
         }
 
         // tiene que terminar en 6 rondas
-        if (g.getRound() >= 2)
-            finished = true;
+        // if (finished || g.getRound() >= 6)
+        //     finished = true;
 
-        if (g.getFinish() != null)
+        if (finished || g.getFinish() != null)
             finished = true;
 
         return new ResponseEntity<>(finished, HttpStatus.OK);
@@ -459,16 +461,6 @@ public class GameRestController {
         List<Dwarf> dwarves = g.getDwarves();
         dwarves.add(dwarf);
         g.setDwarves(dwarves);
-
-        /*
-         * if (gs.checkRoundNeedsChange(g,dwarves)) {
-         * try {
-         * g = gs.handleRoundChange(g);
-         * } catch (Exception e) {
-         * System.out.println(e);
-         * }
-         * }
-         */
 
         gs.saveGame(g);
 
