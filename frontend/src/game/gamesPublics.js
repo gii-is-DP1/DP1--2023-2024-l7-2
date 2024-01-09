@@ -64,6 +64,7 @@ const GamesPublics = () => {
   }, [jwt]);
 
     
+  
   const handleJoinClick = (game) => {
   
     fetch(
