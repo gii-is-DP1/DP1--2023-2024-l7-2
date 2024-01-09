@@ -1,5 +1,7 @@
 package org.springframework.samples.dwarf.card;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,5 +45,14 @@ public class SpecialCardService {
     @Transactional(readOnly = true)
     public SpecialCard getSpecialCardByName(String name) {
         return repo.findByName(name);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SpecialCard> initializeSpecialCards() {
+        ArrayList<SpecialCard> cards = new ArrayList<SpecialCard>();
+        cards.addAll(getSpecialCards());
+
+        Collections.shuffle(cards);
+        return cards;
     }
 }

@@ -101,13 +101,13 @@ export default function ConfirmSpecialCardModel(props) {
 
                 <ModalFooter>
                     <Button
-                        onClick={() => resolveAction(2)}>
+                        onClick={() => {resolveAction(2);props.toggle()}}>
                         <div>
                             Use two dwarves
                         </div>
                     </Button>
                     <Button
-                        onClick={() => resolveAction(1)}>
+                        onClick={() => {resolveAction(1); props.toggle()}}>
                         <div>
                             Use one dwarf
                         </div>

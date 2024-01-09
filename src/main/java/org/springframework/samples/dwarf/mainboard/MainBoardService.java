@@ -73,36 +73,34 @@ public class MainBoardService {
         return result.isPresent() ? result.get() : null;
     }
 
+
+
     @Transactional()
     public MainBoard initialize() {
 
         CardDeck cardDecks = cds.initialiate();
-        SpecialCardDeck specCardDeck = scds.initialize();
+        //SpecialCardDeck specCardDeck = scds.initialize();
 
         MainBoard mb = new MainBoard();
         mb.setCardDeck(cardDecks);
-        mb.setSpecialCardDeck(specCardDeck);
+        //mb.setSpecialCardDeck(specCardDeck);
 
-        ArrayList<Location> locations = new ArrayList<Location>();
-        for (int i = MIN_POSITION; i <= MAX_POSITION; i++) {
-            Card initialCard = cs.getById(i);
-            
-            Location locationI = new Location();
-            locationI.setPosition(i);
-            locationI.setCards(List.of(initialCard));
-            locationI = ls.save(locationI);
-            locations.add(locationI);
-        }
+        List<Location> locations = ls.initialize();
         mb.setLocations(locations);
 
-        ArrayList<SpecialCard> sCards = new ArrayList<SpecialCard>();
-        sCards.addAll(specCardDeck.getSpecialCards());
-        mb.setSCards(sCards);
+        List<SpecialCard> specCards = scs.initializeSpecialCards();
+        mb.setSCards(specCards);
         
-        System.out.println(sCards);
-        saveMainBoard(mb);
+        mb = saveMainBoard(mb);
 
         return mb;
+    }
+
+    @Transactional(readOnly = true)
+    public List<SpecialCard> getSpecialCards(MainBoard mb) {
+        List<SpecialCard> specCards = mb.getSCards();
+        List<SpecialCard> res = specCards.subList(0, 3);
+        return res;
     }
 
     @Transactional
@@ -314,20 +312,35 @@ public class MainBoardService {
     }
 
     @Transactional
-    public Game applyReverseSpecialCard(Game g, Card reverseCard) {
-        MainBoard mb = g.getMainBoard();
+    public MainBoard removeUsedSpecialCard(MainBoard mb, SpecialCard sc) {
+        ArrayList<SpecialCard> newSpecCards = new ArrayList<>();
+        newSpecCards.addAll(mb.getSCards());
+        
+        for( int i = 0 ; i < newSpecCards.size() ; i++) {
+            SpecialCard tmp = newSpecCards.get(i);
+            if (tmp.getName().equals(sc.getName())) {
+                newSpecCards.remove(i);
+                break;
+            }
+        }
+        
+        mb.setSCards(newSpecCards);
+        //mb = saveMainBoard(mb);
+        return mb;
+    }
+
+    @Transactional
+    public MainBoard applyReverseSpecialCard(MainBoard mb, Card reverseCard) {
+        //MainBoard mb = g.getMainBoard();
         ArrayList<Location> newLocations = new ArrayList<>();
         newLocations.addAll(mb.getLocations());
         Location locationToUpdate = newLocations.get(reverseCard.getPosition() - 1);
         locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
         newLocations.set(reverseCard.getPosition() - 1, locationToUpdate);
         mb.setLocations(newLocations);
-        saveMainBoard(mb);
+        //mb = saveMainBoard(mb);
 
-        scds.getSpecialCard(mb);
-
-        g.setMainBoard(mb);
-        return g;
+        return mb;
 
     }
 }

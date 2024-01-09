@@ -25,8 +25,8 @@ public class MainBoard extends BaseEntity {
     @OneToOne
     private CardDeck cardDeck;
 
-    @OneToOne
-    private SpecialCardDeck specialCardDeck;
+    // @OneToOne
+    // private SpecialCardDeck specialCardDeck;
 
     @OneToMany
     private List<Location> locations;

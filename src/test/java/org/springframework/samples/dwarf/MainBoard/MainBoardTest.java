@@ -33,6 +33,7 @@ public class MainBoardTest {
         assertEquals(cardDeck, mainBoard.getCardDeck());
     }
 
+    /* 
     @Test
     public void testGetAndSetSpecialCardDeck() {
         SpecialCardDeck specialCardDeck = mock(SpecialCardDeck.class);
@@ -40,7 +41,7 @@ public class MainBoardTest {
         mainBoard.setSpecialCardDeck(specialCardDeck);
 
         assertEquals(specialCardDeck, mainBoard.getSpecialCardDeck());
-    }
+    }*/
 
     @Test
     public void testGetAndSetCards() {
