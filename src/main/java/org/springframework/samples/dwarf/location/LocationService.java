@@ -131,4 +131,33 @@ public class LocationService {
 
         return save(location);
     }
+
+    @Transactional
+    public Location pushCards(Location location,List<Card> c) {
+        List<Card> locationCards = location.getCards();
+    
+        
+        if (locationCards == null) {
+            locationCards = new ArrayList<>();
+            location.setCards(locationCards);  
+        }
+    
+        locationCards.addAll(c);
+        location.setCards(locationCards);
+        return save(location);
+    }
+    
+
+    @Transactional(readOnly = true)
+    public List<Card> getPreviousCards(Location location) {
+        List<Card> locationCards = location.getCards();
+        
+        // Verifica si hay al menos dos cartas en la ubicación
+        if (locationCards != null && locationCards.size() >= 2) {
+            // Devuelve una lista que contiene todas las cartas anteriores a la posición actual
+            return new ArrayList<>(locationCards.subList(0, locationCards.size() - 1));
+        } else {
+            return Collections.emptyList(); 
+        }
+    }
 }

@@ -651,6 +651,92 @@ public class GameRestController {
 
                 break;
 
+                case "Apprentice":
+
+                List<Dwarf> roundDwarvesApprentice = g.getDwarves();
+                roundDwarvesApprentice = roundDwarvesApprentice.stream()
+                .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
+
+                // Lógica para manejar la acción de la carta "Apprentice"
+                for (Dwarf d : roundDwarvesApprentice) {
+                    
+                     // Verifica si la carta es ocupada por otro jugador
+                        if (!d.getPlayer().equals(p)) {
+                         // Coloca un nuevo enano en la misma posición
+                            Dwarf newDwarf = new Dwarf();
+                            newDwarf.setPlayer(p);
+                            newDwarf.setRound(g.getRound());
+                            newDwarf.setCard(d.getCard());
+            
+                            ds.saveDwarf(newDwarf);
+
+                            List<Dwarf> gameDwarvesApprentice = g.getDwarves();
+                            gameDwarvesApprentice.add(newDwarf);
+                            g.setDwarves(gameDwarvesApprentice);
+                            gs.saveGame(g);
+                        }  
+                }
+                break;
+
+            case "Turn back":
+                // Lógica para manejar la acción de la carta "Turn back"
+                List<Location> newLocationsTurnBack = new ArrayList<>(mb.getLocations());
+                int selectedPosition = request.getPosition();
+
+                if (selectedPosition >= 1 && selectedPosition <= newLocationsTurnBack.size()) {
+                Location location = newLocationsTurnBack.get(selectedPosition - 1);
+                 if (!location.getCards().isEmpty()) {
+                    List<Card> cardsInLocation = location.getCards();
+                    cardsInLocation.remove(cardsInLocation.size() - 1);
+                    Card newCard2 = cardsInLocation.get(cardsInLocation.size() - 1); 
+
+                    Dwarf newDwarfTurnBack = new Dwarf();
+                    newDwarfTurnBack.setPlayer(p);
+                    newDwarfTurnBack.setRound(g.getRound());
+                    newDwarfTurnBack.setCard(newCard2);
+
+                    ds.saveDwarf(newDwarfTurnBack);
+
+                    List<Dwarf> gameDwarvesTurnBack = new ArrayList<>(g.getDwarves());
+                    gameDwarvesTurnBack.add(newDwarfTurnBack);
+                    g.setDwarves(gameDwarvesTurnBack);
+
+                    newLocationsTurnBack.set(selectedPosition - 1, location);
+                    mb.setLocations(newLocationsTurnBack);
+
+                     mbs.saveMainBoard(mb);
+                    g.setMainBoard(mb);
+                    gs.saveGame(g);
+
+                     return ResponseEntity.ok().build();
+                    }
+                }
+
+                break;
+                case "Past Glories":
+                Integer selectedPosition3 = request.getPosition();
+                if (selectedPosition3 != null && selectedPosition3 >= 1 && selectedPosition3 <= 9) {
+            
+                    // Obtén la posición actual de la carta en el tablero
+                    Location selectedLocation = mb.getLocations().get(selectedPosition3 - 1);
+            
+                    // Obtén las cartas que estaba anteriormente arriba de esa posición
+                    List<Card> previousCard = ls.getPreviousCards(selectedLocation);
+            
+                    if (previousCard != null) {
+                        // Coloca la carta seleccionada arriba de la posición
+                        selectedLocation = ls.pushCards(selectedLocation, previousCard);
+                        mb.getLocations().set(selectedPosition3 - 1, selectedLocation);
+                        mbs.saveMainBoard(mb);
+            
+                        
+            
+                        return ResponseEntity.ok().build();
+                    }
+                }
+            break;
+            
+
             default:
                 break;
         }
