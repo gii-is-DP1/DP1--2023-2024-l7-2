@@ -48,10 +48,10 @@ public class Game extends NamedEntity {
     @OneToMany
     private List<Spectator> spectators;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne
     private Player playerCreator;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne
     private Player playerStart;
 
     @NotNull
