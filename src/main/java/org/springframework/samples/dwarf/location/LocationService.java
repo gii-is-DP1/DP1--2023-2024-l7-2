@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.Card;
+import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +17,16 @@ import jakarta.validation.Valid;
 @Service
 public class LocationService {
     
-    LocationRepository repo;
+    private final LocationRepository repo;
+    private final CardService cs;
+
+    private final Integer MAX_POSITION = 9;
+    private final Integer MIN_POSITION = 1;
 
     @Autowired
-    public LocationService(LocationRepository repo) {
+    public LocationService(LocationRepository repo, CardService cs) {
         this.repo = repo;
+        this.cs = cs;
     }
 
     @Transactional(readOnly=true)
@@ -37,6 +43,22 @@ public class LocationService {
     @Transactional
     public Location save( Location location) {
         return repo.save(location);
+    }
+
+    @Transactional
+    public List<Location> initialize() {
+        ArrayList<Location> locations = new ArrayList<Location>();
+        for (int i = MIN_POSITION; i <= MAX_POSITION; i++) {
+            Card initialCard = cs.getById(i);
+            
+            Location locationI = new Location();
+            locationI.setPosition(i);
+            locationI.setCards(List.of(initialCard));
+            locationI = save(locationI);
+            locations.add(locationI);
+        }
+
+        return locations;
     }
 
     @Transactional

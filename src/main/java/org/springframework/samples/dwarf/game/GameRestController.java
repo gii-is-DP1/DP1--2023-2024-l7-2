@@ -550,10 +550,13 @@ public class GameRestController {
             }
         }
 
-
-        g = mbs.applyReverseSpecialCard(g, reverseCard);
-        gs.saveGame(g);
         MainBoard mb = g.getMainBoard();
+
+        mb = mbs.removeUsedSpecialCard(mb, specialCard);
+        mb = mbs.applyReverseSpecialCard(mb, reverseCard);
+        mb = mbs.saveMainBoard(mb);
+        g.setMainBoard(mb);
+        gs.saveGame(g);
 
         
         // Ahora aplicamos la carta
@@ -729,6 +732,10 @@ public class GameRestController {
     @GetMapping("/publics")
     public ResponseEntity<List<Game>> publicGames() {
         try {
+            User u = us.findCurrentUser();
+            if (u == null) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
             List<Game> listGame = gs.getAllPublicGames();
             return new ResponseEntity<>(listGame, HttpStatus.OK);
         } catch (Exception e) {

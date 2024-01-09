@@ -132,13 +132,13 @@ INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,22),(1,33),(1
                                                         (1,11),(1,12),(1,13),(1,24),(1,15),(1,26),(1,27),(1,28),(1,19);
 
 
-INSERT INTO special_card_deck(id) VALUES (1),(2),(3);
+-- -INSERT INTO special_card_deck(id) VALUES (1),(2),(3);
 
-INSERT INTO special_card_deck_special_cards(special_card_deck_id, special_cards_id) VALUES 
-                (1,1),(1,2),(1,3),(2,4),(2,5),(2,6),(3,7),(3,8),(3,9);
+-- -INSERT INTO special_card_deck_special_cards(special_card_deck_id, special_cards_id) VALUES 
+-- -                (1,1),(1,2),(1,3),(2,4),(2,5),(2,6),(3,7),(3,8),(3,9);
 
 
-INSERT INTO main_board(id, card_deck_id, special_card_deck_id) VALUES (1, 1, 1);
+INSERT INTO main_board(id, card_deck_id) VALUES (1, 1);
 
 INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id, is_public) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1, False);
 

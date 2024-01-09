@@ -65,6 +65,7 @@ public class SpecialCardDeckService {
         return scd;
     }
 
+    /*
     @Transactional
     public SpecialCard getSpecialCard(MainBoard mb) {
         SpecialCardDeck speccarddeck = mb.getSpecialCardDeck(); 
@@ -79,7 +80,7 @@ public class SpecialCardDeckService {
         saveSpecialCardDeck(speccarddeck);
 
         return res;
-    }
+    }*/
 
     @Transactional
     public SpecialCardDeck saveSpecialCardDeck(@Valid SpecialCardDeck scd) {

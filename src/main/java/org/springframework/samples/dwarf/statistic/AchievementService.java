@@ -49,16 +49,19 @@ public class AchievementService {
 
     @Transactional(readOnly = true)
     public Achievement getAchievementByUserName(String name) {
-        return repo.findByUserName(name);
+        //return repo.findByUserName(name);
+        return null;
     }
 
     @Transactional(readOnly = true)
     public List<Game> getAllWinnedGames(String name) {
-        return repo.findAllWinnedGames(name);
+        // return repo.findAllWinnedGames(name);
+        return null;
     }
 
     @Transactional(readOnly = true)
     public List<Game> getPlayedGames(User user) {
-        return repo.findAllPlayedGames(user);
+        // return repo.findAllPlayedGames(user);
+        return null;
     }
 }

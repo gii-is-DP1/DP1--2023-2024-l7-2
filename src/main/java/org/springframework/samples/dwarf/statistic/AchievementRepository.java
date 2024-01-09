@@ -15,10 +15,10 @@ public interface AchievementRepository extends CrudRepository<Achievement, Integ
 
     public Achievement findByName(String name);
 
-    public Achievement findByUserName(String username);
+    // public Achievement findByUserName(String username);
 
-    @Query("SELECT g FROM Game g WHERE g.winner_id =?1")
-    List<Game> findAllWinnedGames(String userId);
-    @Query("SELECT g FROM Game g WHERE ?1 in g.players")
-    List<Game> findAllPlayedGames(User user);
+    // @Query("SELECT g FROM Game g WHERE g.winner_id =?1")
+    // List<Game> findAllWinnedGames(String userId);
+    // @Query("SELECT g FROM Game g WHERE ?1 in g.players")
+    // List<Game> findAllPlayedGames(User user);
 }

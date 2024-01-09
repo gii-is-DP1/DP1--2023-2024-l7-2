@@ -23,7 +23,7 @@ public class LocationServiceTest {
     @BeforeEach
     public void setUp() {
         locationRepository = mock(LocationRepository.class);
-        locationService = new LocationService(locationRepository);
+        locationService = new LocationService(locationRepository,null);
     }
 
     @Test
