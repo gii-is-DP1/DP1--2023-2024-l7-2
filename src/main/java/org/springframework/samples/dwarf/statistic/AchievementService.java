@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.game.Game;
+import org.springframework.samples.dwarf.game.GameRepository;
 import org.springframework.samples.dwarf.user.User;
+import org.springframework.samples.dwarf.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +17,14 @@ import jakarta.validation.Valid;
 public class AchievementService {
 
     AchievementRepository repo;
+    UserRepository userRepo;
+    GameRepository gameRepo;
 
     @Autowired
-    public AchievementService(AchievementRepository repo) {
+    public AchievementService(AchievementRepository repo, UserRepository userRepo, GameRepository gameRepo) {
         this.repo = repo;
+        this.userRepo = userRepo;
+        this.gameRepo = gameRepo;
     }
 
     @Transactional(readOnly = true)
@@ -48,20 +54,17 @@ public class AchievementService {
     }
 
     @Transactional(readOnly = true)
-    public Achievement getAchievementByUserName(String name) {
-        //return repo.findByUserName(name);
-        return null;
+    public List<Achievement> getAchievementByUserName(String name) {
+        return userRepo.findAchievemenByUserName(name);
     }
 
     @Transactional(readOnly = true)
     public List<Game> getAllWinnedGames(String name) {
-        // return repo.findAllWinnedGames(name);
-        return null;
+        return gameRepo.findAllWinnedGames(name);
     }
 
     @Transactional(readOnly = true)
-    public List<Game> getPlayedGames(User user) {
-        // return repo.findAllPlayedGames(user);
-        return null;
+    public List<Game> getPlayedGames(String username) {
+        return gameRepo.findGamesByUserName(username);
     }
 }

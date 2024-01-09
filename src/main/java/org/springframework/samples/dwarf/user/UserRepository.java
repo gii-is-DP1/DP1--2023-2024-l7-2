@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.samples.dwarf.statistic.Achievement;
 
 public interface UserRepository extends CrudRepository<User, String> {
 
@@ -36,5 +37,8 @@ public interface UserRepository extends CrudRepository<User, String> {
 
 	@Query("SELECT u FROM User u WHERE u.isLoggedIn = :b")
 	List<User> findByIsLoggedIn(boolean b);
+
+	@Query("SELECT u.achievements FROM User u WHERE u.username = ?1")
+	List<Achievement> findAchievemenByUserName(String username);
 
 }
