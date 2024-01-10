@@ -60,6 +60,8 @@ export default function Register() {
             .catch((message) => {
               alert(message);
             });
+        } else {
+          throw new Error('Username is already taken!');
         }
       })
       .catch((message) => {

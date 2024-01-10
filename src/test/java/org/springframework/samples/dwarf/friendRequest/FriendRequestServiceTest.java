@@ -6,25 +6,30 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataAccessException;
-import org.springframework.samples.dwarf.friendRequest.FriendRequest;
-import org.springframework.samples.dwarf.friendRequest.FriendRequestRepository;
-import org.springframework.samples.dwarf.friendRequest.FriendRequestService;
 import org.springframework.samples.dwarf.user.User;
+import org.springframework.samples.dwarf.user.UserRepository;
+import org.springframework.samples.dwarf.user.UserService;
+
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class FriendRequestServiceTest {
 
     @Mock
     private FriendRequestRepository friendRequestRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private FriendRequestService friendRequestService;
+
+    @InjectMocks
+    private UserService userService;
 
     @Test
     public void testFindAll() {
@@ -79,7 +84,7 @@ public class FriendRequestServiceTest {
         Mockito.when(friendRequestRepository.save(friendRequest)).thenReturn(friendRequest);
 
         Assertions.assertEquals(friendRequest, friendRequestService.saveFriendRequest(friendRequest));
- }
+    }
 
     @Test
     public void testDeleteFriendRequest() {
@@ -87,5 +92,29 @@ public class FriendRequestServiceTest {
         Integer requestId = 1;
         Assertions.assertDoesNotThrow(() -> friendRequestService.deleteFriendRequest(requestId));
 
-}
+    }
+
+    @Test
+    public void testGetFriends() {
+
+        MockitoAnnotations.openMocks(this);
+
+        User f1 = new User();
+        f1.setUsername("friend1");
+        f1.setIsLoggedIn(true);
+        User f2 = new User();
+        f2.setUsername("friend2");
+        f2.setIsLoggedIn(true);
+
+        FriendRequest fr = new FriendRequest();
+        fr.setReceiver(f1);
+        fr.setSender(f2);
+
+        List<User> expectedFriends = List.of(f2);
+        List<User> actualFriends = friendRequestService.getFriends(f1);
+
+        // Verify the results
+        assertEquals(expectedFriends, actualFriends);
+    }
+
 }

@@ -21,7 +21,6 @@ function AppNavbar() {
 
     let adminLinks = <></>;
     let registeredUserLinks = <></>;
-    let userLinks = <></>;
     let userLogout = <></>;
     let publicLinks = <></>;
 
@@ -55,21 +54,21 @@ function AppNavbar() {
         if (role === "USER") {
             registeredUserLinks = (
                 <>
-                    <NavItem>
+                    <li><NavItem>
                         <NavLink style={{ color: "white" }} tag={Link} to="/games">Games</NavLink>
-                    </NavItem>
-                    <NavItem>
+                    </NavItem></li>
+                    <li><NavItem>
                         <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/">Stats</NavLink>
-                    </NavItem>
-                    <NavItem>
+                    </NavItem></li>
+                    <li><NavItem>
                         <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/friends">Friends</NavLink>
-                    </NavItem>
-                    <NavItem>
-                        <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/docs">Docs</NavLink>
-                    </NavItem>
-                    <NavItem>
+                    </NavItem></li>
+                    <li><NavItem>
+                    <NavLink style={{ color: "white" }} id="docs" tag={Link} to="/docs">Docs</NavLink>
+                     </NavItem></li>
+                    <li><NavItem>
                         <NavLink style={{ color: "white" }} tag={Link} to="/rules">Rules</NavLink>
-                    </NavItem>
+                    </NavItem></li>
                 </>
             )
         }
@@ -113,7 +112,6 @@ function AppNavbar() {
                 <NavbarToggler onClick={toggleNavbar} className="ms-2" />
                 <Collapse isOpen={!collapsed} navbar>
                     <Nav className="me-auto mb-2 mb-lg-0" navbar>
-                        {userLinks}
                         {adminLinks}
                         {registeredUserLinks}
                     </Nav>

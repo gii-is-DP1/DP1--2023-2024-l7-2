@@ -9,7 +9,7 @@ const Logout = () => {
   const jwt = tokenService.getLocalAccessToken();
 
   async function logout() {
-    await fetch(`/api/users/${tokenService.getUserName()}/logout`, {
+    await fetch(`/api/v1/users/${tokenService.getUserName()}/logout`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -20,7 +20,8 @@ const Logout = () => {
     .then(function (data) {
       tokenService.setUser(data);
       tokenService.updateLocalAccessToken(data.token);
-    });      
+    })
+    .catch((message) => alert(message));;      
 
   }
   function sendLogoutRequest() {

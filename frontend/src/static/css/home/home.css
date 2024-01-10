@@ -34,3 +34,33 @@
 .hero-div h3{
     text-align: center;
 }
+
+.friendList {
+    position: fixed;
+    text-align: center;
+    right: 20px;
+    width: 200px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(233, 187, 47, 1);
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    color: rgba(233, 187, 47, 1);
+}
+
+
+.friendListTitle {
+    position: fixed;
+    text-align: center;
+    right: 20px;
+    width: 200px;
+    height: 400px;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+    overflow-y: auto;
+    justify-content: center;
+    display: flex;
+    color: rgba(233,187,47);
+}

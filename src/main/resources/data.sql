@@ -101,12 +101,9 @@ INSERT INTO card(id, name, description, position, card_type_id, total_iron, tota
                         (53,'Knockers','If undefended at the end of the round, each player must return 1 iron to the supply.',8, 2,0,0,0,1, null),
                         (54,'Alloy Steel','Return 3 to the iron supply then take 2 steel',9, 4,-3,0,2,0, null);
 
-/* Friend Request status */
-INSERT INTO friend_request_status(id,name) VALUES (1, 'Sent'), (2,'Accepted'), (3, 'Denied'), (4, 'Blocked');
-
 /* Friendes mocks */
-INSERT INTO friend_request(id, receiver_id, sender_id, status_id) VALUES 
-                (1,4,5,1), (2,6,7,1), (3,4,8,2);
+INSERT INTO friend_request(id, receiver_id, sender_id, status) VALUES 
+                (1,4,5, 2), (2,6,7,2), (3,4,8, 0);
 
 
 INSERT INTO special_card(id, turned_side_id, name, description) VALUES 

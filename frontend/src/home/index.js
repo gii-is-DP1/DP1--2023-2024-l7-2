@@ -21,7 +21,7 @@ export default function Home(){
         setMessage,
         setVisible
     );
-
+    console.log(users);
     useEffect(() => {
         if (jwt) {
             setRole(jwt_decode(jwt).authorities[0]);
@@ -32,7 +32,9 @@ export default function Home(){
     const userList = users.map((user) => {
         return (
         <tr key={user.id}>
+            <br></br>
             <td>{user.username}</td>
+            <br></br>
         </tr>
         );
     });
@@ -66,17 +68,10 @@ export default function Home(){
                             {userLinks}
                         </div>
                     </div>
-                    {jwt?<div className="row-6">
-                        <div className="text-center">
-                            <Table aria-label="users" className="mt-4">
-                                <thead>
-                                    <tr>
-                                        <th>Online players</th>
-                                    </tr>
-                                </thead>
-                                <tbody>{userList}</tbody>
-                            </Table>
-                        </div>
+                    {jwt?<div>
+                        <h4 className="friendListTitle">Online users</h4>
+                        <br></br>
+                        <div className="friendList">{userList}</div>
                     </div>
                     :<br></br>}
         </div>
