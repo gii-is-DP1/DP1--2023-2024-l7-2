@@ -118,10 +118,11 @@ export default function GameJoin() {
                                         </Button>
                                     </div>
                                 </Form>
+                                <br></br>
                                 {/* Botón para redirigir a /games/publics */}
                                 <div className="custom-button-row">
                                     <Button className="btn btn-dark btn-lg" outline color="warning" size="lg" onClick={handlePublicGamesClick}>
-                                        Ver Juegos Públicos
+                                        Join other public game
                                     </Button>
                             </div>
                     </div>

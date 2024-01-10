@@ -15,13 +15,12 @@ import lombok.Setter;
 @Setter
 public class FriendRequest extends BaseEntity {
 
-	@ManyToOne
+    @ManyToOne
     private User sender;
-    
-	@ManyToOne
-    private User receiver;
 
     @ManyToOne
+    private User receiver;
+
     private Status status;
 
     LocalDateTime sendTime;
