@@ -4,6 +4,7 @@ import tokenService from "../../services/token.service";
 import useFetchState from "../../util/useFetchState";
 import {FormSellAnItem, resolveSellAnItem} from './SpecialCardForms/SellAnItemForm';
 import {FormPastGlories, resolvePastGlories} from './SpecialCardForms/PastGloriesForm';
+import {FormTurnBack, resolveTurnBack} from './SpecialCardForms/TurnBackForm';
 
 const jwt = tokenService.getLocalAccessToken();
 
@@ -76,6 +77,15 @@ export default function ConfirmSpecialCardModel(props) {
 
                 })
                 break
+            case "Turn back":
+                console.log("Turn back selected")
+                console.log(position)
+                resolveTurnBack(props.code,jwt, {
+                    specialCard: props.card,
+                    usesBothDwarves: numberOfDwarves === 2,
+                    position: position
+                })
+                break
             default:
                 resolveSellAnItem(props.code,jwt, {
                     specialCard: props.card,
@@ -114,6 +124,11 @@ export default function ConfirmSpecialCardModel(props) {
                         <FormPastGlories
                             position={position} setPosition={setPosition}
                             cardSelected={cardSelected} setCardSelected={setCardSelected}
+                        />
+                    }
+                    {title == "Turn back" && 
+                        <FormTurnBack
+                            position={position} setPosition={setPosition}
                         />
                     }
                 </ModalBody>
