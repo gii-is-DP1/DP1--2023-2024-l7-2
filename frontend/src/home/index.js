@@ -21,7 +21,7 @@ export default function Home(){
         setMessage,
         setVisible
     );
-    console.log(users);
+
     useEffect(() => {
         if (jwt) {
             setRole(jwt_decode(jwt).authorities[0]);
@@ -40,13 +40,12 @@ export default function Home(){
     });
     let userLinks = <></>;
     let publicLinks = <></>;
-    console.log(users)
 
     if (!jwt) {
         publicLinks = (
             <>
                 <Button className="btn btn-dark btn-lg" outline color="warning" size="lg">
-                        <Link to={"/login"} className="btn" style={{ textDecoration: "none", color: "white"}}>Play Now</Link>
+                        <Link to={"/login"} className="btn" style={{ textDecoration: "none", color: "white"}}>Play Now!</Link>
                 </Button>
             </>
         )
@@ -54,7 +53,7 @@ export default function Home(){
         userLinks = (
                 <>
                     <Button outline color="warning" size="lg">
-                        <Link to={`/game/publics`} className="btn" style={{ textDecoration: "none" }}>Play Now</Link>
+                        <Link to={`/game/`} className="btn" style={{ textDecoration: "none" }}>Play Now!</Link>
                     </Button>
                 </>
             )

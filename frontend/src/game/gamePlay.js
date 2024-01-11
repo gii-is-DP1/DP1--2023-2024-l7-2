@@ -9,6 +9,7 @@ import SpecialCard from "../cards/specialCard";
 import  { isFinished, sendCard, isStart, resign}  from "./gameFunctions";
 import ConfirmSpecialCardModel from "./modals/ConfirmSpecialCardModel";
 import ChatModel from "./modals/ChatModel";
+import InviteFormModel from "./modals/InviteFormModel";
 import useIntervalFetchState from "../util/useIntervalFetchState";
 
 import '../static/css/game/objects.css'; 
@@ -30,6 +31,7 @@ export default function GamePlay() {
   const [choosedSpecialCard, setChoosedSpecialCard] = useState(null);
   const [specialCardToBeConfirmed, setSpecialCardToBeConfirmed] = useState(false);
   const [showChat,setShowChat] = useState(false);
+  const [showInviteForm, setShowInviteForm] = useState(false)
   const [cards, setCards] = useFetchState(
     [],
     `/api/v1/game/play/${code}/getCards`,
@@ -291,6 +293,14 @@ export default function GamePlay() {
       player={player}
     ></ChatModel>
 
+    <InviteFormModel
+      isOpen={showInviteForm}
+      toggle={() => {
+        setShowInviteForm(!showInviteForm)
+      }}
+      code={code}
+    ></InviteFormModel>
+
     {getErrorModal(setVisible,visible,message)}
     <div style={{marginTop: "70px"}}>
 
@@ -304,12 +314,30 @@ export default function GamePlay() {
             color="#008000"
             style={{border: '3px solid black',padding: "3px"}}>
               Start game
-            </Button>
+          </Button>
         }
 
-        <Button onClick={() => {
-          setShowChat(!showChat)
-        }}>Show Chat</Button>
+        { game != {} && game.playerCreator && game.playerCreator.name === user.username 
+          && players && players.length < 3 && !gameStarted &&
+          <Button
+            onClick={() => {setShowInviteForm(!showInviteForm)}}
+            title="Send Invitation"
+            color="#008000"
+            style={{border: '3px solid black',padding: "3px"}}>
+              Send Invitation
+          </Button>
+        }
+
+        <Button 
+          onClick={() => {
+            setShowChat(!showChat)}}
+          title="Resign"
+          color="#008000"
+          style={{border: '3px solid black',padding: "3px"}}>
+          Show Chat
+        </Button>
+        
+        
         { (gameStarted || game != {} && game.playerCreator && game.playerCreator.name !== user.username) &&
         <section className="buttonsLayout" style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
 
