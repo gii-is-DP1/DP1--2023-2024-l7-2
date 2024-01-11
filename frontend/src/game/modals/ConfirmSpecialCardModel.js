@@ -3,6 +3,7 @@ import {Button, Modal, ModalBody, ModalFooter, ModalHeader, Input, FormGroup, Fo
 import tokenService from "../../services/token.service";
 import useFetchState from "../../util/useFetchState";
 import {FormSellAnItem, resolveSellAnItem} from './SpecialCardForms/SellAnItemForm';
+import {FormSpecialOrder, resolveSpecialOrder} from './SpecialCardForms/SpecialOrderForm';
 import {FormPastGlories, resolvePastGlories} from './SpecialCardForms/PastGloriesForm';
 import {FormTurnBack, resolveTurnBack} from './SpecialCardForms/TurnBackForm';
 
@@ -20,7 +21,7 @@ export default function ConfirmSpecialCardModel(props) {
     const [position, setPosition] = useState(1);
     const [cardSelected, setCardSelected] = useState(null);
 
-    const [gameObject, setGameObject] = useFetchState(
+    const [gameObjects, setGameObjects] = useFetchState(
         [],
         `/api/v1/objects`,
         jwt,
@@ -38,19 +39,51 @@ export default function ConfirmSpecialCardModel(props) {
         description = props.card.description
     }
 
+    useEffect(() => {
+        if (props.playerObjects && gameObjects) {
+            let tmp_gameObjects = gameObjects
+            for (const i in props.playerObjects) {
+                tmp_gameObjects = tmp_gameObjects.filter((obj) => obj.name !== props.playerObjects[i].name)
+            }
+            setGameObjects(tmp_gameObjects)
+        }
+    }, [props.playerObjects])
+
     function resolveAction(numberOfDwarves) {
         console.log("Selected "+numberOfDwarves+"dwarves")
         
+        let objectToSend
         switch (title) {
-            case "Sell an item":
-                console.log("sell an item selected")
-                console.log(gameObject)
+            case "Special order":
+                console.log("Special order selected")
+                console.log(gameObjects)
                 console.log(objectSelected)
 
-                let objectToSend
-                for (const i in gameObject) {
-                    if (gameObject[i].name === objectSelected){
-                        objectToSend = gameObject[i]
+                for (const i in gameObjects) {
+                    if (gameObjects[i].name === objectSelected){
+                        objectToSend = gameObjects[i]
+                        //setObjectSelected(gameObject[i])
+                        break;
+                    }
+                }
+                
+                resolveSellAnItem(props.code, jwt, {
+                    specialCard: props.card,
+                    usesBothDwarves: numberOfDwarves === 2,
+                    selectedGold: gold,
+                    selectedIron: iron,
+                    selectedSteal: steal,
+                    selectedObject: objectToSend
+                })
+                break;
+            case "Sell an item":
+                console.log("sell an item selected")
+                console.log(gameObjects)
+                console.log(objectSelected)
+
+                for (const i in gameObjects) {
+                    if (gameObjects[i].name === objectSelected){
+                        objectToSend = gameObjects[i]
                         //setObjectSelected(gameObject[i])
                         break;
                     }
@@ -111,13 +144,22 @@ export default function ConfirmSpecialCardModel(props) {
 
                 <ModalBody>
                     {description}
+                    {title === "Special order" && 
+                        <FormSpecialOrder
+                        gold={gold} setGold={setGold}  
+                        steal={steal} setSteal={setSteal} 
+                        iron={iron} setIron={setIron}
+                        objectSelected={objectSelected} setObjectSelected={setObjectSelected}
+                        gameObject={gameObjects} setGameObject={setGameObjects}
+                        />
+                    }
                     {title === "Sell an item" && 
                         <FormSellAnItem 
                         gold={gold} setGold={setGold}  
                         steal={steal} setSteal={setSteal} 
                         iron={iron} setIron={setIron}
                         objectSelected={objectSelected} setObjectSelected={setObjectSelected}
-                        gameObject={gameObject} setGameObject={setGameObject}
+                        gameObject={gameObjects} setGameObject={setGameObjects}
                         />
                     }
                     {title == "Past Glories" && 

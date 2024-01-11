@@ -585,33 +585,34 @@ public class GameRestController {
                 g.setDwarves(gameDwarves);
                 gs.saveGame(g);
                 break;
-            case "Special Order":
+            case "Special order":
                 Integer selectedGold = request.getSelectedGold();
                 Integer selectedIron = request.getSelectedIron();
                 Integer selectedSteal = request.getSelectedSteal();
                 Object selectedObject = request.getSelectedObject();
                 if (selectedGold != null && selectedIron != null
-                        && selectedSteal != null && selectedObject != null) {
-                    // Check if the sum of gold, iron, and steel is 5
-                    if (selectedGold + selectedIron + selectedSteal == 5) {
+                        && selectedSteal != null && selectedObject != null 
+                        && selectedGold + selectedIron + selectedSteal == 5
+                        && selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
 
-                        // Check if at least one of each material is selected
-                        if (selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
-
-                            // Update player's state
-                            p.setGold(p.getGold() - selectedGold);
-                            p.setIron(p.getIron() - selectedIron);
-                            p.setSteal(p.getSteal() - selectedSteal);
-
-                            // Add the selected object
-                            p.getObjects().add(selectedObject);
-
-                            // Save the updated player
-                            ps.savePlayer(p);
-
-                            return ResponseEntity.ok().build();
-                        }
+                    List<Object> playerObjects = p.getObjects();
+                    // Update player's state
+                    if (selectedGold > p.getGold() || selectedIron > p.getIron()
+                        || selectedSteal > p.getSteal() || playerObjects.contains(selectedObject)) {
+                            //TODO: Create error
                     }
+                    p.setGold(p.getGold() - selectedGold);
+                    p.setIron(p.getIron() - selectedIron);
+                    p.setSteal(p.getSteal() - selectedSteal);
+
+                    // Add the selected object
+                    playerObjects.add(selectedObject);
+                    p.setObjects(playerObjects);
+
+                    // Save the updated player
+                    ps.savePlayer(p);
+
+                    return ResponseEntity.ok().build();
                 }
                 break;
             case "Hold a council":
