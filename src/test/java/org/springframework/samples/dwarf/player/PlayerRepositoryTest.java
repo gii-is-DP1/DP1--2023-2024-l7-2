@@ -23,7 +23,7 @@ public class PlayerRepositoryTest {
 
     @Autowired
     private PlayerRepository playerRepository;
-    private UserRepository us;
+    
 
     @Test
     public void testFindAll() {
@@ -80,35 +80,5 @@ public class PlayerRepositoryTest {
         assertEquals("Player3", result.getName());
         assertEquals("Yellow", result.getColor());
     }
-/*
-    @Test
-    public void testFindByUserAndGame() {
-        // Given
-        Game game = new Game();
-
-        User user1 = new User();
-        user1.setUsername("Pepe");
-        user1.setId(1);
-
-        Player player = new Player();
-        player.setName("Player4");
-        player.setColor("Purple");
-        player.setUser(user1);
-
-        // Save the User entity first
-        us.save(user1);
-
-        // When
-        playerRepository.save(player);
-
-        // Then
-        Player result = playerRepository.findByUserAndGame(user1, game);
-
-        assertNotNull(result);
-        assertEquals("Player4", result.getName());
-        assertEquals("Purple", result.getColor());
-        assertEquals(user1, result.getUser());
-        assertEquals(game, result.getGame());
-    }*/
 
 }
