@@ -694,16 +694,18 @@ public class GameRestController {
                 selectedPosition = request.getPosition();
 
                 if (selectedPosition >= 1 && selectedPosition <= newLocationsTurnBack.size()) {
-                Location location = newLocationsTurnBack.get(selectedPosition - 1);
-                 if (!location.getCards().isEmpty()) {
-                    List<Card> cardsInLocation = location.getCards();
-                    cardsInLocation.remove(cardsInLocation.size() - 1);
-                    Card newCard2 = cardsInLocation.get(cardsInLocation.size() - 1); 
+                Location selectedLocation = newLocationsTurnBack.get(selectedPosition - 1);
+
+                Card removedCard = ls.removeLastCard(selectedLocation);
+                if (removedCard != null) {
+                    List<Card> newCards = selectedLocation.getCards();
+                    Card newTopCard = newCards.get(newCards.size()-1);
+
 
                     Dwarf newDwarfTurnBack = new Dwarf();
                     newDwarfTurnBack.setPlayer(p);
                     newDwarfTurnBack.setRound(g.getRound());
-                    newDwarfTurnBack.setCard(newCard2);
+                    newDwarfTurnBack.setCard(newTopCard);
 
                     ds.saveDwarf(newDwarfTurnBack);
 
@@ -711,44 +713,28 @@ public class GameRestController {
                     gameDwarvesTurnBack.add(newDwarfTurnBack);
                     g.setDwarves(gameDwarvesTurnBack);
 
-                    newLocationsTurnBack.set(selectedPosition - 1, location);
-                    mb.setLocations(newLocationsTurnBack);
-
-                     mbs.saveMainBoard(mb);
-                    g.setMainBoard(mb);
                     gs.saveGame(g);
 
-                     return ResponseEntity.ok().build();
-                    }
+                    
+                    } 
+                }else {
+                    //TODO: create error
                 }
 
                 break;
                 case "Past Glories":
                 selectedPosition = request.getPosition();
                 Card cardToBeOnTop = request.getPastCard();
+
                 if (selectedPosition != null && cardToBeOnTop != null && selectedPosition >= 1 && selectedPosition <= 9) {
             
-                    // Obtén la posición actual de la carta en el tablero
                     Location selectedLocation = mb.getLocations().get(selectedPosition - 1);
             
-                    // Obtén las cartas que estaba anteriormente arriba de esa posición
-                    Location locationToUpdate = ls.pastGloriesAction(selectedLocation, cardToBeOnTop);
-            
-                    // ArrayList<Location> newLocations = new ArrayList<>();
-                    // newLocations.addAll(mb.getLocations());
-
-                    // try {
-                    //     //newLocations.set(locationToUpdate.getPosition(), locationToUpdate);
-                    //     mb.setLocations(newLocations);
-                    //     mb = mbs.saveMainBoard(mb);
-                    //     g.setMainBoard(mb);
-                    //     gs.saveGame(g);
-                    // }catch (Exception e) {
-                    //     System.out.println(e);
-                    // }
-
-                    return ResponseEntity.ok().build();
+                    ls.pastGloriesAction(selectedLocation, cardToBeOnTop);
    
+                } else {
+                    //TODO: create error
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 break;
             

@@ -6,7 +6,7 @@ import Card from '../../../cards/card';
 import useFetchState from "../../../util/useFetchState";
 
 
-function resolvePastGlories(code, jwt, payload) {
+function resolveTurnBack(code, jwt, payload) {
   fetch(`/api/v1/game/play/${code}/specialAction`, {
     method: "POST",
     headers: {
@@ -31,46 +31,7 @@ function resolvePastGlories(code, jwt, payload) {
 
 const jwt = tokenService.getLocalAccessToken();
 
-function FormPastGlories(props) {
-  const code = getIdFromUrl(2);
-
-  const [cardSelection, setCardSelection] = useState(null);
-  const [tmpCard, setTmpCard] = useState(null);
-  const [message, setMessage] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const [allCards, setAllCards] = useFetchState(
-    [],
-    `/api/v1/game/play/${code}/getAllCards`,
-    jwt,
-    setMessage,
-    setVisible,
-    code
-  );
-
-  useEffect(() => {
-    if (allCards && allCards.length === 9) {
-      setCardSelection(allCards[props.position-1].map((cardObj) => {
-        return (
-          <option key={cardObj.id}>
-            {cardObj.name}
-          </option>
-        )
-      }))
-    }
-  },[props.position])
-
-  useEffect(() => {
-    if (allCards && allCards.length === 9) {
-      let possibleCards = allCards[props.position-1];
-      for (const card of possibleCards) {
-        if (card.name === tmpCard) {
-          props.setCardSelected(card)
-          break
-        }
-      }
-    }
-  },[tmpCard])
-
+function FormTurnBack(props) {
 
     function handleChange(event, setParam) {
         const target = event.target;
@@ -78,6 +39,8 @@ function FormPastGlories(props) {
         setParam(value);
     }
 
+
+    //console.log("Selected card =>",props.cardSelected )
     return (
     <Form>
         <FormGroup style={{display:'flex',flexDirection:'row'}}>
@@ -100,25 +63,9 @@ function FormPastGlories(props) {
             <option key={9}>9</option>
           </Input>
         </FormGroup>
-        <FormGroup style={{display:'flex',flexDirection:'Column'}}>
-            <Label for="iron"> Cards </Label>
-            <Input
-                type="select"
-                required
-                name="CardSelection"
-                value={tmpCard}
-                onChange={(event) => handleChange(event,setTmpCard)}
-                className="custom-input"
-            >
-              <option key={-1}>-</option>
-              {cardSelection}
-            </Input>
-            {props.cardSelected && props.cardSelected.id && 
-              <Card id={props.cardSelected.id}/>}
-        </FormGroup>
     </Form>
     )
 
 }
 
-export {FormPastGlories, resolvePastGlories};
+export {FormTurnBack, resolveTurnBack};

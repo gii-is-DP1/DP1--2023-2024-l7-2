@@ -100,9 +100,10 @@ public class LocationService {
         Card toRemove = null;
         if (locationCards.size() > 1){
             toRemove = locationCards.get(locationCards.size() -1);
+            locationCards.remove(toRemove);
+            location.setCards(locationCards);
+            save(location);
         }
-        locationCards.remove(toRemove);
-        location.setCards(locationCards);
         return toRemove;
     }
 /* 
