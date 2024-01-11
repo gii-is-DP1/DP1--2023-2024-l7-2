@@ -22,8 +22,6 @@ export default function ChatModel(props) {
         code
       );
 
-    console.log(messages)
-
     function handleSubmit(event) {
 
         event.preventDefault();

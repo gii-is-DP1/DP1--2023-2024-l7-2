@@ -20,7 +20,6 @@ const user = tokenService.getUser()
 
 export default function GamePlay() {
   const code = getIdFromUrl(2);
-  //console.log(jwt)
 
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
@@ -79,7 +78,9 @@ export default function GamePlay() {
     setVisible,
     code
   );
-  const player = players.filter(p => p.name === user.username)[0];
+  
+  let player = players.filter(p => p.name === user.username)[0];
+  if (player == null) player = {};
 
   const [isMyTurn, setIsMyTurn] = useIntervalFetchState(
     false,
@@ -112,7 +113,7 @@ export default function GamePlay() {
           continue;
         }
         const pacolor = d.player.color;
-        console.log(c.id + " to color => " + pacolor);
+        //console.log(c.id + " to color => " + pacolor);
         updated[c.position] = pacolor;  
     }
 
@@ -140,7 +141,7 @@ export default function GamePlay() {
         if (cards !== response) {
           //let tmpCardsHistorical = cardsHistorical;
           setCards(response)
-          console.log("THE RESPONSE ",response)
+          //console.log("THE RESPONSE ",response)
           /*
           let i;
           for (i = 0; i < response.length ; i++) {
@@ -205,7 +206,8 @@ export default function GamePlay() {
       if (choosedCard === null) {
         setChoosedCard(card)
       } else {
-        console.log("You cant choose that many cads :(")
+        setMessage("You cant choose more many cads");
+        setVisible(true);
       }
     }
   }
@@ -268,7 +270,6 @@ export default function GamePlay() {
     isStart(code,jwt);
   };
 
-  //console.log(choosedCard)
   return (
     <>
     <ConfirmSpecialCardModel
@@ -278,6 +279,7 @@ export default function GamePlay() {
       }}
       card={choosedSpecialCard}
       code={code}
+      playerObjects={player.objects}
     ></ConfirmSpecialCardModel>
 
     <ChatModel
@@ -375,16 +377,22 @@ export default function GamePlay() {
             </section>
           </section>
           }
-          {specialCards.length != 0 && player && player.color &&
+
           <section className="specialCardDeckLayout"  style={{display:"flex", flexDirection:"row", gap:"40px", margin:"40px"}}>
-            <SpecialCard id={specialCards[0].id} 
-                  onClick={() => selectSpecialCard(1,specialCards[0])}/>
-            <SpecialCard id={specialCards[1].id}
-                  onClick={() => selectSpecialCard(2,specialCards[1])}/>
-            <SpecialCard id={specialCards[2].id} 
-                  onClick={() => selectSpecialCard(3,specialCards[2])}/>
+            {specialCards && specialCards[0] &&
+              <SpecialCard id={specialCards[0].id} 
+                    onClick={() => selectSpecialCard(1,specialCards[0])}/>
+            }
+            {specialCards && specialCards[1] &&
+              <SpecialCard id={specialCards[1].id}
+                    onClick={() => selectSpecialCard(2,specialCards[1])}/>
+            }
+            {specialCards && specialCards[2] &&
+              <SpecialCard id={specialCards[2].id} 
+                    onClick={() => selectSpecialCard(3,specialCards[2])}/>
+            }
           </section>
-          }
+          
         </section>
       </div>
     </div>
