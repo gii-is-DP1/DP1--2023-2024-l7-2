@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
@@ -105,6 +107,11 @@ public class GameService {
     @Transactional(readOnly = true)
     public List<Game> getAllPublicGames() {
         return gr.findAllPublicGames();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Game> getAllPublicGames(Pageable pageable) {
+        return gr.findAllPublicGames(pageable);
     }
 
     @Transactional
@@ -204,7 +211,7 @@ public class GameService {
         mbCards.addAll(mb.getCards());
 
         ArrayList<Card> cd = new ArrayList<Card>();
-        
+
         try {
 
             List<Card> twoCards = cds.getNewCards(g.getMainBoard().getCardDeck().getId());
@@ -374,7 +381,7 @@ public class GameService {
         // ArrayList<Player> players = new ArrayList<>();
         // players.addAll(g.getPlayers());
         List<Player> players = g.getPlayers();
-        
+
         Integer playerStarterId = g.getPlayerStart().getId();
         for (Pair<Player, Card> pc : helpCards) {
             Player p = pc.getFirst();

@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
 @Repository
@@ -25,9 +27,11 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     List<Game> findByFinishIsNullAndStartIsNotNull();
 
-
     @Query("SELECT g FROM Game g WHERE g.isPublic = true")
     List<Game> findAllPublicGames();
+
+    @Query("SELECT g FROM Game g WHERE g.isPublic = true")
+    Page<Game> findAllPublicGames(Pageable pageable);
 
     @Query("SELECT g FROM Game g WHERE g.winner_id =?1")
     List<Game> findAllWinnedGames(String userId);

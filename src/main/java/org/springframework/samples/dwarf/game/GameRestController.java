@@ -8,17 +8,21 @@ import java.util.Optional;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.SpecialCard;
-import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.chat.Message;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.invitation.Invitation;
+import org.springframework.samples.dwarf.invitation.InvitationService;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
@@ -26,7 +30,6 @@ import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerService;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 import org.springframework.samples.dwarf.spectator.Spectator;
 import org.springframework.samples.dwarf.spectator.SpectatorService;
 import org.springframework.samples.dwarf.user.User;
@@ -59,11 +62,12 @@ public class GameRestController {
     private final DwarfService ds;
     private final SpectatorService specservice;
     private final ChatService chatservice;
+    private final InvitationService is;
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayerService ps,
             MainBoardService mbs, DwarfService ds,
-            LocationService ls, SpectatorService specservice, ChatService chatservice) {
+            LocationService ls, SpectatorService specservice, ChatService chatservice, InvitationService is) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
@@ -72,6 +76,7 @@ public class GameRestController {
         this.ls = ls;
         this.specservice = specservice;
         this.chatservice = chatservice;
+        this.is = is;
     }
 
     @GetMapping
@@ -188,7 +193,7 @@ public class GameRestController {
             // TODO: Create error
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        
+
         if (!gs.gameContainsPlayer(g, u)) {
             Player p = ps.initialize(u.getUsername());
             p.setColor(ps.getRandomColor(g.getPlayers()));
@@ -425,7 +430,7 @@ public class GameRestController {
 
         // tiene que terminar si un jugador consigue 4 objetos
         for (Player p : plys) {
-            if (p.getObjects() != null && p.getObjects().size() >= 4){
+            if (p.getObjects() != null && p.getObjects().size() >= 4) {
                 finished = true;
                 break;
             }
@@ -433,7 +438,7 @@ public class GameRestController {
 
         // tiene que terminar en 6 rondas
         // if (finished || g.getRound() >= 6)
-        //     finished = true;
+        // finished = true;
 
         if (finished || g.getFinish() != null)
             finished = true;
@@ -550,7 +555,6 @@ public class GameRestController {
         g.setMainBoard(mb);
         gs.saveGame(g);
 
-        
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case "Muster an army":
@@ -643,30 +647,30 @@ public class GameRestController {
 
                 break;
 
-                case "Apprentice":
+            case "Apprentice":
 
                 List<Dwarf> roundDwarvesApprentice = g.getDwarves();
                 roundDwarvesApprentice = roundDwarvesApprentice.stream()
-                .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
+                        .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
 
                 // Lógica para manejar la acción de la carta "Apprentice"
                 for (Dwarf d : roundDwarvesApprentice) {
-                    
-                     // Verifica si la carta es ocupada por otro jugador
-                        if (!d.getPlayer().equals(p)) {
-                         // Coloca un nuevo enano en la misma posición
-                            Dwarf newDwarf = new Dwarf();
-                            newDwarf.setPlayer(p);
-                            newDwarf.setRound(g.getRound());
-                            newDwarf.setCard(d.getCard());
-            
-                            ds.saveDwarf(newDwarf);
 
-                            List<Dwarf> gameDwarvesApprentice = g.getDwarves();
-                            gameDwarvesApprentice.add(newDwarf);
-                            g.setDwarves(gameDwarvesApprentice);
-                            gs.saveGame(g);
-                        }  
+                    // Verifica si la carta es ocupada por otro jugador
+                    if (!d.getPlayer().equals(p)) {
+                        // Coloca un nuevo enano en la misma posición
+                        Dwarf newDwarf = new Dwarf();
+                        newDwarf.setPlayer(p);
+                        newDwarf.setRound(g.getRound());
+                        newDwarf.setCard(d.getCard());
+
+                        ds.saveDwarf(newDwarf);
+
+                        List<Dwarf> gameDwarvesApprentice = g.getDwarves();
+                        gameDwarvesApprentice.add(newDwarf);
+                        g.setDwarves(gameDwarvesApprentice);
+                        gs.saveGame(g);
+                    }
                 }
                 break;
 
@@ -676,58 +680,55 @@ public class GameRestController {
                 int selectedPosition = request.getPosition();
 
                 if (selectedPosition >= 1 && selectedPosition <= newLocationsTurnBack.size()) {
-                Location location = newLocationsTurnBack.get(selectedPosition - 1);
-                 if (!location.getCards().isEmpty()) {
-                    List<Card> cardsInLocation = location.getCards();
-                    cardsInLocation.remove(cardsInLocation.size() - 1);
-                    Card newCard2 = cardsInLocation.get(cardsInLocation.size() - 1); 
+                    Location location = newLocationsTurnBack.get(selectedPosition - 1);
+                    if (!location.getCards().isEmpty()) {
+                        List<Card> cardsInLocation = location.getCards();
+                        cardsInLocation.remove(cardsInLocation.size() - 1);
+                        Card newCard2 = cardsInLocation.get(cardsInLocation.size() - 1);
 
-                    Dwarf newDwarfTurnBack = new Dwarf();
-                    newDwarfTurnBack.setPlayer(p);
-                    newDwarfTurnBack.setRound(g.getRound());
-                    newDwarfTurnBack.setCard(newCard2);
+                        Dwarf newDwarfTurnBack = new Dwarf();
+                        newDwarfTurnBack.setPlayer(p);
+                        newDwarfTurnBack.setRound(g.getRound());
+                        newDwarfTurnBack.setCard(newCard2);
 
-                    ds.saveDwarf(newDwarfTurnBack);
+                        ds.saveDwarf(newDwarfTurnBack);
 
-                    List<Dwarf> gameDwarvesTurnBack = new ArrayList<>(g.getDwarves());
-                    gameDwarvesTurnBack.add(newDwarfTurnBack);
-                    g.setDwarves(gameDwarvesTurnBack);
+                        List<Dwarf> gameDwarvesTurnBack = new ArrayList<>(g.getDwarves());
+                        gameDwarvesTurnBack.add(newDwarfTurnBack);
+                        g.setDwarves(gameDwarvesTurnBack);
 
-                    newLocationsTurnBack.set(selectedPosition - 1, location);
-                    mb.setLocations(newLocationsTurnBack);
+                        newLocationsTurnBack.set(selectedPosition - 1, location);
+                        mb.setLocations(newLocationsTurnBack);
 
-                     mbs.saveMainBoard(mb);
-                    g.setMainBoard(mb);
-                    gs.saveGame(g);
+                        mbs.saveMainBoard(mb);
+                        g.setMainBoard(mb);
+                        gs.saveGame(g);
 
-                     return ResponseEntity.ok().build();
+                        return ResponseEntity.ok().build();
                     }
                 }
 
                 break;
-                case "Past Glories":
+            case "Past Glories":
                 Integer selectedPosition3 = request.getPosition();
                 if (selectedPosition3 != null && selectedPosition3 >= 1 && selectedPosition3 <= 9) {
-            
+
                     // Obtén la posición actual de la carta en el tablero
                     Location selectedLocation = mb.getLocations().get(selectedPosition3 - 1);
-            
+
                     // Obtén las cartas que estaba anteriormente arriba de esa posición
                     List<Card> previousCard = ls.getPreviousCards(selectedLocation);
-            
+
                     if (previousCard != null) {
                         // Coloca la carta seleccionada arriba de la posición
                         selectedLocation = ls.pushCards(selectedLocation, previousCard);
                         mb.getLocations().set(selectedPosition3 - 1, selectedLocation);
                         mbs.saveMainBoard(mb);
-            
-                        
-            
+
                         return ResponseEntity.ok().build();
                     }
                 }
-            break;
-            
+                break;
 
             default:
                 break;
@@ -808,18 +809,15 @@ public class GameRestController {
     }
 
     @GetMapping("/publics")
-    public ResponseEntity<List<Game>> publicGames() {
-        try {
-            User u = us.findCurrentUser();
-            if (u == null) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-            List<Game> listGame = gs.getAllPublicGames();
-            return new ResponseEntity<>(listGame, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public Page<Game> publicGamesPagination(@RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "3") int pageSize) {
+
+        User u = us.findCurrentUser();
+        if (u == null) {
+            return null;
         }
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return gs.getAllPublicGames(pageable);
     }
 
     @GetMapping("/play/{code}/chat")
@@ -846,6 +844,23 @@ public class GameRestController {
         chatservice.saveMessage(g.getChat(), msg);
 
         return new ResponseEntity<>(g.getChat(), HttpStatus.OK);
+    }
+
+    @PostMapping("/play/{code}/invite")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Invitation> create(@PathVariable("code") String code, @RequestBody @Valid String username) {
+
+        Invitation inv = new Invitation();
+        User u1 = us.findCurrentUser();
+        User u2 = us.findUser(username);
+
+        inv.setGame(gs.getGameByCode(code));
+        inv.setSender(u1);
+        inv.setReceiver(u2);
+        inv.setSendTime(LocalDateTime.now());
+        Invitation savedInv = is.saveInvitation(inv);
+
+        return new ResponseEntity<>(savedInv, HttpStatus.CREATED);
     }
 
 }
