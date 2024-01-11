@@ -150,6 +150,23 @@ public class GameRestController {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
+    @GetMapping("/play/{code}/getAllCards")
+    public ResponseEntity<ArrayList<List<Card>>> getAllCardsFromAllPositions(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+
+        if (!gs.checkPlayerInGameAndGameExists(g)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        ArrayList<List<Card>> res = new ArrayList<>();
+        List<Location> locations = g.getMainBoard().getLocations();
+
+        for (Location l : locations) {
+            res.add(l.getCards());
+        }
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
     @GetMapping("/play/{code}/getCards")
     public ResponseEntity<List<Card>> getMainBoardCards(@PathVariable("code") String code) {
 
@@ -555,6 +572,7 @@ public class GameRestController {
         g.setMainBoard(mb);
         gs.saveGame(g);
 
+        Integer selectedPosition;
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case "Muster an army":
@@ -571,33 +589,34 @@ public class GameRestController {
                 g.setDwarves(gameDwarves);
                 gs.saveGame(g);
                 break;
-            case "Special Order":
+            case "Special order":
                 Integer selectedGold = request.getSelectedGold();
                 Integer selectedIron = request.getSelectedIron();
                 Integer selectedSteal = request.getSelectedSteal();
                 Object selectedObject = request.getSelectedObject();
                 if (selectedGold != null && selectedIron != null
-                        && selectedSteal != null && selectedObject != null) {
-                    // Check if the sum of gold, iron, and steel is 5
-                    if (selectedGold + selectedIron + selectedSteal == 5) {
+                        && selectedSteal != null && selectedObject != null
+                        && selectedGold + selectedIron + selectedSteal == 5
+                        && selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
 
-                        // Check if at least one of each material is selected
-                        if (selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
-
-                            // Update player's state
-                            p.setGold(p.getGold() - selectedGold);
-                            p.setIron(p.getIron() - selectedIron);
-                            p.setSteal(p.getSteal() - selectedSteal);
-
-                            // Add the selected object
-                            p.getObjects().add(selectedObject);
-
-                            // Save the updated player
-                            ps.savePlayer(p);
-
-                            return ResponseEntity.ok().build();
-                        }
+                    List<Object> playerObjects = p.getObjects();
+                    // Update player's state
+                    if (selectedGold > p.getGold() || selectedIron > p.getIron()
+                            || selectedSteal > p.getSteal() || playerObjects.contains(selectedObject)) {
+                        // TODO: Create error
                     }
+                    p.setGold(p.getGold() - selectedGold);
+                    p.setIron(p.getIron() - selectedIron);
+                    p.setSteal(p.getSteal() - selectedSteal);
+
+                    // Add the selected object
+                    playerObjects.add(selectedObject);
+                    p.setObjects(playerObjects);
+
+                    // Save the updated player
+                    ps.savePlayer(p);
+
+                    return ResponseEntity.ok().build();
                 }
                 break;
             case "Hold a council":
@@ -677,19 +696,20 @@ public class GameRestController {
             case "Turn back":
                 // Lógica para manejar la acción de la carta "Turn back"
                 List<Location> newLocationsTurnBack = new ArrayList<>(mb.getLocations());
-                int selectedPosition = request.getPosition();
+                selectedPosition = request.getPosition();
 
                 if (selectedPosition >= 1 && selectedPosition <= newLocationsTurnBack.size()) {
-                    Location location = newLocationsTurnBack.get(selectedPosition - 1);
-                    if (!location.getCards().isEmpty()) {
-                        List<Card> cardsInLocation = location.getCards();
-                        cardsInLocation.remove(cardsInLocation.size() - 1);
-                        Card newCard2 = cardsInLocation.get(cardsInLocation.size() - 1);
+                    Location selectedLocation = newLocationsTurnBack.get(selectedPosition - 1);
+
+                    Card removedCard = ls.removeLastCard(selectedLocation);
+                    if (removedCard != null) {
+                        List<Card> newCards = selectedLocation.getCards();
+                        Card newTopCard = newCards.get(newCards.size() - 1);
 
                         Dwarf newDwarfTurnBack = new Dwarf();
                         newDwarfTurnBack.setPlayer(p);
                         newDwarfTurnBack.setRound(g.getRound());
-                        newDwarfTurnBack.setCard(newCard2);
+                        newDwarfTurnBack.setCard(newTopCard);
 
                         ds.saveDwarf(newDwarfTurnBack);
 
@@ -697,36 +717,28 @@ public class GameRestController {
                         gameDwarvesTurnBack.add(newDwarfTurnBack);
                         g.setDwarves(gameDwarvesTurnBack);
 
-                        newLocationsTurnBack.set(selectedPosition - 1, location);
-                        mb.setLocations(newLocationsTurnBack);
-
-                        mbs.saveMainBoard(mb);
-                        g.setMainBoard(mb);
                         gs.saveGame(g);
 
-                        return ResponseEntity.ok().build();
                     }
+                } else {
+                    // TODO: create error
                 }
 
                 break;
             case "Past Glories":
-                Integer selectedPosition3 = request.getPosition();
-                if (selectedPosition3 != null && selectedPosition3 >= 1 && selectedPosition3 <= 9) {
+                selectedPosition = request.getPosition();
+                Card cardToBeOnTop = request.getPastCard();
 
-                    // Obtén la posición actual de la carta en el tablero
-                    Location selectedLocation = mb.getLocations().get(selectedPosition3 - 1);
+                if (selectedPosition != null && cardToBeOnTop != null && selectedPosition >= 1
+                        && selectedPosition <= 9) {
 
-                    // Obtén las cartas que estaba anteriormente arriba de esa posición
-                    List<Card> previousCard = ls.getPreviousCards(selectedLocation);
+                    Location selectedLocation = mb.getLocations().get(selectedPosition - 1);
 
-                    if (previousCard != null) {
-                        // Coloca la carta seleccionada arriba de la posición
-                        selectedLocation = ls.pushCards(selectedLocation, previousCard);
-                        mb.getLocations().set(selectedPosition3 - 1, selectedLocation);
-                        mbs.saveMainBoard(mb);
+                    ls.pastGloriesAction(selectedLocation, cardToBeOnTop);
 
-                        return ResponseEntity.ok().build();
-                    }
+                } else {
+                    // TODO: create error
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 break;
 

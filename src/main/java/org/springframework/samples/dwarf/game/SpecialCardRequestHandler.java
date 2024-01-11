@@ -17,10 +17,10 @@ public class SpecialCardRequestHandler {
     @NotNull
     private Boolean usesBothDwarves; // Si no usa los dos dwarves se le quitan 4 medallas
     
-    // Necesario para carta turnBack
+    // Necesario para carta turnBack y Past Glories
     private Integer position;
 
-    // Necesario para la carta Past glories
+    // Necesario para la carta Past Glories
     private Card pastCard;
 
     //Necesario para special order

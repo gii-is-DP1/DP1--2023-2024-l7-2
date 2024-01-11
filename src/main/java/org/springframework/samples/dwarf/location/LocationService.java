@@ -100,9 +100,10 @@ public class LocationService {
         Card toRemove = null;
         if (locationCards.size() > 1){
             toRemove = locationCards.get(locationCards.size() -1);
+            locationCards.remove(toRemove);
+            location.setCards(locationCards);
+            save(location);
         }
-        locationCards.remove(toRemove);
-        location.setCards(locationCards);
         return toRemove;
     }
 /* 
@@ -121,8 +122,16 @@ public class LocationService {
     @Transactional
     public Location pastGloriesAction(Location location, Card c) {
         List<Card> locationCards = location.getCards();
-        if (!locationCards.contains(c)) {
-            // TODO: Create error
+
+        Boolean contains = false;
+        for (Card currentLocationCard:locationCards) {
+            if (currentLocationCard.getId().equals(c.getId())) {
+                contains = true;
+                break;
+            }
+        }
+        if (!contains) {
+            // TODO: create error
             return null;
         }
         locationCards.remove(c);

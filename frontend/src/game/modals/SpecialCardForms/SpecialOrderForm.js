@@ -92,4 +92,4 @@ function FormSpecialOrder(props) {
 
 }
 
-export {FormSellAnItem, resolveSellAnItem};
+export {FormSpecialOrder, resolveSpecialOrder};
