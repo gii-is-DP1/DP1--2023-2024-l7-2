@@ -1,60 +1,103 @@
 package org.springframework.samples.dwarf.card;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.card.CardRestController;
-import org.springframework.samples.dwarf.card.CardService;
-import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.dwarf.exceptions.BadRequestException;
+import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
-public class CardRestControllerTest {
+class CardRestControllerTest {
 
-    @Mock
-    private CardService cardService;
-
-    @InjectMocks
-    private CardRestController cardController;
+    private CardService cardService = mock(CardService.class);
+    private CardRestController cardRestController = new CardRestController(cardService);
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    void setUp() {
+        
+        reset(cardService);
     }
 
     @Test
-    public void testFindAll() {
-        List<Card> testCards = new ArrayList<>();
-        when(cardService.getCards()).thenReturn(testCards);
-        ResponseEntity<List<Card>> response = cardController.findAll();
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(testCards, response.getBody());
+    void findAll_ReturnsListOfCards() {
+       
+        List<Card> cards = new ArrayList<>();
+        when(cardService.getCards()).thenReturn(cards);
+
+        
+        ResponseEntity<List<Card>> responseEntity = cardRestController.findAll();
+
+        
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(cards, responseEntity.getBody());
         verify(cardService, times(1)).getCards();
     }
 
     @Test
-    public void testFindCard() {
-        Card testCard = new Card();
-        when(cardService.getById(1)).thenReturn(testCard);
+    void findCard_ExistingCard_ReturnsCard() {
+        
+        int cardId = 1;
+        Card existingCard = new Card();
+        when(cardService.getById(cardId)).thenReturn(existingCard);
 
-        ResponseEntity<Card> response = cardController.findCard(1);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(testCard, response.getBody());
+        
+        ResponseEntity<Card> responseEntity = cardRestController.findCard(cardId);
 
-        verify(cardService, times(1)).getById(1);
-
-        when(cardService.getById(2)).thenReturn(null);
-        assertThrows(ResourceNotFoundException.class, () -> cardController.findCard(2));
+        
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(existingCard, responseEntity.getBody());
+        verify(cardService, times(1)).getById(cardId);
     }
 
+
+    @Test
+    void createCard_ValidCard() {
+        
+        Card validCard = new Card();
+        validCard.setName("a");
+        validCard.setId(1);
+        BindingResult bindingResult = new BeanPropertyBindingResult(validCard, "validCard");
+
+        
+        ResponseEntity<Card> responseEntity = cardRestController.createCard(validCard, bindingResult);
+
+        
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        verify(cardService, times(1)).saveCard(validCard);
+    }
+
+    @Test
+    void findCard_NonExistingCard() {
+        
+        int nonExistingCardId = 999;
+        when(cardService.getById(nonExistingCardId)).thenReturn(null);
+
+        
+        assertThrows(ResourceNotFoundException.class, () -> cardRestController.findCard(nonExistingCardId));
+        verify(cardService, times(1)).getById(nonExistingCardId);
+    }
+
+    @Test
+    void createCard_InvalidCard_ThrowsBadRequestException() {
+        
+        Card invalidCard = new Card();
+        BindingResult bindingResult = new BeanPropertyBindingResult(invalidCard, "invalidCard");
+        bindingResult.reject("fieldErrorCode", "Error message");
+
+       
+        assertThrows(BadRequestException.class, () -> cardRestController.createCard(invalidCard, bindingResult));
+        verify(cardService, never()).saveCard(invalidCard);
+    }
+
+    
+
 }
+

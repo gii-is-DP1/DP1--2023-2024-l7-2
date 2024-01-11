@@ -19,24 +19,6 @@ public class PlayerTest {
     }
 
     @Test
-    public void testPlayerColorBlank() {
-        Player player = new Player();
-        player.setColor("");
-
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-        validatePlayerColor(player.getColor());
-    });
-
-    assertEquals("Color cannot be blank", exception.getMessage());
-    }
-
-    private void validatePlayerColor(String color) {
-        if (color.isBlank()) {
-            throw new IllegalArgumentException("Color cannot be blank");
-        }
-    }
-
-    @Test
     public void testPlayerStealGoldIronMedalNotNull() {
         Player player = new Player();
         player.setSteal(10);
@@ -73,7 +55,7 @@ public class PlayerTest {
     public void testPlayerInitialization() {
         Player player = new Player();
 
-        // Ensure that the player object is not null after initialization
+    
         assertNotNull(player);
     }
 

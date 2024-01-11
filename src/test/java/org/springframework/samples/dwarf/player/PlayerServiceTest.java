@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -126,6 +127,25 @@ public class PlayerServiceTest {
         // esperado
         assertNotNull(retrievedPlayers);
         assertEquals("Red", retrievedPlayers.getColor());
+    }
+
+
+
+    @Test
+    public void testInitialize() {
+        String username = "TestUser";
+
+        Player initializedPlayer = playerService.initialize(username);
+
+        assertNotNull(initializedPlayer);
+        assertEquals(username, initializedPlayer.getName());
+        assertEquals(0, initializedPlayer.getSteal());
+        assertEquals(0, initializedPlayer.getGold());
+        assertEquals(0, initializedPlayer.getIron());
+        assertEquals(0, initializedPlayer.getMedal());
+        
+        
+        verify(playerRepository, never()).save(any(Player.class));
     }
 /*
     @Test

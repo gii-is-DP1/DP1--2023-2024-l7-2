@@ -63,4 +63,32 @@ public class PlayerRestControllerTest {
         // BadRequestException
         assertThrows(BadRequestException.class, () -> playerRestController.createPlayer(new Player(), bindingResult));
     }
+
+    @Test
+    public void testGetPlayers() {
+        int playerId = 1;
+        Player mockPlayer = new Player();
+        mockPlayer.setId(playerId);
+        mockPlayer.setName("TestPlayer");
+
+        when(playerService.getById(playerId)).thenReturn(mockPlayer);
+
+        ResponseEntity<Player> responseEntity = playerRestController.getPlayers(playerId);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(mockPlayer, responseEntity.getBody());
+
+        verify(playerService, times(1)).getById(playerId);
+    }
+
+    @Test
+    public void testGetPlayers_PlayerNotFound() {
+        int playerId = 2;
+        when(playerService.getById(playerId)).thenReturn(null);
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> playerRestController.getPlayers(playerId));
+        assertEquals("Player with id " + playerId + " not found!", exception.getMessage());
+        verify(playerService, times(1)).getById(playerId);
+    }
 }
