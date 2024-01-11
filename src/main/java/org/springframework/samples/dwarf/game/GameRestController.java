@@ -145,6 +145,23 @@ public class GameRestController {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
+    @GetMapping("/play/{code}/getAllCards")
+    public ResponseEntity<ArrayList<List<Card>>> getAllCardsFromAllPositions(@PathVariable("code") String code) {
+        Game g = gs.getGameByCode(code);
+
+        if (!gs.checkPlayerInGameAndGameExists(g)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        ArrayList<List<Card>> res = new ArrayList<>();
+        List<Location> locations = g.getMainBoard().getLocations();
+
+        for (Location l: locations) {
+            res.add(l.getCards());
+        }
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
     @GetMapping("/play/{code}/getCards")
     public ResponseEntity<List<Card>> getMainBoardCards(@PathVariable("code") String code) {
 
@@ -551,6 +568,7 @@ public class GameRestController {
         gs.saveGame(g);
 
         
+        Integer selectedPosition;
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case "Muster an army":
@@ -673,7 +691,7 @@ public class GameRestController {
             case "Turn back":
                 // Lógica para manejar la acción de la carta "Turn back"
                 List<Location> newLocationsTurnBack = new ArrayList<>(mb.getLocations());
-                int selectedPosition = request.getPosition();
+                selectedPosition = request.getPosition();
 
                 if (selectedPosition >= 1 && selectedPosition <= newLocationsTurnBack.size()) {
                 Location location = newLocationsTurnBack.get(selectedPosition - 1);
@@ -706,27 +724,33 @@ public class GameRestController {
 
                 break;
                 case "Past Glories":
-                Integer selectedPosition3 = request.getPosition();
-                if (selectedPosition3 != null && selectedPosition3 >= 1 && selectedPosition3 <= 9) {
+                selectedPosition = request.getPosition();
+                Card cardToBeOnTop = request.getPastCard();
+                if (selectedPosition != null && cardToBeOnTop != null && selectedPosition >= 1 && selectedPosition <= 9) {
             
                     // Obtén la posición actual de la carta en el tablero
-                    Location selectedLocation = mb.getLocations().get(selectedPosition3 - 1);
+                    Location selectedLocation = mb.getLocations().get(selectedPosition - 1);
             
                     // Obtén las cartas que estaba anteriormente arriba de esa posición
-                    List<Card> previousCard = ls.getPreviousCards(selectedLocation);
+                    Location locationToUpdate = ls.pastGloriesAction(selectedLocation, cardToBeOnTop);
             
-                    if (previousCard != null) {
-                        // Coloca la carta seleccionada arriba de la posición
-                        selectedLocation = ls.pushCards(selectedLocation, previousCard);
-                        mb.getLocations().set(selectedPosition3 - 1, selectedLocation);
-                        mbs.saveMainBoard(mb);
-            
-                        
-            
-                        return ResponseEntity.ok().build();
-                    }
+                    // ArrayList<Location> newLocations = new ArrayList<>();
+                    // newLocations.addAll(mb.getLocations());
+
+                    // try {
+                    //     //newLocations.set(locationToUpdate.getPosition(), locationToUpdate);
+                    //     mb.setLocations(newLocations);
+                    //     mb = mbs.saveMainBoard(mb);
+                    //     g.setMainBoard(mb);
+                    //     gs.saveGame(g);
+                    // }catch (Exception e) {
+                    //     System.out.println(e);
+                    // }
+
+                    return ResponseEntity.ok().build();
+   
                 }
-            break;
+                break;
             
 
             default:

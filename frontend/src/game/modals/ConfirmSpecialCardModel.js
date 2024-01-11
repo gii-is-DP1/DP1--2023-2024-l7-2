@@ -3,7 +3,7 @@ import {Button, Modal, ModalBody, ModalFooter, ModalHeader, Input, FormGroup, Fo
 import tokenService from "../../services/token.service";
 import useFetchState from "../../util/useFetchState";
 import {FormSellAnItem, resolveSellAnItem} from './SpecialCardForms/SellAnItemForm';
-
+import {FormPastGlories, resolvePastGlories} from './SpecialCardForms/PastGloriesForm';
 
 const jwt = tokenService.getLocalAccessToken();
 
@@ -16,6 +16,8 @@ export default function ConfirmSpecialCardModel(props) {
     const [steal, setSteal] = useState(0);
     const [iron, setIron] = useState(0);
     const [objectSelected, setObjectSelected] = useState(null);
+    const [position, setPosition] = useState(1);
+    const [cardSelected, setCardSelected] = useState(null);
 
     const [gameObject, setGameObject] = useFetchState(
         [],
@@ -62,6 +64,18 @@ export default function ConfirmSpecialCardModel(props) {
                     selectedObject: objectToSend
                 })
                 break;
+            case "Past Glories":
+                console.log("Past Glories selected")
+                console.log(position)
+                console.log(cardSelected)
+                resolvePastGlories(props.code,jwt, {
+                    specialCard: props.card,
+                    usesBothDwarves: numberOfDwarves === 2,
+                    position: position,
+                    pastCard: cardSelected
+
+                })
+                break
             default:
                 resolveSellAnItem(props.code,jwt, {
                     specialCard: props.card,
@@ -94,6 +108,12 @@ export default function ConfirmSpecialCardModel(props) {
                         iron={iron} setIron={setIron}
                         objectSelected={objectSelected} setObjectSelected={setObjectSelected}
                         gameObject={gameObject} setGameObject={setGameObject}
+                        />
+                    }
+                    {title == "Past Glories" && 
+                        <FormPastGlories
+                            position={position} setPosition={setPosition}
+                            cardSelected={cardSelected} setCardSelected={setCardSelected}
                         />
                     }
                 </ModalBody>

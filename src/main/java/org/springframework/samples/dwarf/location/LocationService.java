@@ -121,8 +121,16 @@ public class LocationService {
     @Transactional
     public Location pastGloriesAction(Location location, Card c) {
         List<Card> locationCards = location.getCards();
-        if (!locationCards.contains(c)) {
-            // TODO: Create error
+
+        Boolean contains = false;
+        for (Card currentLocationCard:locationCards) {
+            if (currentLocationCard.getId().equals(c.getId())) {
+                contains = true;
+                break;
+            }
+        }
+        if (!contains) {
+            // TODO: create error
             return null;
         }
         locationCards.remove(c);
