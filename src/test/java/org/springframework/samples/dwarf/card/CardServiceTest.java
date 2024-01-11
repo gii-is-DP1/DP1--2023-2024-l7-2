@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.samples.dwarf.game.Game;
+import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,11 @@ public class CardServiceTest {
 
     @Autowired
     private PlayerService playerService;
+
+    @Autowired
+    private GameService gameService;
+
+   
 
     @Test
     public void testGetCards() {
@@ -121,7 +127,6 @@ public class CardServiceTest {
         assertEquals(4, player1.getIron()); // 5 - 1 = 4
         assertEquals(0, player2.getIron()); // La cantidad de hierro no debería ser menor que 0
     }
-/*
     @Test
     public void testOrcCardSidheAction() {
         // Datos de prueba
@@ -139,11 +144,9 @@ public class CardServiceTest {
 
         List<Player> players = Arrays.asList(player1, player2, player3);
 
-        // Configuración del repositorio mock
-        when(playerRepository.findAll()).thenReturn(players);
-
+        
         // Llamada al método que queremos probar
-        gameService.orcCardSidheAction(mock(Game.class));
+        cardService.orcCardSidheAction(players);
 
         // Verificaciones
         assertEquals(7, player1.getIron()); // 5 + 2 = 7
@@ -167,11 +170,9 @@ public class CardServiceTest {
 
         List<Player> players = Arrays.asList(player1, player2);
 
-        // Configuración del repositorio mock
-        when(playerRepository.findAll()).thenReturn(players);
 
         // Llamada al método que queremos probar
-        gameService.orcCardDragonAction(mock(Game.class));
+        cardService.orcCardDragonAction(players);
 
         // Verificaciones
         assertEquals(4, player1.getGold()); // 5 - 1 = 4
@@ -189,14 +190,11 @@ public class CardServiceTest {
 
         List<Player> players = Arrays.asList(player1, player2);
 
-        // Configuración del repositorio mock
-        when(playerRepository.findAll()).thenReturn(players);
-
         // Llamada al método que queremos probar
-        gameService.orcCardGreatDragonAction(mock(Game.class));
+        cardService.orcCardGreatDragonAction(players);
 
         // Verificaciones
         assertEquals(0, player1.getGold()); 
         assertEquals(0, player2.getGold()); 
-    }*/
+    }
 }
