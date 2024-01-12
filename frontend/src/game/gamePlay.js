@@ -110,6 +110,7 @@ export default function GamePlay() {
       4: null,5: null,6: null,
       7: null,8: null,9: null};
     for (const d of dwarves) {
+        if (!d.player) continue;
         const c = d.card;
         if (c==null) {
           continue;

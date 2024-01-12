@@ -18,7 +18,7 @@ public class Dwarf extends BaseEntity {
 
     Integer round;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     Player player;
 
     @ManyToOne(optional = true)
