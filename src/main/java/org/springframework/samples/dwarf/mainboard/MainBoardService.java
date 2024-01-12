@@ -147,6 +147,7 @@ public class MainBoardService {
         }
     }
 
+    /*
     @Transactional
     public void adwardMedal(ArrayList<Pair<Player, Card>> orcCards) {
 
@@ -156,7 +157,7 @@ public class MainBoardService {
 
             cs.adwardMedalSingleAction(p, c);
         }
-    }
+    }*/
 
     @Transactional
     public void faseForjar(ArrayList<Pair<Player, Card>> playerCards) {
@@ -190,7 +191,12 @@ public class MainBoardService {
                 continue;
             }
             
-            Pair<Player, Card> playerPair = Pair.of(d.getPlayer(), d.getCard());
+            Pair<Player, Card> playerPair;
+            if (d.getPlayer() == null) {
+                 playerPair = Pair.of(new Player(), d.getCard());
+            } else {
+                playerPair = Pair.of(d.getPlayer(), d.getCard());
+            }
             cards.add(playerPair);
         }
 
@@ -257,10 +263,12 @@ public class MainBoardService {
             for (Pair<Player, Card> pc : orcCards) {
                 if (currentCards.contains(pc.getSecond())) {
                     currentCards.remove(pc.getSecond());
-                    if (pc.getFirst() != null) {
-                        adwardMedal(orcCards);
-                    }
 
+                    Player p = pc.getFirst();
+                    Card c = pc.getSecond();
+                    if (p.getUser() != null) {
+                        cs.adwardMedalSingleAction(p,c);
+                    }
                 }
             }
         }
