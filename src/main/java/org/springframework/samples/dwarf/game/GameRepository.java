@@ -34,7 +34,7 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
     Page<Game> findAllPublicGames(Pageable pageable);
 
     @Query("SELECT g FROM Game g WHERE g.winner_id =?1")
-    List<Game> findAllWinnedGames(String userId);
+    List<Game> findAllWinnedGames(Integer userId);
 
     @Query("SELECT DISTINCT g FROM Game g JOIN g.players p WHERE p.user.username = :username")
     List<Game> findGamesByUserName(String username);
