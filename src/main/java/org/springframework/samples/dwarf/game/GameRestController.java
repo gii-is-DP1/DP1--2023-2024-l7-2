@@ -568,17 +568,20 @@ public class GameRestController {
         gs.saveGame(g);
 
         
-        Integer selectedPosition;
+        Integer selectedPosition, selectedGold, selectedIron, 
+            selectedSteal;
+        Object selectedObject;
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case "Muster an army":
                 List<Card> gameCards = g.getMainBoard().getCards();
                 ArrayList<Dwarf> gameDwarves = new ArrayList<>(g.getDwarves());
                 for (Card c : gameCards) {
-                    if (c.getCardType().getName().equals("orcCard")) {
+                    if (c.getCardType().getName().equals("OrcCard")) {
                         Dwarf d = new Dwarf();
                         d.setCard(c);
-                        d.setRound(g.getRound());
+                        d.setRound(round);
+                        d = ds.saveDwarf(d);
                         gameDwarves.add(d);
                     }
                 }
@@ -586,10 +589,10 @@ public class GameRestController {
                 gs.saveGame(g);
                 break;
             case "Special order":
-                Integer selectedGold = request.getSelectedGold();
-                Integer selectedIron = request.getSelectedIron();
-                Integer selectedSteal = request.getSelectedSteal();
-                Object selectedObject = request.getSelectedObject();
+                selectedGold = request.getSelectedGold();
+                selectedIron = request.getSelectedIron();
+                selectedSteal = request.getSelectedSteal();
+                selectedObject = request.getSelectedObject();
                 if (selectedGold != null && selectedIron != null
                         && selectedSteal != null && selectedObject != null 
                         && selectedGold + selectedIron + selectedSteal == 5
@@ -632,32 +635,32 @@ public class GameRestController {
 
             case "Sell an Item":
 
-                Object selectedObject2 = request.getSelectedObject();
-                Integer selectedGold2 = request.getSelectedGold();
-                Integer selectedIron2 = request.getSelectedIron();
-                Integer selectedSteal2 = request.getSelectedSteal();
-                if (selectedGold2 != null && selectedIron2 != null
-                        && selectedSteal2 != null && selectedObject2 != null) {
-                    // Check if the sum of gold, iron, and steel is 5
-                    if (selectedGold2 + selectedIron2 + selectedSteal2 == 5) {
+                selectedObject = request.getSelectedObject();
+                selectedGold = request.getSelectedGold();
+                selectedIron = request.getSelectedIron();
+                selectedSteal = request.getSelectedSteal();
+                if (selectedGold != null && selectedIron != null
+                    && selectedSteal != null && selectedObject != null 
+                    && selectedGold + selectedIron + selectedSteal == 5 
+                    && selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
 
-                        // Check if at least one of each material is selected
-                        if (selectedGold2 > 0 && selectedIron2 > 0 && selectedSteal2 > 0) {
+                    List<Object> playerObjects = p.getObjects();
+                    // Update player's state
+                    p.setGold(p.getGold() + selectedGold);
+                    p.setIron(p.getIron() + selectedIron);
+                    p.setSteal(p.getSteal() + selectedSteal);
 
-                            // Update player's state
-                            p.setGold(p.getGold() + selectedGold2);
-                            p.setIron(p.getIron() + selectedIron2);
-                            p.setSteal(p.getSteal() + selectedSteal2);
-
-                            // Remove the selected object
-                            p.getObjects().remove(selectedObject2);
-
-                            // Save the updated player
-                            ps.savePlayer(p);
-
-                            return ResponseEntity.ok().build();
-                        }
+                    // Remove the selected object
+                    if (!playerObjects.contains(selectedObject)) {
+                        // TODO: Create error
                     }
+                    playerObjects.remove(selectedObject);
+                    p.setObjects(playerObjects);
+                    // Save the updated player
+                    ps.savePlayer(p);
+                    return ResponseEntity.ok().build();
+                        
+                    
                 }
 
                 break;

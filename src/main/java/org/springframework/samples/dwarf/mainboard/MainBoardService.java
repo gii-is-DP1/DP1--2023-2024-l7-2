@@ -189,6 +189,7 @@ public class MainBoardService {
             if (d.getCard() == null) {
                 continue;
             }
+            
             Pair<Player, Card> playerPair = Pair.of(d.getPlayer(), d.getCard());
             cards.add(playerPair);
         }
@@ -256,7 +257,9 @@ public class MainBoardService {
             for (Pair<Player, Card> pc : orcCards) {
                 if (currentCards.contains(pc.getSecond())) {
                     currentCards.remove(pc.getSecond());
-                    adwardMedal(orcCards);
+                    if (pc.getFirst() != null) {
+                        adwardMedal(orcCards);
+                    }
 
                 }
             }
