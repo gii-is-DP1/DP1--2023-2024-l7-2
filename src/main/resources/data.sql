@@ -138,5 +138,3 @@ INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,22),(1,33),(1
 INSERT INTO main_board(id, card_deck_id) VALUES (1, 1);
 
 INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id, is_public) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1, False);
-
-

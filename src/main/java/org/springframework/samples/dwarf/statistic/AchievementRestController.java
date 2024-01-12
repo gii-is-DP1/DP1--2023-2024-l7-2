@@ -2,6 +2,7 @@ package org.springframework.samples.dwarf.statistic;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Empty;
+
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -43,6 +46,11 @@ public class AchievementRestController {
 	@GetMapping
 	public ResponseEntity<List<Achievement>> findAll() {
 		return new ResponseEntity<>((List<Achievement>) achievementService.getAchievements(), HttpStatus.OK);
+	}
+
+	@GetMapping("/all/{name}")
+	public ResponseEntity<List<Achievement>> findAllAchievements(@PathVariable("name") String name) {
+		return new ResponseEntity<>((List<Achievement>) achievementService.getAchievementByUserName(name), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
@@ -86,17 +94,17 @@ public class AchievementRestController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	@GetMapping("/allWinnedGames/{name}")
-	public ResponseEntity<Integer> findAllWinnedGames(@PathVariable("name") String name) {
-		List<Game> gamesToGet = achievementService.getAllWinnedGames(name);
+	@GetMapping("/allWinnedGames/{id}")
+	public ResponseEntity<Integer> findAllWinnedGames(@PathVariable("id") Integer id) {
+		List<Game> gamesToGet = achievementService.getAllWinnedGames(id);
 	 	Integer res = gamesToGet.size();
 	 	if (gamesToGet == null)
-	 		throw new ResourceNotFoundException("Games with name " + name + " not found!");
+	 		throw new ResourceNotFoundException("Games with name " + id + " not found!");
 	 	return new ResponseEntity<Integer>(res, HttpStatus.OK);
 	}
 
 	@GetMapping("/allPlayedGames/{username}")
-	public ResponseEntity<Integer> findAllPlayedGames(@PathVariable("usernamename") String username) {
+	public ResponseEntity<Integer> findAllPlayedGames(@PathVariable("username") String username) {
 	 	List<Game> gamesToGet = achievementService.getPlayedGames(username);
 	 	Integer res = gamesToGet.size();
 	 	if (gamesToGet == null)
@@ -105,28 +113,34 @@ public class AchievementRestController {
 	}
 
 	@GetMapping("/gameTimeList/{username}")
-	public ResponseEntity<List<Long>> findAllGameTime(@PathVariable("usernamename") String username) {
-	 	List<Game> gamesToGet = achievementService.getPlayedGames(username);
-	 	List<Long> gameTimes = null;
-	 	for(Game g : gamesToGet){
-	 		gameTimes.add(ChronoUnit.HOURS.between(g.getStart(), g.getFinish()));
-			
-	 	}
-	 	if (gameTimes == null)
-	 		throw new ResourceNotFoundException("Games with name " + username + " not found!");
-	 	return new ResponseEntity<List<Long>>(gameTimes, HttpStatus.OK);
+	public ResponseEntity<List<Long>> findAllGameTime(@PathVariable("username") String username) {
+    	List<Game> gamesToGet = achievementService.getPlayedGames(username);
+    	List<Long> gameTimes = new ArrayList<>();
+
+    	for (Game g : gamesToGet) {
+        	gameTimes.add(ChronoUnit.HOURS.between(g.getStart(), g.getFinish()));
+		}
+    	if (gameTimes.isEmpty()) {
+        // Si la lista está vacía, devuelve una lista que contiene solo 0
+        	gameTimes.add(0L);
+    	}
+
+    	return new ResponseEntity<List<Long>>(gameTimes, HttpStatus.OK);
 	}
 
+
 	@GetMapping("/mediaPlayers/{username}")
-	public ResponseEntity<Integer> findAllPlayersMeeted(@PathVariable("usernamename") String username) {
+	public ResponseEntity<Integer> findAllPlayersMeeted(@PathVariable("username") String username) {
 	 	List<Game> gamesToGet = achievementService.getPlayedGames(username);
-	 	List<Player> playersList = null;
-	 	for(Game g : gamesToGet){
+	 	List<Player> playersList = new ArrayList<>();
+	 	if (gamesToGet.isEmpty()){
+			gamesToGet.add(null);
+		}else{
+		for(Game g : gamesToGet){
 	 		playersList.addAll(g.getPlayers());
-	 	}
+	 	}}
 	 	Integer res = playersList.size()/gamesToGet.size();
-	 	if (playersList == null)
-	 		throw new ResourceNotFoundException("Games with name " + username + " not found!");
+	 		
 	 	return new ResponseEntity<Integer>(res, HttpStatus.OK);
 	}
 
