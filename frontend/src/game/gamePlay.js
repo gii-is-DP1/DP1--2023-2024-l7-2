@@ -25,6 +25,7 @@ export default function GamePlay() {
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
 
+  const [apprenticeAction, setApprenticeAction] = useState(false)
   const [gameStarted, setGameStarted] = useState(null);
   const [gameRound, setGameRound] = useState(null);
   const [choosedCard, setChoosedCard] = useState(null);
@@ -54,10 +55,11 @@ export default function GamePlay() {
     7: null,8: null,9: null}
   const [selectedCards,setSelectedCards] = useState(emptySelectedCards)
 
-  const emptyHistoricalCards = {1: [],2: [],3: [],
-    4: [],5: [],6: [],
-    7: [],8: [],9: []}
-  const [cardsHistorical,setCardsHistorical] = useState(emptyHistoricalCards)
+  
+  // const emptyHistoricalCards = {1: [],2: [],3: [],
+  //   4: [],5: [],6: [],
+  //   7: [],8: [],9: []}
+  // const [cardsHistorical,setCardsHistorical] = useState(emptyHistoricalCards)
 
 
   //const emptySelectedSpecialCards = {1: null,2: null,3: null}
@@ -142,30 +144,13 @@ export default function GamePlay() {
       }
     }).then(response => response.json()).then(response => {
         if (cards !== response) {
-          //let tmpCardsHistorical = cardsHistorical;
           setCards(response)
-          //console.log("THE RESPONSE ",response)
-          /*
-          let i;
-          for (i = 0; i < response.length ; i++) {
-            let positionHistorical = tmpCardsHistorical[i+1]
-            console.log(tmpCardsHistorical)
-            console.log(response)
-            if (positionHistorical.length === 0) {
-              tmpCardsHistorical[i+1].push(response[i])
-            }
-            let positionLen = positionHistorical.length
-
-            if (positionHistorical[positionLen-1].id !== response[i].id) {
-              tmpCardsHistorical[i+1].push(response[i])
-            }
-          }
-
-          setCardsHistorical(tmpCardsHistorical)*/
         }
     })
   }, [gameRound, specialCardToBeConfirmed])
   
+  useEffect(() => {if(apprenticeAction)setApprenticeAction(false)},[gameRound])
+
   function checkResourcesSelectCard(card) {
     
     if (card.totalGold * -1 > player.gold) {
@@ -190,7 +175,7 @@ export default function GamePlay() {
       return false; // Just a random return to ensure that function exits
     }
 
-    if (selectedCards[id] !== null && selectedCards[id] !== undefined) {
+    if (!apprenticeAction && selectedCards[id] !== null && selectedCards[id] !== undefined) {
       // Card is already selected, you can't select it
       setMessage("Card already selected");
       setVisible(true);
@@ -225,27 +210,18 @@ export default function GamePlay() {
     setChoosedSpecialCard(specialCard)
   }
 
-
-  //console.log(selectedCards)
   function getCardColor(id,card) {
-    // If card was already selected by another player, card's color is other player's color
-    let color = selectedCards[id] !== null ? selectedCards[id] : "white"
-
-    // Else it is checked if the card has been selected
+    // it is checked if the card has been selected
+    let color = choosedCard === card ? player.color : "white"
+    
+    // Else if card was already selected by another player, card's color is other player's color
     if ( color === "white") {
-      color = choosedCard === card ? player.color : "white"
+      color = selectedCards[id] !== null ? selectedCards[id] : "white"
+      
     }
 
     return color
   }
-/*
-  function specialOrderHandler() {
-    specialOrder(code, jwt, setSelectedCards);
-  }
-  const isSpecialOrderCard = (specialCard) => {
-    // Replace 'isSpecialOrderCard' with the actual property or condition that identifies the "Special Order" card
-    return specialCard  === "Special Order";
-  };*/
 
   const playerList = players.map((play) => {
     return (
@@ -283,6 +259,7 @@ export default function GamePlay() {
       card={choosedSpecialCard}
       code={code}
       playerObjects={player.objects}
+      setApprenticeAction={setApprenticeAction}
     ></ConfirmSpecialCardModel>
 
     <ChatModel
