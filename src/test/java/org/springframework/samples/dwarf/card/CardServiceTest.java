@@ -2,11 +2,16 @@ package org.springframework.samples.dwarf.card;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,7 +20,10 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.samples.dwarf.game.Game;
+import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.samples.dwarf.player.Player;
+import org.springframework.samples.dwarf.object.*;
+import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +36,11 @@ public class CardServiceTest {
 
     @Autowired
     private PlayerService playerService;
+
+    @Autowired
+    private GameService gameService;
+
+   
 
     @Test
     public void testGetCards() {
@@ -121,7 +134,6 @@ public class CardServiceTest {
         assertEquals(4, player1.getIron()); // 5 - 1 = 4
         assertEquals(0, player2.getIron()); // La cantidad de hierro no debería ser menor que 0
     }
-/*
     @Test
     public void testOrcCardSidheAction() {
         // Datos de prueba
@@ -139,11 +151,9 @@ public class CardServiceTest {
 
         List<Player> players = Arrays.asList(player1, player2, player3);
 
-        // Configuración del repositorio mock
-        when(playerRepository.findAll()).thenReturn(players);
-
+        
         // Llamada al método que queremos probar
-        gameService.orcCardSidheAction(mock(Game.class));
+        cardService.orcCardSidheAction(players);
 
         // Verificaciones
         assertEquals(7, player1.getIron()); // 5 + 2 = 7
@@ -167,11 +177,9 @@ public class CardServiceTest {
 
         List<Player> players = Arrays.asList(player1, player2);
 
-        // Configuración del repositorio mock
-        when(playerRepository.findAll()).thenReturn(players);
 
         // Llamada al método que queremos probar
-        gameService.orcCardDragonAction(mock(Game.class));
+        cardService.orcCardDragonAction(players);
 
         // Verificaciones
         assertEquals(4, player1.getGold()); // 5 - 1 = 4
@@ -189,14 +197,121 @@ public class CardServiceTest {
 
         List<Player> players = Arrays.asList(player1, player2);
 
-        // Configuración del repositorio mock
-        when(playerRepository.findAll()).thenReturn(players);
-
         // Llamada al método que queremos probar
-        gameService.orcCardGreatDragonAction(mock(Game.class));
+        cardService.orcCardGreatDragonAction(players);
 
         // Verificaciones
         assertEquals(0, player1.getGold()); 
         assertEquals(0, player2.getGold()); 
-    }*/
+    }
+
+    @Test
+    public void testCanApplyCard_PlayerHasEnoughResources_ReturnsTrue() {
+        
+        Player player = new Player();
+        player.setGold(10);
+        player.setSteal(5);
+        player.setIron(8);
+        player.setMedal(3);
+
+        Card card = new Card();
+        card.setTotalGold(-5);
+        card.setTotalSteal(-3);
+        card.setTotalIron(-2);
+        card.setTotalMedals(-1);
+
+       
+        boolean result = cardService.canApplyCard(player, card);
+
+        
+        assertTrue(result);
+    }
+
+    @Test
+    public void testCanApplyCard_PlayerDoesNotHaveEnoughResources_ReturnsFalse() {
+        
+        Player player = new Player();
+        player.setGold(5);
+        player.setSteal(2);
+        player.setIron(3);
+        player.setMedal(1);
+
+        Card card = new Card();
+        card.setTotalGold(-10);
+        card.setTotalSteal(-5);
+        card.setTotalIron(-8);
+        card.setTotalMedals(-3);
+
+        
+        boolean result = cardService.canApplyCard(player, card);
+
+        
+        assertFalse(result);
+    }
+
+    @Test
+    public void testForjar_CanApplyCard() {
+        
+        Player player = new Player();
+        player.setGold(10);
+        player.setSteal(5);
+        player.setIron(8);
+        player.setMedal(3);
+        player.setObjects(new ArrayList<>());
+
+        Card card = new Card();
+        card.setTotalGold(-5);
+        card.setTotalSteal(-3);
+        card.setTotalIron(-2);
+        card.setTotalMedals(-1);
+        
+
+        
+        cardService.forjarSingleAction(player, card);
+
+        
+        assertEquals(5, player.getGold());   // 10 - 5 = 5
+        assertEquals(2, player.getSteal());  // 5 - 3 = 2
+        assertEquals(6, player.getIron());   // 8 - 2 = 6
+        assertEquals(2, player.getMedal());  // 3 - 1 = 2
+        
+
+        
+    }
+
+    @Test
+    public void testForjarn_CannotApplyCard() {
+        
+        Player player = new Player();
+        player.setGold(5);
+        player.setSteal(2);
+        player.setIron(3);
+        player.setMedal(1);
+        player.setObjects(new ArrayList<>());
+
+        Card card = new Card();
+        card.setTotalGold(-10);
+        card.setTotalSteal(-5);
+        card.setTotalIron(-8);
+        card.setTotalMedals(-3);
+        
+
+        
+        cardService.forjarSingleAction(player, card);
+
+        
+        assertEquals(5, player.getGold());  
+        assertEquals(2, player.getSteal());
+        assertEquals(3, player.getIron());
+        assertEquals(1, player.getMedal());
+       
+
+        
+    }
+
+
+
+
+
+
 }

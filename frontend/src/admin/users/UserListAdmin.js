@@ -42,12 +42,7 @@ export default function UserListAdmin() {
     }).catch((error) => {window.alert(error);});
     }, [page ,pageSize]);
     
-  // let datatable = data.content.map((user) =>{
-  //   return ( <tr>
-  //   <td>{user.username}</td>
-  //   </tr>);
-  // });
-  
+
   function handleNextPage(){
     if(data.content.length >= pageSize)
       setPage (page+1);

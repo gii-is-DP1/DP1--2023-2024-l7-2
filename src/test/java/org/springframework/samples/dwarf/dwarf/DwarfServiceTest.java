@@ -71,4 +71,22 @@ public class DwarfServiceTest {
         Dwarf result = dwarfService.getById(dwarfId);
         assertNull(result, "Se esperaba null para un ID inexistente");
     }
+
+    @Test
+    public void testDeleteDwarf() {
+        
+        Dwarf dwarfToDelete = new Dwarf();
+
+        
+        dwarfService.deleteDwarf(dwarfToDelete);
+
+        
+        verify(dwarfRepository, times(1)).delete(dwarfToDelete);
+    }
+
+    @Test
+    public void testDeleteDwarf_WithNullDwarf() {
+        
+        assertDoesNotThrow(() -> dwarfService.deleteDwarf(null));
+    }
 }

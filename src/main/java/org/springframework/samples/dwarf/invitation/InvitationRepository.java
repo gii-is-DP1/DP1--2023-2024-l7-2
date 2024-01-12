@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.stereotype.Repository;
 
@@ -13,11 +14,12 @@ public interface InvitationRepository extends CrudRepository<Invitation, Integer
 
     public List<Invitation> findAll();
 
-
     public Optional<Invitation> findById(Integer id);
 
     @Query("SELECT fr FROM Invitation fr WHERE fr.sender = :u OR fr.receiver = :u")
     public List<Invitation> findByUser(User u);
 
+    @Query("SELECT inv.game FROM Invitation inv WHERE inv.receiver = :u")
+    public List<Game> findGamesInvitedTo(User u);
+
 }
-   
