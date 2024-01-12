@@ -260,6 +260,7 @@ export default function GamePlay() {
       code={code}
       playerObjects={player.objects}
       setApprenticeAction={setApprenticeAction}
+      selectedCards={selectedCards}
     ></ConfirmSpecialCardModel>
 
     <ChatModel

@@ -669,9 +669,10 @@ public class GameRestController {
                 }
 
                 break;
-/*
+
             case "Apprentice":
 
+                selectedPosition = request.getPosition();
                 List<Dwarf> roundDwarvesApprentice = g.getDwarves();
                 roundDwarvesApprentice = roundDwarvesApprentice.stream()
                         .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
@@ -679,8 +680,7 @@ public class GameRestController {
                 // Lógica para manejar la acción de la carta "Apprentice"
                 for (Dwarf d : roundDwarvesApprentice) {
 
-                    // Verifica si la carta es ocupada por otro jugador
-                    if (!d.getPlayer().equals(p)) {
+                    if (!d.getPlayer().equals(p) && d.getCard().getPosition().equals(selectedPosition)) {
                         // Coloca un nuevo enano en la misma posición
                         Dwarf newDwarf = new Dwarf();
                         newDwarf.setPlayer(p);
@@ -696,7 +696,7 @@ public class GameRestController {
                     }
                 }
                 break;
-*/
+
             case "Turn back":
                 // Lógica para manejar la acción de la carta "Turn back"
                 List<Location> newLocationsTurnBack = new ArrayList<>(mb.getLocations());

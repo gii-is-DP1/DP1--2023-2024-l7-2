@@ -6,7 +6,7 @@ import {FormSellAnItem, resolveSellAnItem} from './SpecialCardForms/SellAnItemFo
 import {FormSpecialOrder, resolveSpecialOrder} from './SpecialCardForms/SpecialOrderForm';
 import {FormPastGlories, resolvePastGlories} from './SpecialCardForms/PastGloriesForm';
 import {FormTurnBack, resolveTurnBack} from './SpecialCardForms/TurnBackForm';
-
+import {FormApprentice, resolveApprentice} from './SpecialCardForms/ApprenticeForm'
 const jwt = tokenService.getLocalAccessToken();
 
 export default function ConfirmSpecialCardModel(props) {
@@ -121,12 +121,13 @@ export default function ConfirmSpecialCardModel(props) {
                 break
             case "Apprentice":
                 console.log("Apprentice selected")
-                props.setApprenticeAction(true)
-                resolveSellAnItem(props.code,jwt, {
+                console.log(position)
+                resolveTurnBack(props.code,jwt, {
                     specialCard: props.card,
                     usesBothDwarves: numberOfDwarves === 2,
+                    position: position
                 })
-                break;
+                break
             default:
                 resolveSellAnItem(props.code,jwt, {
                     specialCard: props.card,
@@ -179,6 +180,12 @@ export default function ConfirmSpecialCardModel(props) {
                     {title == "Turn back" && 
                         <FormTurnBack
                             position={position} setPosition={setPosition}
+                        />
+                    }
+                    {title == "Apprentice" && 
+                        <FormApprentice
+                            position={position} setPosition={setPosition}
+                            selectedCards={props.selectedCards}
                         />
                     }
                 </ModalBody>
