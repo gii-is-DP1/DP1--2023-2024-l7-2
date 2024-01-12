@@ -119,6 +119,14 @@ export default function ConfirmSpecialCardModel(props) {
                     position: position
                 })
                 break
+            case "Apprentice":
+                console.log("Apprentice selected")
+                props.setApprenticeAction(true)
+                resolveSellAnItem(props.code,jwt, {
+                    specialCard: props.card,
+                    usesBothDwarves: numberOfDwarves === 2,
+                })
+                break;
             default:
                 resolveSellAnItem(props.code,jwt, {
                     specialCard: props.card,

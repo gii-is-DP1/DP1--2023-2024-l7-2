@@ -669,7 +669,7 @@ public class GameRestController {
                 }
 
                 break;
-
+/*
             case "Apprentice":
 
                 List<Dwarf> roundDwarvesApprentice = g.getDwarves();
@@ -696,7 +696,7 @@ public class GameRestController {
                     }
                 }
                 break;
-
+*/
             case "Turn back":
                 // Lógica para manejar la acción de la carta "Turn back"
                 List<Location> newLocationsTurnBack = new ArrayList<>(mb.getLocations());
