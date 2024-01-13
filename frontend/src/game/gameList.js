@@ -67,16 +67,36 @@ export default function GameList() {
 
   }
 
+  function gamePlayers(players) {
+    
+    if (players.length == 0) {
+      return "No players"
+    }
+    let res = players[0].name;
+
+    if (players.length>1) {
+      res = res + "," + players[1].name;
+      if (players.length === 3){
+        res = res + "," + players[2].name;
+      }
+    }
+
+    return res;
+  }
+
     
     function showGame(game) {
+      const players = gamePlayers(game.players)
       return (
         <tr key={game.id}>
           <td className="text-center">{game.name}</td>
           <td className="text-center">{game.isPublic?"Public":"Private"}</td>
+          <td className="text-center">{game.playerCreator?game.playerCreator.name:"No player creator"}</td>
           <td className="text-center">{game.start==null?'Waiting':(game.finish==null?'Playing':'Finished')}</td>
           <td className="text-center">{game.finish?game.finish:'not finished'}</td>
           <td className="text-center">{game.finish!=null?(game.winner_id==null?'"Tie"':game.winner_id):'-'}</td>
           <td className="text-center">{game.finish?'-':game.round}</td>
+          <td className="text-center">{players}</td>
           <td className="text-center">
             {username==game.playerCreator || role=="ADMIN"?
               <ButtonGroup>
@@ -194,6 +214,7 @@ export default function GameList() {
                 <th width="15%" className="text-center">Finished</th>
                 <th width="15%" className="text-center">Winner</th>
                 <th width="15%" className="text-center">Round</th>
+                <th width="15%" className="text-center">Players</th>
               </tr>
             </thead>
             <tbody>{gamesList}</tbody>

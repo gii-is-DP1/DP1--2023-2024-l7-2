@@ -10,6 +10,7 @@ import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.model.BaseEntity;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
@@ -22,13 +23,13 @@ import lombok.Setter;
 @Setter
 public class MainBoard extends BaseEntity {
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private CardDeck cardDeck;
 
     // @OneToOne
     // private SpecialCardDeck specialCardDeck;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Location> locations;
 
     @ManyToMany
