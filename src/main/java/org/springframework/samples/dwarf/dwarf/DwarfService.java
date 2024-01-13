@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.samples.dwarf.card.Card;
+import org.springframework.samples.dwarf.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +44,23 @@ public class DwarfService {
      * }
      */
 
+    @Transactional
     public void deleteDwarf(Dwarf d) {
         repo.delete(d);
     }
+
+    @Transactional
+    public Dwarf genAndSave(Player p, Integer pos, Card c) {
+        Dwarf dwarf = new Dwarf();
+
+        dwarf.setPlayer(p);
+        dwarf.setRound(pos);
+        dwarf.setCard(c);
+
+        dwarf = saveDwarf(dwarf);
+        return dwarf;
+    }
+
+
 
 }

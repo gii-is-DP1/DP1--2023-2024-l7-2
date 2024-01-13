@@ -42,7 +42,7 @@ public class GameRestControllerTest {
         invitationService = mock(InvitationService.class);
 
         gameRestController = new GameRestController(gameService, userService, playerService, null, null,
-                locationService, null, null, null);
+                locationService, null, null, null, null);
     }
 
     @Test

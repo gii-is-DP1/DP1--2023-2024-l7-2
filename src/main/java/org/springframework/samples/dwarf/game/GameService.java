@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
+import org.springframework.samples.dwarf.card.CardType;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.location.Location;
@@ -114,6 +115,14 @@ public class GameService {
         return gr.findAllPublicGames(pageable);
     }
 
+    @Transactional(readOnly = true)
+    public List<Dwarf> getRoundDwarfs(Game g, Integer round) {
+        List<Dwarf> roundDwarves = g.getDwarves();
+        roundDwarves = roundDwarves.stream()
+                .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
+        return roundDwarves;
+    }
+
     @Transactional
     public Game addPlayer(Game g, Player p) {
         ArrayList<Player> players = new ArrayList<Player>();
@@ -173,13 +182,36 @@ public class GameService {
         remaining_turns.addAll(plys);
         // Se ponen al final porque deben de ser los ultimos en tirar
         // Es decir, cuando se resuelven las acciones
+        Map<Player,Boolean> hasUsedSpecialCard = new HashMap<Player,Boolean>();
+        Player lastPlayer = null;
         for (Dwarf d : dwarves) {
-            if (d.getCard() == null) {
+
+            Player p = d.getPlayer();
+            lastPlayer = p;
+            Card c = d.getCard();
+            if (!hasUsedSpecialCard.containsKey(p)) {
+                hasUsedSpecialCard.put(p, false);
+            }
+
+            // Se ha usado una carta especial
+            if (c == null) {
+                if (!hasUsedSpecialCard.get(p)) {
+                    hasUsedSpecialCard.put(p, true);
+                }
                 continue;
             }
-            if (d.getCard().getCardType().getName().equals(helpCard)) {
-                remaining_turns.add(d.getPlayer());
-                remaining_turns.add(d.getPlayer());
+
+            // Si se ha tirado una carta despues de la carta especial significa que
+            // la carta especial te deja tirar un dwarf de mas.
+            if (lastPlayer.getName().equals(p.getName()) && hasUsedSpecialCard.get(p)) {
+                hasUsedSpecialCard.put(p, false);
+                remaining_turns.add(p);
+            }
+
+            CardType ct = c.getCardType();
+            if (ct.getName().equals(helpCard)) {
+                remaining_turns.add(p);
+                remaining_turns.add(p);
             }
         }
         return remaining_turns;
@@ -195,7 +227,7 @@ public class GameService {
 
         List<Player> remainingTurns = getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
 
-        return thisRoundDwarves.size() == remainingTurns.size();
+        return thisRoundDwarves.size() >= remainingTurns.size();
     }
 
     @Transactional

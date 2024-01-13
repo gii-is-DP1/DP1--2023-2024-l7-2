@@ -11,6 +11,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.card.SpecialCardRepository;
 import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
@@ -39,22 +40,20 @@ public class MainBoardService {
     private final Integer MAX_NUMBER_SPECIAL_CARD_DECK = 9;
 
 
-    MainBoardRepository repo;
+    private final MainBoardRepository repo;
+    private final SpecialCardRepository specCardRepo;
     private final CardDeckService cds;
-    private final SpecialCardDeckService scds;
-    private final SpecialCardService scs;
     private final CardService cs;
     private final LocationService ls;
 
     @Autowired
-    public MainBoardService(MainBoardRepository repo, CardDeckService cds, SpecialCardDeckService scds,
-            SpecialCardService scs, CardService cs, LocationService ls) {
+    public MainBoardService(MainBoardRepository repo, SpecialCardRepository specCardRepo, CardDeckService cds, 
+        CardService cs, LocationService ls) {
         this.repo = repo;
         this.cds = cds;
-        this.scds = scds;
-        this.scs = scs;
         this.cs = cs;
         this.ls = ls;
+        this.specCardRepo = specCardRepo;
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +72,15 @@ public class MainBoardService {
         return result.isPresent() ? result.get() : null;
     }
 
+    @Transactional(readOnly = true)
+    public List<SpecialCard> initializeSpecialCards() {
+        ArrayList<SpecialCard> cards = new ArrayList<SpecialCard>();
+        cards.addAll(specCardRepo.findAll());
+
+        Collections.shuffle(cards);
+        return cards;
+    }
+
     @Transactional
     public MainBoard initialize() {
 
@@ -86,7 +94,7 @@ public class MainBoardService {
         List<Location> locations = ls.initialize();
         mb.setLocations(locations);
 
-        List<SpecialCard> specCards = scs.initializeSpecialCards();
+        List<SpecialCard> specCards = initializeSpecialCards();
         mb.setSCards(specCards);
         
         mb = saveMainBoard(mb);
@@ -302,6 +310,18 @@ public class MainBoardService {
     }
 
     @Transactional
+    public void applySingleCardWhenSpecialCard(List<Dwarf> roundDwarves, Card reverseCard) {
+        for (Dwarf d : roundDwarves) {
+            Card dwarfCard = d.getCard();
+            Player p = d.getPlayer();
+
+            if (reverseCard.getPosition().equals(dwarfCard.getPosition())) {
+                applySingleCardWhenSpecialCardAction(p, dwarfCard);
+            }
+        }
+    }
+
+    @Transactional
     public void applySingleCardWhenSpecialCardAction(Player p, Card c) {
         switch (c.getCardType().getName()) {
             case otherCard:
@@ -337,7 +357,7 @@ public class MainBoardService {
     }
 
     @Transactional
-    public MainBoard applyReverseSpecialCard(MainBoard mb, Card reverseCard) {
+    public MainBoard putReverseSpecialCard(MainBoard mb, Card reverseCard) {
         //MainBoard mb = g.getMainBoard();
         ArrayList<Location> newLocations = new ArrayList<>();
         newLocations.addAll(mb.getLocations());
@@ -348,6 +368,16 @@ public class MainBoardService {
         //mb = saveMainBoard(mb);
 
         return mb;
+    }
 
+    @Transactional
+    public MainBoard handleSpecialCardTurn(MainBoard mb, Card reverseCard, SpecialCard specialCard, List<Dwarf> roundDwarves) {
+        applySingleCardWhenSpecialCard(roundDwarves, reverseCard);
+
+
+        mb = removeUsedSpecialCard(mb, specialCard);
+        mb = putReverseSpecialCard(mb, reverseCard);
+        mb = saveMainBoard(mb);
+        return mb;
     }
 }
