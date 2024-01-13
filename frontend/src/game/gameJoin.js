@@ -165,6 +165,7 @@ export default function GameJoin() {
         <div>
             <div className="row" style={{height: "100vh", width: "100vw"}}>
                 <div className="col game-join-container" style={{height: "100vh", width: "100vw"}}>
+                            <div className="custom-button-column">
                                 <h1 className="text-center" style={{ color: 'white'}}>
                                     Join a game
                                 </h1>
@@ -189,23 +190,24 @@ export default function GameJoin() {
                                     </div>
                                 </Form>
                                 <br></br>
-                                <div className="custom-button-column">
-                                    <h4 className="text-center" style={{ color: 'white', textDecoration: 'underline'}}>
-                                        Join public games
-                                    </h4>
-                                    {gameList}
-                                    {invitationList.length < 3 ? 
-                                    <div className="pagination-container" style={{ margin: "20px" }}>
-                                        <Button style={{ marginRight: "10px" }} onClick={handlePreviousPage}>
-                                            Prev Page
-                                        </Button>
+                            </div>
+                            <div className="custom-button-column">
+                                <h4 className="text-center" style={{ color: 'white', textDecoration: 'underline'}}>
+                                    Join public games
+                                </h4>
+                                {gameList}
+                                {invitationList.length < 3 ? 
+                                <div className="pagination-container" style={{ margin: "20px" }}>
+                                    <Button style={{ marginRight: "10px" }} onClick={handlePreviousPage}>
+                                        Prev Page
+                                    </Button>
 
-                                        <Button onClick={handleNextPage}>
-                                            Next Page
-                                        </Button>
-                                    </div>
-                                    :<br></br>}
+                                    <Button onClick={handleNextPage}>
+                                        Next Page
+                                    </Button>
                                 </div>
+                                :<br></br>}
+                            </div>
                 </div>
                 <div className="col game-create-container">
                         <h1 className="text-center" style={{ color: 'white'}}>
