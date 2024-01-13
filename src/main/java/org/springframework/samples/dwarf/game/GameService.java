@@ -41,6 +41,7 @@ public class GameService {
     LocationService ls;
     CardService cs;
 
+    private final Integer MAX_DWARVES_PER_PLAYER = 4;
     final String helpCard = "HelpCard";
     final String orcCard = "OrcCard";
     final String objectCard = "ObjectCard";
@@ -227,7 +228,8 @@ public class GameService {
 
         List<Player> remainingTurns = getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
 
-        return thisRoundDwarves.size() >= remainingTurns.size();
+        return thisRoundDwarves.size() >= remainingTurns.size() 
+            || thisRoundDwarves.size() >= MAX_DWARVES_PER_PLAYER*plys.size() ;
     }
 
     @Transactional

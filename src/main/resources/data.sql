@@ -140,12 +140,13 @@ INSERT INTO location_cards(location_id,cards_id) VALUES (1,1),(1,22),(1,33),(2,1
 
 INSERT INTO main_board_locations(main_board_id, locations_id) VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9);
 
-INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id, is_public) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,5,1,1, False);
-
 INSERT INTO player(id,user_id,name,iron,gold,steal,medal,color) VALUES 
         (1,4,'owner1',0,0,0,0,'red'),
         (2,5,'owner2',6,7,8,10,'blue'),
         (3,6,'owner3',10,20,50,30,'yellow');
+INSERT INTO game(id,name,player_creator_id,code,start,finish, winner_id, round, main_board_id, is_public) VALUES 
+        (4,'game-test',1,'test-code','2023-04-11 10:20',null,5,1,1, False);
+
 
 INSERT INTO player_objects(player_id, objects_id) VALUES (2,1), (3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8);
 
