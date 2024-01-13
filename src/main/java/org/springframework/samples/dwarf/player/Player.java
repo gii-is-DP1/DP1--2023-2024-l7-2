@@ -8,8 +8,8 @@ import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.user.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +30,7 @@ public class Player extends NamedEntity {
     @ManyToOne(optional = true)
     private User user;
 
-    @OneToMany
+    @ManyToMany
     List<Object> objects;
 
 }
