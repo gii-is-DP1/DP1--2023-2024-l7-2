@@ -31,6 +31,8 @@ export default function StatsList() {
             Accept: "application/json",
             "Content-Type": "application/json",
           }
+
+          
         });
 
         if (!achievementsResponse.ok) {
@@ -130,7 +132,7 @@ export default function StatsList() {
 
   console.log(statistic.victories);
 
-  const filteredStats = stats.filter((achievement) => achievement.description === "Stats");
+  const filteredStats = stats.filter((achievement) => achievement.description === "stats");
 
 const statsList = Array.isArray(filteredStats) && filteredStats.map((request) => (
   <tr key={request.id}>

@@ -67,4 +67,9 @@ public class AchievementService {
     public List<Game> getPlayedGames(String username) {
         return gameRepo.findGamesByUserName(username);
     }
+
+    @Transactional(readOnly = true)
+    public List<Achievement> getAllStats(String description) {
+        return repo.findAllStats(description);
+    }
 }

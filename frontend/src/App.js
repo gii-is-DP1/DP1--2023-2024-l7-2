@@ -32,6 +32,7 @@ import GameEnd from "./game/gameEnd";
 import CardViewer from "./cards/cardViewer";
 import CardList from "./cards/cardList";
 import GamesPublics from "./game/gamesPublics";
+import LeaderboardList from "./leaderboard/leaderboardPage";
 
 
 
@@ -90,6 +91,7 @@ function App() {
           <Route path="/game/edit/" exact={true} element={<PrivateRoute><GameEdit/></PrivateRoute>} />
           <Route path="/game/:gameId" exact={true} element={<PrivateRoute><GamePlay/></PrivateRoute>} />
           <Route path="/friends" exact={true} element={<PrivateRoute><FriendsPage/></PrivateRoute>}/>
+          <Route path="/leaderboard" exact={true} element={<PrivateRoute><LeaderboardList/></PrivateRoute>}/>
           <Route path="/friendRequest/SentRequest" exact={true} element={<PrivateRoute><SentRequest/></PrivateRoute>}/>
           <Route path="/friendRequest/BlockRequest" exact={true} element={<PrivateRoute><BlockRequest/></PrivateRoute>}/>
           <Route path="/rules" exact={true} element={<PrivateRoute><RulesText/></PrivateRoute>}/>
