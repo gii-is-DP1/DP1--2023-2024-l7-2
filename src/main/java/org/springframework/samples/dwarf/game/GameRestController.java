@@ -529,7 +529,6 @@ public class GameRestController {
 
         gs.saveGame(g);
 
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

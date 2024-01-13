@@ -17,6 +17,7 @@ export default function UserEditPage() {
         password: user1.password
       };
 
+    const [passw, setPassw] = useState("");
     const [message, setMessage] = useState(null);
     const [visible, setVisible] = useState(false);
     const [user, setUser] = useFetchState(
@@ -26,14 +27,16 @@ export default function UserEditPage() {
         setMessage,
         setVisible
     );
-
-    console.log(`/api/v1/users/${user.id}`)
       
     function handleSubmit(event) {
         event.preventDefault();
     
-        fetch("/api/v1/users" + (user.id ? "/" + user.id : ""), {
-          method: user.id ? "PUT" : "POST",
+        if (passw !== ""){
+          setUser({ ...user, password: passw })
+        }
+
+        fetch("/api/v1/auth/update/" + user.id, {
+          method: "POST",
           headers: {
             Authorization: `Bearer ${jwt}`,
             Accept: "application/json",
@@ -41,12 +44,21 @@ export default function UserEditPage() {
           },
           body: JSON.stringify(user),
         })
-          .then((response) => response.json())
-          .then((json) => {
-            if (json.message) {
-              setMessage(json.message);
-              setVisible(true);
-            } else window.location.href = "/user";
+          .then((response) => {
+            if (response.status !== 200) return Promise.reject("Invalid login attempt");
+            fetch("/api/v1/auth/signin", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${jwt}`,
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({username:user.username,password:user.password}),
+            }).then((response)=> response.json()).then((data)=> {
+              tokenService.setUser(data);
+              tokenService.updateLocalAccessToken(data.token);
+              //window.location.href = "/user"
+            })
           })
           .catch((message) => alert(message));
       }
@@ -77,11 +89,10 @@ export default function UserEditPage() {
             </Label>
             <Input
               type="password"
-              required
               name="password"
               id="password"
-              value={user.password || ""}
-              onChange={(e) => setUser({ ...user, password: e.target.value })}
+              value={passw || ""}
+              onChange={(e) => setPassw(e.target.value)}
               className="custom-input"
             />
           </div>

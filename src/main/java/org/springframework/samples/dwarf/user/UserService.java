@@ -26,19 +26,22 @@ import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.samples.dwarf.friendRequest.FriendRequestService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
 
+	private final PasswordEncoder encoder;
 	private UserRepository userRepository;
 	private FriendRequestService friendRequestService;
 
 	@Autowired
-	public UserService(UserRepository userRepository, FriendRequestService friendRequestService) {
+	public UserService(UserRepository userRepository, FriendRequestService friendRequestService, PasswordEncoder encoder) {
 		this.userRepository = userRepository;
 		this.friendRequestService = friendRequestService;
+		this.encoder = encoder;
 	}
 
 	@Transactional
@@ -84,7 +87,8 @@ public class UserService {
 	@Transactional
 	public User updateUser(@Valid User user, Integer idToUpdate) {
 		User toUpdate = findUserById(idToUpdate);
-		BeanUtils.copyProperties(user, toUpdate, "id");
+		toUpdate.setUsername(user.getUsername());
+		toUpdate.setPassword(encoder.encode(toUpdate.getPassword()));
 		userRepository.save(toUpdate);
 
 		return toUpdate;
