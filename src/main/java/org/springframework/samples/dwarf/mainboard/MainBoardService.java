@@ -12,7 +12,6 @@ import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.card.SpecialCardRepository;
-import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
@@ -20,8 +19,6 @@ import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.player.Player;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,11 +124,16 @@ public class MainBoardService {
     }
 
     @Transactional
-    public void collapseTheShaftsAction(MainBoard mb) {
+    public MainBoard collapseTheShaftsAction(MainBoard mb) {
 
+        List<Location> locations = new ArrayList<Location>();
         for (Location lc:mb.getLocations()) {
-            ls.putFirstCardAtEnd(lc);
+            Location l = ls.putFirstCardAtEnd(lc);
+            locations.add(l);
         }
+        mb.setLocations(locations);
+        mb = saveMainBoard(mb);
+        return mb;
     }
 
     @Transactional

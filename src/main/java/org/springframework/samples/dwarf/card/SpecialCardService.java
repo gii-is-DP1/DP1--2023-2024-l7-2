@@ -256,15 +256,18 @@ public class SpecialCardService {
 
             case SPECIAL_CARD_HOLD_A_COUNCIL:
                 mb = mbService.holdACouncilAction(mb);
+                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, mb);
                 break;
 
             case SPECIAL_CARD_COLLAPSE_THE_SHAFTS:
-                mbService.collapseTheShaftsAction(mb);
+                mb = mbService.collapseTheShaftsAction(mb);
+                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, mb);
                 break;
 
             case SPECIAL_CARD_RUN_AMOK:
                 mb = mbService.runAmokAction(mb);
                 mb = mbService.saveMainBoard(mb);
+                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, mb);
                 g.setMainBoard(mb);
                 break;
 
@@ -281,7 +284,7 @@ public class SpecialCardService {
                 locations = new ArrayList<>(mb.getLocations());
 
                 g = turnBackAction(g, p, round, selectedPosition, locations);
-
+                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, g.getMainBoard());
                 break;
             case SPECIAL_CARD_PAST_GLORIES:
                 locations = new ArrayList<>(mb.getLocations());
