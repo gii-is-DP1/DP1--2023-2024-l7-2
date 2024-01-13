@@ -3,6 +3,7 @@ package org.springframework.samples.dwarf.statistic;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -51,6 +52,23 @@ public class AchievementRestController {
 	@GetMapping("/all/{name}")
 	public ResponseEntity<List<Achievement>> findAllAchievements(@PathVariable("name") String name) {
 		return new ResponseEntity<>((List<Achievement>) achievementService.getAchievementByUserName(name), HttpStatus.OK);
+	}
+
+	@GetMapping("/statsByName/{name}")
+	public ResponseEntity<List<Achievement>> findStatsByUser(@PathVariable("name") String name) {
+		List<Achievement> stats = achievementService.getAchievementByUserName(name);
+    	List<Achievement> stats2 = new ArrayList<>();
+
+    	for (Achievement a : stats) {
+			if (a.getDescription() == "stats") {
+					stats2.add(a);
+				}
+		}
+    	if (stats2.isEmpty()) {
+			stats2.add(null);
+    	}
+
+    	return new ResponseEntity<List<Achievement>>(stats2, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
@@ -142,6 +160,18 @@ public class AchievementRestController {
 	 	Integer res = playersList.size()/gamesToGet.size();
 	 		
 	 	return new ResponseEntity<Integer>(res, HttpStatus.OK);
+	}
+
+	@GetMapping("/allStats")
+	public ResponseEntity<List<Achievement>> findAllStats() {
+	 	List<Achievement> statsToGet = achievementService.getAllStats("stats");
+	 	if (statsToGet.isEmpty()){
+			statsToGet.add(null);
+		}else{
+		   statsToGet.sort(Comparator.comparingInt(Achievement::getTotalVictories).reversed());
+	 	}
+	 		
+	 	return new ResponseEntity<List<Achievement>>(statsToGet, HttpStatus.OK);
 	}
 
 
