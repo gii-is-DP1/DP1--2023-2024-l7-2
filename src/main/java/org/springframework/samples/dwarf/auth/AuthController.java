@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.auth.payload.request.LoginRequest;
@@ -13,12 +14,15 @@ import org.springframework.samples.dwarf.auth.payload.response.JwtResponse;
 import org.springframework.samples.dwarf.auth.payload.response.MessageResponse;
 import org.springframework.samples.dwarf.configuration.jwt.JwtUtils;
 import org.springframework.samples.dwarf.configuration.services.UserDetailsImpl;
+import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
+import org.springframework.samples.dwarf.util.RestPreconditions;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,6 +86,13 @@ public class AuthController {
 		}
 		authService.createUser(signUpRequest);
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+	}
+
+	@PostMapping("/update/{userId}")
+	public ResponseEntity updateUser(@PathVariable("userId") Integer id, @RequestBody @Valid User user) {
+		RestPreconditions.checkNotNull(userService.findUserById(id), "User", "ID", id);
+		userService.updateUser(user, id);
+		return ResponseEntity.ok(new MessageResponse("User updated successfully!"));
 	}
 
 }
