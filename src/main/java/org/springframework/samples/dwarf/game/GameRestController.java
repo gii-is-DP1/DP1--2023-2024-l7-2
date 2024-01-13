@@ -202,12 +202,12 @@ public class GameRestController {
 
         // if a player already exists in a game he can just join the game :)
         if (g == null || u == null) {
-            // TODO: Create error
+            
             return ResponseEntity.notFound().build();
         }
 
         if (g.getStart() != null) {
-            // TODO: Create error
+            
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -221,8 +221,8 @@ public class GameRestController {
             ps.savePlayer(p);
             gs.addPlayer(g, p);
         } else {
-            // TODO: Create error
-            System.out.println("This player already in game");
+            
+           return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
         }
 
         return ResponseEntity.ok(g);
@@ -239,7 +239,7 @@ public class GameRestController {
         Game g = g_tmp.get();
 
         if (g.getIsPublic() == false || g.getStart() != null) {
-            // TODO: Create error
+            
             // El juego ya ha comenzado
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -256,8 +256,8 @@ public class GameRestController {
             ps.savePlayer(p);
             gs.addPlayer(g, p);
         } else {
-            // TODO: Create error
-            System.out.println("This player already in game");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
+            
         }
 
         return ResponseEntity.ok(g);
@@ -273,11 +273,11 @@ public class GameRestController {
         // if a player already exists in a game he can just join the game :)
 
         if (g == null || u == null) {
-            // TODO: Create error
+            
             return ResponseEntity.notFound().build();
         }
         if (g.getStart() != null) {
-            // TODO: Create error
+            
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -291,8 +291,7 @@ public class GameRestController {
             specservice.saveSpectator(s);
             gs.addSpectator(g, s);
         } else {
-            // TODO: Create error
-            System.out.println("This player already in game");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
         }
 
         return ResponseEntity.ok(g);
@@ -528,7 +527,7 @@ public class GameRestController {
                 p.setMedal(p.getMedal() - 4);
                 ps.savePlayer(p);
             } else {
-                // TODO: create error
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
             Dwarf dwarf1 = new Dwarf();
@@ -607,7 +606,7 @@ public class GameRestController {
                     // Update player's state
                     if (selectedGold > p.getGold() || selectedIron > p.getIron()
                             || selectedSteal > p.getSteal() || playerObjects.contains(selectedObject)) {
-                        // TODO: Create error
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
                     p.setGold(p.getGold() - selectedGold);
                     p.setIron(p.getIron() - selectedIron);
@@ -657,7 +656,7 @@ public class GameRestController {
 
                     // Remove the selected object
                     if (!playerObjects.contains(selectedObject)) {
-                        // TODO: Create error
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
                     playerObjects.remove(selectedObject);
                     p.setObjects(playerObjects);
@@ -725,7 +724,7 @@ public class GameRestController {
 
                     }
                 } else {
-                    // TODO: create error
+                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
 
                 break;
