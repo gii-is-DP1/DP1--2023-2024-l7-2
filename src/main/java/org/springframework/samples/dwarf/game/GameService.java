@@ -115,6 +115,14 @@ public class GameService {
         return gr.findAllPublicGames(pageable);
     }
 
+    @Transactional(readOnly = true)
+    public List<Dwarf> getRoundDwarfs(Game g, Integer round) {
+        List<Dwarf> roundDwarves = g.getDwarves();
+        roundDwarves = roundDwarves.stream()
+                .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
+        return roundDwarves;
+    }
+
     @Transactional
     public Game addPlayer(Game g, Player p) {
         ArrayList<Player> players = new ArrayList<Player>();

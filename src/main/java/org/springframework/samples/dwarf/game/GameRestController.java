@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.chat.Message;
@@ -63,11 +64,13 @@ public class GameRestController {
     private final SpectatorService specservice;
     private final ChatService chatservice;
     private final InvitationService is;
+    private final SpecialCardService scs;
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayerService ps,
             MainBoardService mbs, DwarfService ds,
-            LocationService ls, SpectatorService specservice, ChatService chatservice, InvitationService is) {
+            LocationService ls, SpectatorService specservice, ChatService chatservice, InvitationService is
+            , SpecialCardService scs) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
@@ -77,6 +80,7 @@ public class GameRestController {
         this.specservice = specservice;
         this.chatservice = chatservice;
         this.is = is;
+        this.scs = scs;
     }
 
     @GetMapping
@@ -504,251 +508,26 @@ public class GameRestController {
 
         Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
 
-        if (usesBothDwarves) {
-            Dwarf dwarf1 = new Dwarf();
-            Dwarf dwarf2 = new Dwarf();
-
-            dwarf1.setPlayer(p);
-            dwarf1.setRound(g.getRound());
-            dwarf1.setCard(null);
-
-            dwarf2.setPlayer(p);
-            dwarf2.setRound(g.getRound());
-            dwarf2.setCard(null);
-
-            ds.saveDwarf(dwarf1);
-            ds.saveDwarf(dwarf2);
-
-            List<Dwarf> gameDwarves = g.getDwarves();
-            gameDwarves.add(dwarf1);
-            gameDwarves.add(dwarf2);
-            g.setDwarves(gameDwarves);
-        } else {
-            if (p.getMedal() > 4) {
-                p.setMedal(p.getMedal() - 4);
-                ps.savePlayer(p);
-            } else {
-                // TODO: create error
-            }
-
-            Dwarf dwarf1 = new Dwarf();
-
-            dwarf1.setPlayer(p);
-            dwarf1.setRound(g.getRound());
-            dwarf1.setCard(null);
-
-            ds.saveDwarf(dwarf1);
-
-            List<Dwarf> gameDwarves = g.getDwarves();
-            gameDwarves.add(dwarf1);
-        }
+        Integer round = g.getRound();
+        scs.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
 
         // Ahora vamos a darle la vuelta a la carta. Si hay
-        // un jugador en esa posicion, es decir, si se hay una entidad
+        // un jugador en esa posicion, es decir, si se hay un
         // dwarf en la base de datos con esa carta, se resuelve automaticamente.
         // Despues, se coloca el dwarf del jugador que ha tirado la carta especial
         // en esa posicion.
         Card reverseCard = specialCard.getTurnedSide();
-        List<Dwarf> roundDwarves = g.getDwarves();
-        Integer round = g.getRound();
-        roundDwarves = roundDwarves.stream()
-                .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
-
-        for (Dwarf d : roundDwarves) {
-            Card dwarfCard = d.getCard();
-            if (reverseCard.getPosition().equals(dwarfCard.getPosition())) {
-                // Solo tiene sentido resolver esta situacion
-                // cuando la carta es de forja o una carta normal
-                // El dwarf tiene que permanecer para seguir con el recuento de turnos
-                mbs.applySingleCardWhenSpecialCardAction(p, dwarfCard);
-            }
-        }
-
+        List<Dwarf> roundDwarves = gs.getRoundDwarfs(g, round);
         MainBoard mb = g.getMainBoard();
 
-        mb = mbs.removeUsedSpecialCard(mb, specialCard);
-        mb = mbs.applyReverseSpecialCard(mb, reverseCard);
-        mb = mbs.saveMainBoard(mb);
+        mbs.handleSpecialCardTurn(mb, reverseCard, specialCard, roundDwarves);
+        
         g.setMainBoard(mb);
         gs.saveGame(g);
 
+        g = scs.resolveSpecialCard(g, p, mb, request, round, roundDwarves);
         
-        Integer selectedPosition, selectedGold, selectedIron, 
-            selectedSteal;
-        Object selectedObject;
-        // Ahora aplicamos la carta
-        switch (specialCard.getName()) {
-            case "Muster an army":
-                List<Card> gameCards = g.getMainBoard().getCards();
-                ArrayList<Dwarf> gameDwarves = new ArrayList<>(g.getDwarves());
-                for (Card c : gameCards) {
-                    if (c.getCardType().getName().equals("OrcCard")) {
-                        Dwarf d = new Dwarf();
-                        d.setCard(c);
-                        d.setRound(round);
-                        d = ds.saveDwarf(d);
-                        gameDwarves.add(d);
-                    }
-                }
-                g.setDwarves(gameDwarves);
-                gs.saveGame(g);
-                break;
-            case "Special order":
-                selectedGold = request.getSelectedGold();
-                selectedIron = request.getSelectedIron();
-                selectedSteal = request.getSelectedSteal();
-                selectedObject = request.getSelectedObject();
-                if (selectedGold != null && selectedIron != null
-                        && selectedSteal != null && selectedObject != null
-                        && selectedGold + selectedIron + selectedSteal == 5
-                        && selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
-
-                    List<Object> playerObjects = p.getObjects();
-                    // Update player's state
-                    if (selectedGold > p.getGold() || selectedIron > p.getIron()
-                            || selectedSteal > p.getSteal() || playerObjects.contains(selectedObject)) {
-                        // TODO: Create error
-                    }
-                    p.setGold(p.getGold() - selectedGold);
-                    p.setIron(p.getIron() - selectedIron);
-                    p.setSteal(p.getSteal() - selectedSteal);
-
-                    // Add the selected object
-                    playerObjects.add(selectedObject);
-                    p.setObjects(playerObjects);
-
-                    // Save the updated player
-                    ps.savePlayer(p);
-
-                    return ResponseEntity.ok().build();
-                }
-                break;
-            case "Hold a council":
-                mb = mbs.holdACouncilAction(mb);
-                break;
-
-            case "Collapse the Shafts":
-                mbs.collapseTheShaftsAction(mb);
-                break;
-
-            case "Run Amok":
-                mb = mbs.runAmokAction(mb);
-                mbs.saveMainBoard(mb);
-                g.setMainBoard(mb);
-                gs.saveGame(g);
-                break;
-
-            case "Sell an Item":
-
-                selectedObject = request.getSelectedObject();
-                selectedGold = request.getSelectedGold();
-                selectedIron = request.getSelectedIron();
-                selectedSteal = request.getSelectedSteal();
-                if (selectedGold != null && selectedIron != null
-                    && selectedSteal != null && selectedObject != null 
-                    && selectedGold + selectedIron + selectedSteal == 5 
-                    && selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
-
-                    List<Object> playerObjects = p.getObjects();
-                    // Update player's state
-                    p.setGold(p.getGold() + selectedGold);
-                    p.setIron(p.getIron() + selectedIron);
-                    p.setSteal(p.getSteal() + selectedSteal);
-
-                    // Remove the selected object
-                    if (!playerObjects.contains(selectedObject)) {
-                        // TODO: Create error
-                    }
-                    playerObjects.remove(selectedObject);
-                    p.setObjects(playerObjects);
-                    // Save the updated player
-                    ps.savePlayer(p);
-                    return ResponseEntity.ok().build();
-                        
-                    
-                }
-
-                break;
-
-            case "Apprentice":
-
-                selectedPosition = request.getPosition();
-                List<Dwarf> roundDwarvesApprentice = g.getDwarves();
-                roundDwarvesApprentice = roundDwarvesApprentice.stream()
-                        .filter(d -> d.getRound() == round && d.getPlayer() != null && d.getCard() != null).toList();
-
-                // Lógica para manejar la acción de la carta "Apprentice"
-                for (Dwarf d : roundDwarvesApprentice) {
-
-                    if (!d.getPlayer().equals(p) && d.getCard().getPosition().equals(selectedPosition)) {
-                        // Coloca un nuevo enano en la misma posición
-                        Dwarf newDwarf = new Dwarf();
-                        newDwarf.setPlayer(p);
-                        newDwarf.setRound(g.getRound());
-                        newDwarf.setCard(d.getCard());
-
-                        ds.saveDwarf(newDwarf);
-
-                        List<Dwarf> gameDwarvesApprentice = g.getDwarves();
-                        gameDwarvesApprentice.add(newDwarf);
-                        g.setDwarves(gameDwarvesApprentice);
-                        gs.saveGame(g);
-                    }
-                }
-                break;
-
-            case "Turn back":
-                // Lógica para manejar la acción de la carta "Turn back"
-                List<Location> newLocationsTurnBack = new ArrayList<>(mb.getLocations());
-                selectedPosition = request.getPosition();
-
-                if (selectedPosition >= 1 && selectedPosition <= newLocationsTurnBack.size()) {
-                    Location selectedLocation = newLocationsTurnBack.get(selectedPosition - 1);
-
-                    Card removedCard = ls.removeLastCard(selectedLocation);
-                    if (removedCard != null) {
-                        List<Card> newCards = selectedLocation.getCards();
-                        Card newTopCard = newCards.get(newCards.size() - 1);
-
-                        Dwarf newDwarfTurnBack = new Dwarf();
-                        newDwarfTurnBack.setPlayer(p);
-                        newDwarfTurnBack.setRound(g.getRound());
-                        newDwarfTurnBack.setCard(newTopCard);
-
-                        ds.saveDwarf(newDwarfTurnBack);
-
-                        List<Dwarf> gameDwarvesTurnBack = new ArrayList<>(g.getDwarves());
-                        gameDwarvesTurnBack.add(newDwarfTurnBack);
-                        g.setDwarves(gameDwarvesTurnBack);
-
-                        gs.saveGame(g);
-
-                    }
-                } else {
-                    // TODO: create error
-                }
-
-                break;
-            case "Past Glories":
-                selectedPosition = request.getPosition();
-                Card cardToBeOnTop = request.getPastCard();
-
-                if (selectedPosition != null && cardToBeOnTop != null && selectedPosition >= 1
-                        && selectedPosition <= 9) {
-
-                    Location selectedLocation = mb.getLocations().get(selectedPosition - 1);
-
-                    ls.pastGloriesAction(selectedLocation, cardToBeOnTop);
-
-                } else {
-                    // TODO: create error
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-                }
-                break;
-
-            default:
-                break;
-        }
+        gs.saveGame(g);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
