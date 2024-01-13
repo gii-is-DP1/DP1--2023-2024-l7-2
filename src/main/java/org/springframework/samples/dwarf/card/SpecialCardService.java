@@ -27,6 +27,20 @@ import jakarta.validation.Valid;
 @Service
 public class SpecialCardService {
 
+    private final Integer MEDALS_USED_FOR_SPECIAL_CARD_USAGE = 4;
+    private final Integer POSITION_MAX = 9;
+    private final Integer POSITION_MIN = 1;
+
+    private final String SPECIAL_CARD_MUSTER_AN_ARMY = "Muster an army";
+    private final String SPECIAL_CARD_SPECIAL_ORDER = "Special order";
+    private final String SPECIAL_CARD_HOLD_A_COUNCIL = "Hold a council";
+    private final String SPECIAL_CARD_COLLAPSE_THE_SHAFTS = "Collapse the Shafts";
+    private final String SPECIAL_CARD_RUN_AMOK = "Run Amok";
+    private final String SPECIAL_CARD_SELL_AN_ITEM = "Sell an item";
+    private final String SPECIAL_CARD_APPRENTICE = "Apprentice";
+    private final String SPECIAL_CARD_TURN_BACK = "Turn back";
+    private final String SPECIAL_CARD_PAST_GLORIES = "Past Glories";
+
     private final SpecialCardRepository repo;
     private final DwarfService dwService;
     private final PlayerService plService;
@@ -82,12 +96,7 @@ public class SpecialCardService {
             gameDwarves.add(dwarf2);
             g.setDwarves(gameDwarves);
         } else {
-            if (p.getMedal() > 4) {
-                p.setMedal(p.getMedal() - 4);
-                plService.savePlayer(p);
-            } else {
-                // TODO: create error
-            }
+            plService.removeMedalsUsedSpecialCard(p);
 
             Dwarf dwarf1 = dwService.genAndSave(p, round, null);
 
@@ -100,8 +109,7 @@ public class SpecialCardService {
     }
 
     @Transactional
-    public Game musterAnArmyAction(Game g, Integer round) {
-        List<Card> gameCards = g.getMainBoard().getCards();
+    public Game musterAnArmyAction(Game g, Integer round, List<Card> gameCards) {
         ArrayList<Dwarf> gameDwarves = new ArrayList<>(g.getDwarves());
         for (Card c : gameCards) {
             if (c.getCardType().getName().equals(ORC_CARD)) {
@@ -114,7 +122,9 @@ public class SpecialCardService {
     }
 
     @Transactional
-    public Game apprenticeAction(Game g,Player p, Integer round, Integer selectedPosition, List<Dwarf> roundDwarvesApprentice) {
+    public Game apprenticeAction(Game g,Player p, Integer round, 
+        Integer selectedPosition, List<Dwarf> roundDwarvesApprentice) {
+
         for (Dwarf d : roundDwarvesApprentice) {
 
             if (!d.getPlayer().equals(p) && d.getCard().getPosition().equals(selectedPosition)) {
@@ -187,7 +197,7 @@ public class SpecialCardService {
     public Game turnBackAction(Game g, Player p, Integer round, Integer selectedPosition, 
         List<Location> newLocationsTurnBack) {
     
-        if (selectedPosition >= 1 && selectedPosition <= newLocationsTurnBack.size()) {
+        if (selectedPosition >= POSITION_MIN && selectedPosition <= POSITION_MAX) {
             Location selectedLocation = newLocationsTurnBack.get(selectedPosition - 1);
 
             Card removedCard = locService.removeLastCard(selectedLocation);
@@ -209,27 +219,18 @@ public class SpecialCardService {
 
     @Transactional
     public void pastGloriesAction(Integer selectedPosition, Card cardToBeOnTop, List<Location> locations) {
-        if (selectedPosition != null && cardToBeOnTop != null && selectedPosition >= 1
-            && selectedPosition <= 9) {
+        if (selectedPosition != null && cardToBeOnTop != null && selectedPosition >= POSITION_MIN
+            && selectedPosition <= POSITION_MAX) {
 
             Location selectedLocation = locations.get(selectedPosition - 1);
 
-                locService.pastGloriesAction(selectedLocation, cardToBeOnTop);
+            locService.pastGloriesAction(selectedLocation, cardToBeOnTop);
 
             } else {
                 // TODO: create error
             }
     }
 
-    private final String SPECIAL_CARD_MUSTER_AN_ARMY = "Muster an army";
-    private final String SPECIAL_CARD_SPECIAL_ORDER = "Special order";
-    private final String SPECIAL_CARD_HOLD_A_COUNCIL = "Hold a council";
-    private final String SPECIAL_CARD_COLLAPSE_THE_SHAFTS = "Collapse the Shafts";
-    private final String SPECIAL_CARD_RUN_AMOK = "Run Amok";
-    private final String SPECIAL_CARD_SELL_AN_ITEM = "Sell an item";
-    private final String SPECIAL_CARD_APPRENTICE = "Apprentice";
-    private final String SPECIAL_CARD_TURN_BACK = "Turn back";
-    private final String SPECIAL_CARD_PAST_GLORIES = "Past Glories";
     @Transactional
     public Game resolveSpecialCard(Game g, Player p, MainBoard mb, SpecialCardRequestHandler request, 
         Integer round, List<Dwarf> roundDwarvesApprentice) {
@@ -245,7 +246,8 @@ public class SpecialCardService {
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case SPECIAL_CARD_MUSTER_AN_ARMY:
-                g = musterAnArmyAction(g, round);
+                List<Card> gameCards = mb.getCards();
+                g = musterAnArmyAction(g, round, gameCards);
                 break;
             case SPECIAL_CARD_SPECIAL_ORDER:
 

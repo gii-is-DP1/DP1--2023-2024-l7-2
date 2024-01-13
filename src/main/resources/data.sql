@@ -123,18 +123,35 @@ INSERT INTO game(id,name,code,start,finish, winner_id, round, is_public) VALUES 
         (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1, True),
         (3,'super cool game', '222','2023-04-11 18:20','2023-04-11 19:20', 2, null, False); 
 
-INSERT INTO card_deck(id, card_id) VALUES (1,1);
+
+INSERT INTO card_deck(id) VALUES (1);
 
 INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,22),(1,33),(1,14),(1,25),(1,36),(1,37),(1,38),(1,9),(1,10),
                                                         (1,11),(1,12),(1,13),(1,24),(1,15),(1,26),(1,27),(1,28),(1,19);
 
-
--- -INSERT INTO special_card_deck(id) VALUES (1),(2),(3);
-
--- -INSERT INTO special_card_deck_special_cards(special_card_deck_id, special_cards_id) VALUES 
--- -                (1,1),(1,2),(1,3),(2,4),(2,5),(2,6),(3,7),(3,8),(3,9);
-
-
 INSERT INTO main_board(id, card_deck_id) VALUES (1, 1);
 
+INSERT INTO main_board_s_cards(main_board_id,s_cards_id) VALUES (1,2),(1,4),(1,1),(1,7),(1,9),(1,8);
+
+INSERT INTO location(id,position) VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9);
+
+INSERT INTO location_cards(location_id,cards_id) VALUES (1,1),(1,22),(1,33),(2,14),(2,25),(3,36),(3,37),(4,38),(4,9),(5,10),
+                                                        (5,11),(6,12),(6,13),(7,24),(7,15),(8,26),(8,27),(9,28),(9,19);
+
+INSERT INTO main_board_locations(main_board_id, locations_id) VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9);
+
 INSERT INTO game(id,name,code,start,finish, winner_id, round, main_board_id, is_public) VALUES (4,'game-test','test-code','2023-04-11 10:20',null,null,1,1, False);
+
+INSERT INTO player(id,user_id,name,iron,gold,steal,medal,color) VALUES 
+        (1,4,'owner1',0,0,0,0,'red'),
+        (2,5,'owner2',6,7,8,10,'blue'),
+        (3,6,'owner3',10,20,50,30,'yellow');
+
+INSERT INTO player_objects(player_id, objects_id) VALUES (2,1), (3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8);
+
+INSERT INTO game_players(game_id, players_id) VALUES (4,1),(4,2),(4,3);
+
+INSERT INTO dwarf(id, card_id, player_id, round) VALUES 
+        (1, 1, 1, 1),(2, 22, 2, 1),(3, 33, 3, 1),(4, 14, 1, 1),(5, 25, 2, 1),(6, 36, 3, 1); 
+
+INSERT INTO game_dwarves(dwarves_id, game_id) VALUES (1,4),(2,4),(3,4),(4,4),(5,4),(6,4);

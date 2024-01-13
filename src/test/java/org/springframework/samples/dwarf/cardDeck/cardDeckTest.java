@@ -34,24 +34,7 @@ public class cardDeckTest {
 
         cardDeck.setCards(cards);
 
-        Card lastCard = new Card();
-        // Configura el objeto Card según tus necesidades
-        cardDeck.setLastCard(lastCard);
-
         // Asegúrate de que las propiedades se hayan establecido correctamente
         assertEquals(cards, cardDeck.getCards());
-        assertEquals(lastCard, cardDeck.getLastCard());
-    }
-
-    @Test
-    public void testCardAssociation() {
-        CardDeck cardDeck = new CardDeck();
-        assertNull(cardDeck.getLastCard());
-
-        Card card = new Card();
-        cardDeck.setLastCard(card);
-
-        assertNotNull(cardDeck.getLastCard());
-        assertEquals(card, cardDeck.getLastCard());
     }
 }

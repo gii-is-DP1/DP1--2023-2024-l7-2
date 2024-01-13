@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.card.CardService;
-import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +13,8 @@ import jakarta.validation.Valid;
 
 @Service
 public class PlayerService {
+
+    private final Integer MEDALS_USED_FOR_SPECIAL_CARD_USAGE = 4;
 
     PlayerRepository repo;
 
@@ -116,5 +115,15 @@ public class PlayerService {
 
         return repo.save(p);
     }*/
+
+    @Transactional
+    public void removeMedalsUsedSpecialCard(Player p) {
+        if (p.getMedal() > MEDALS_USED_FOR_SPECIAL_CARD_USAGE) {
+            p.setMedal(p.getMedal() - MEDALS_USED_FOR_SPECIAL_CARD_USAGE);
+            savePlayer(p);
+        } else {
+            // TODO: create error
+        }
+    }
 
 }
