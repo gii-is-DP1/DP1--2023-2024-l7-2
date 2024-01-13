@@ -14,6 +14,7 @@ import UserEditAdmin from "./admin/users/UserEditAdmin";
 import SwaggerDocs from "./public/swagger";
 import AchievementList from "./achievements/achievementList";
 import AchievementEdit from "./achievements/achievementEdit";
+import StatsList from "./statistics/statisticsPage";
 
 import RulesText from "./rules/rulesText";
 import UserPage from "./user/userPage";
@@ -96,7 +97,7 @@ function App() {
           <Route path="/user/:userId" exact={true} element={<PrivateRoute><UserEditPage/></PrivateRoute>}/>
           <Route path="/game/:gameId/finish" exact={true} element={<PrivateRoute><GameEnd/></PrivateRoute>} />
           <Route path="/game/publics" exact={true} element={<PrivateRoute><GamesPublics/></PrivateRoute>} />
-
+          <Route path="/statistics/" exact={true} element={<PrivateRoute><StatsList/></PrivateRoute>} />
 
           
 

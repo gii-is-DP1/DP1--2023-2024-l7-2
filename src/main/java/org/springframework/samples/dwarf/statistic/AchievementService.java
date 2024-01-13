@@ -59,8 +59,8 @@ public class AchievementService {
     }
 
     @Transactional(readOnly = true)
-    public List<Game> getAllWinnedGames(String name) {
-        return gameRepo.findAllWinnedGames(name);
+    public List<Game> getAllWinnedGames(Integer id) {
+        return gameRepo.findAllWinnedGames(id);
     }
 
     @Transactional(readOnly = true)

@@ -206,12 +206,12 @@ public class GameRestController {
 
         // if a player already exists in a game he can just join the game :)
         if (g == null || u == null) {
-            // TODO: Create error
+            
             return ResponseEntity.notFound().build();
         }
 
         if (g.getStart() != null) {
-            // TODO: Create error
+            
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -225,8 +225,8 @@ public class GameRestController {
             ps.savePlayer(p);
             gs.addPlayer(g, p);
         } else {
-            // TODO: Create error
-            System.out.println("This player already in game");
+            
+           return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
         }
 
         return ResponseEntity.ok(g);
@@ -243,7 +243,7 @@ public class GameRestController {
         Game g = g_tmp.get();
 
         if (g.getIsPublic() == false || g.getStart() != null) {
-            // TODO: Create error
+            
             // El juego ya ha comenzado
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -260,8 +260,8 @@ public class GameRestController {
             ps.savePlayer(p);
             gs.addPlayer(g, p);
         } else {
-            // TODO: Create error
-            System.out.println("This player already in game");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
+            
         }
 
         return ResponseEntity.ok(g);
@@ -277,11 +277,11 @@ public class GameRestController {
         // if a player already exists in a game he can just join the game :)
 
         if (g == null || u == null) {
-            // TODO: Create error
+            
             return ResponseEntity.notFound().build();
         }
         if (g.getStart() != null) {
-            // TODO: Create error
+            
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -295,8 +295,7 @@ public class GameRestController {
             specservice.saveSpectator(s);
             gs.addSpectator(g, s);
         } else {
-            // TODO: Create error
-            System.out.println("This player already in game");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
         }
 
         return ResponseEntity.ok(g);
@@ -511,6 +510,7 @@ public class GameRestController {
         Integer round = g.getRound();
         scs.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
 
+
         // Ahora vamos a darle la vuelta a la carta. Si hay
         // un jugador en esa posicion, es decir, si se hay un
         // dwarf en la base de datos con esa carta, se resuelve automaticamente.
@@ -526,8 +526,9 @@ public class GameRestController {
         gs.saveGame(g);
 
         g = scs.resolveSpecialCard(g, p, mb, request, round, roundDwarves);
-        
+
         gs.saveGame(g);
+
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

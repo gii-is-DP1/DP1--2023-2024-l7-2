@@ -1,8 +1,10 @@
 package org.springframework.samples.dwarf.user;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.model.NamedEntity;
 import org.springframework.samples.dwarf.statistic.Achievement;
 
@@ -35,7 +37,8 @@ public class User extends NamedEntity {
 	Authorities authority;
 
 	@OneToMany
- 	private Collection<Achievement> achievements;
+	@JoinColumn(name = "user_id")
+ 	private List<Achievement> achievements;
 
 	public Boolean hasAuthority(String auth) {
 		return authority.getAuthority().equals(auth);
