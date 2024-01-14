@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+
 @RestControllerAdvice
 public class ExceptionHandlerController {
 
@@ -67,7 +68,7 @@ public class ExceptionHandlerController {
 		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler(value = AccessDeniedException.class)
+	
 	@ResponseStatus(HttpStatus.FORBIDDEN)
 	public ResponseEntity<ErrorMessage> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
 		ErrorMessage message = new ErrorMessage(HttpStatus.FORBIDDEN.value(), new Date(), ex.getMessage(),
@@ -75,5 +76,7 @@ public class ExceptionHandlerController {
 
 		return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
 	}
+	
+
 
 }
