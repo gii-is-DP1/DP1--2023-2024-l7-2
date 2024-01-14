@@ -38,6 +38,7 @@ public class cardDeckServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+        //cardDeckService = new CardDeckService(cardDeckRepository, cardRepository);
     }
 
     // Tests findAll()
@@ -129,11 +130,11 @@ public class cardDeckServiceTest {
     @Test
     public void testInitialize() {
         // Arrange
-        List<Card> testCards = cardRepository.findAll();
-        when(cardService.getCards()).thenReturn(testCards);
-    
+        List<Card> testCards = List.of(new Card(),new Card(),new Card(),new Card(),new Card(),new Card()
+            ,new Card(),new Card(),new Card(),new Card(),new Card(),new Card());
+        when(cardRepository.findAll()).thenReturn(testCards);
         // Ensure that testCards has at least 9 cards
-        assertTrue(testCards.size() <= 9);
+        assertTrue(testCards.size() >= 9);
     
         // Act
         CardDeck result = cardDeckService.initialiate();
@@ -188,24 +189,9 @@ public class cardDeckServiceTest {
 
     // Tests getNewCards(Integer cardDeckId)
     // --------------------------------------------------------
-    @Test
-    public void testGetNewCards_ShouldReturnTwoCards() {
-        // Arrange
-        CardDeck testDeck = new CardDeck();
-        testDeck.setId(1);
-        testDeck.setCards(cardRepository.findAll());
-
-        when(cardDeckRepository.findById(1)).thenReturn(Optional.of(testDeck));
-
-        // Act
-        List<Card> result = cardDeckService.getNewCards(1);
-
-        // Assert
-        assertEquals(2, result.size());
-    }
 
    @Test
-    public void testGetNewCards_ShouldHandleDuplicatePositions() {
+    public void testGetNewCards_ShouldReturnTwoCards() {
         // Arrange
         Card card1 = new Card();
         card1.setId(56);
@@ -233,12 +219,117 @@ public class cardDeckServiceTest {
     }
 
     @Test
+    public void testGetNewCards_ShouldHandleDuplicatePosition() {
+        // Arrange
+        Card card1 = new Card();
+        card1.setId(56);
+        card1.setDescription("asdasd");
+        card1.setPosition(1);
+    
+        Card card2 = new Card();
+        card2.setId(57);
+        card2.setDescription("asdasd");
+        card2.setPosition(1);
+
+        Card card3 = new Card();
+        card2.setId(58);
+        card2.setDescription("asdasd");
+        card2.setPosition(2);
+    
+        CardDeck testDeck = new CardDeck();
+        testDeck.setId(2);
+        testDeck.setCards(new ArrayList<>(List.of(card1, card2, card3)));  // Use a mutable list
+    
+        when(cardDeckRepository.findById(2)).thenReturn(Optional.of(testDeck));
+    
+        // Act
+        List<Card> result = cardDeckService.getNewCards(2);
+    
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals(2, result.get(1).getPosition());
+        assertEquals(1, result.get(0).getPosition());
+    }
+
+    @Test
+    public void testGetNewCards_ShouldReturnOneCard() {
+        // Arrange
+        Card card1 = new Card();
+        card1.setId(56);
+        card1.setDescription("asdasd");
+        card1.setPosition(1);
+    
+        Card card2 = new Card();
+        card2.setId(57);
+        card2.setDescription("asdasd");
+        card2.setPosition(1);
+
+        Card card3 = new Card();
+        card2.setId(58);
+        card2.setDescription("asdasd");
+        card2.setPosition(1);
+    
+        CardDeck testDeck = new CardDeck();
+        testDeck.setId(2);
+        testDeck.setCards(new ArrayList<>(List.of(card1, card2, card3)));  // Use a mutable list
+    
+        when(cardDeckRepository.findById(2)).thenReturn(Optional.of(testDeck));
+    
+        // Act
+        List<Card> result = cardDeckService.getNewCards(2);
+    
+        // Assert
+        assertEquals(1, result.size());
+        assertEquals(1, result.get(0).getPosition());
+    }
+
+    @Test
+    public void testGetNewCards_ShouldReturnOneCardBecauseIsOnlyCard() {
+        // Arrange
+        Card card1 = new Card();
+        card1.setId(56);
+        card1.setDescription("asdasd");
+        card1.setPosition(1);
+    
+    
+        CardDeck testDeck = new CardDeck();
+        testDeck.setId(2);
+        testDeck.setCards(new ArrayList<>(List.of(card1)));  // Use a mutable list
+    
+        when(cardDeckRepository.findById(2)).thenReturn(Optional.of(testDeck));
+    
+        // Act
+        List<Card> result = cardDeckService.getNewCards(2);
+    
+        // Assert
+        assertEquals(1, result.size());
+        assertEquals(1, result.get(0).getPosition());
+    }
+
+    @Test
+    public void testGetNewCards_ShouldReturnNull() {
+
+        CardDeck testDeck = new CardDeck();
+        testDeck.setId(2);
+        testDeck.setCards(new ArrayList<>(List.of()));  // Use a mutable list
+    
+        when(cardDeckRepository.findById(2)).thenReturn(Optional.of(testDeck));
+    
+        // Act
+        List<Card> result = cardDeckService.getNewCards(2);
+    
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
     public void testGetNewCards_ShouldUpdateDeck() {
         // Arrange
         CardDeck testDeck = new CardDeck();
         List<Card> testCards = new ArrayList<>();
         Card c = new Card();
         testCards.add(c);
+        testDeck.setCards(testCards);
 
         when(cardDeckRepository.findById(1)).thenReturn(Optional.of(testDeck));
         when(cardDeckRepository.save(any())).thenReturn(testDeck);

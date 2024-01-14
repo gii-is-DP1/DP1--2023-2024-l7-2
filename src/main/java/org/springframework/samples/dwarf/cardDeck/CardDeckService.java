@@ -89,7 +89,7 @@ public class CardDeckService {
         /*
          * Al inicio de cada ronda se robarán dos cartas del mazo y
          * se colocarán en la posición indicada. Si las dos cartas robadas
-         * se deben colocarse en el mismo lugar,
+         * se deben colocar en el mismo lugar,
          * se robará una tercera carta, si esta tercera carta
          * robada se debe colocar en el mismo lugar, no se robará una cuarta carta.
          * 
@@ -101,24 +101,31 @@ public class CardDeckService {
 
         ArrayList<Card> newCards = new ArrayList<>();
 
-        Integer offset = 0;
-        Card firstCard = cards.get(offset);
-        offset++;
-        Card secondCard = cards.get(offset);
-        offset++;
+        
+        if(cards.size() == 0) return null;
+
+        Card firstCard = cards.get(0);
         newCards.add(firstCard);
-        // Integer offset = 2;
-        if (firstCard.getPosition().equals(secondCard.getPosition())) {
-            secondCard = cards.get(offset);
-            offset++;
 
-            if (!firstCard.getPosition().equals(secondCard.getPosition())) {
-
+        if(cards.size() >= 2) {
+            Card secondCard = cards.get(1);
+            if (firstCard.getPosition().equals(secondCard.getPosition())) {
+                cards.remove(secondCard);
+                if (cards.size() >= 3) {
+                    secondCard = cards.get(1);
+        
+                    if (!firstCard.getPosition().equals(secondCard.getPosition())) {
+        
+                        newCards.add(secondCard);
+                    } else {
+                        cards.remove(secondCard);
+                    }
+                }
+            } else {
                 newCards.add(secondCard);
             }
-        } else {
-            newCards.add(secondCard);
         }
+
 
         cards.removeAll(newCards);
         cd.setCards(cards);

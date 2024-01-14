@@ -124,10 +124,13 @@ INSERT INTO game(id,name,code,start,finish, winner_id, round, is_public) VALUES 
         (3,'super cool game', '222','2023-04-11 18:20','2023-04-11 19:20', 2, null, False); 
 
 
-INSERT INTO card_deck(id) VALUES (1);
+INSERT INTO card_deck(id) VALUES (1),(2),(3);
 
 INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,22),(1,33),(1,14),(1,25),(1,36),(1,37),(1,38),(1,9),(1,10),
                                                         (1,11),(1,12),(1,13),(1,24),(1,15),(1,26),(1,27),(1,28),(1,19);
+
+INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (2,1),(2,19),(2,33),(2,14), (3,1),(3,19),(3,46),(3,14);
+
 
 INSERT INTO main_board(id, card_deck_id) VALUES (1, 1);
 
