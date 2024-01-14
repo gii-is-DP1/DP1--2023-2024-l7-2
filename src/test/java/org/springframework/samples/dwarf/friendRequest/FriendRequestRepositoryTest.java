@@ -7,13 +7,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.samples.dwarf.friendRequest.FriendRequest;
-import org.springframework.samples.dwarf.friendRequest.FriendRequestRepository;
 import org.springframework.samples.dwarf.user.User;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class FriendRequestRepositoryTest {
@@ -45,12 +48,12 @@ public class FriendRequestRepositoryTest {
         int requestId = 1;
         FriendRequest friendRequest = new FriendRequest();
         Mockito.when(friendRequestRepository.findById(requestId)).thenReturn(friendRequest);
-    
+
         Assertions.assertEquals(friendRequest, friendRequestService.findById(requestId));
-    
+
         // Caso negativo
         Mockito.when(friendRequestRepository.findById(requestId)).thenReturn(null);
-    
+
         Assertions.assertNull(friendRequestService.findById(requestId));
     }
 
@@ -69,4 +72,52 @@ public class FriendRequestRepositoryTest {
 
         Assertions.assertTrue(friendRequestService.findByUser(user).isEmpty());
     }
+
+    @Test
+    public void testAreFriends_Positive() {
+        User friend1 = new User();
+        friend1.setUsername("f1");
+        User friend2 = new User();
+        friend2.setUsername("f2");
+
+        FriendRequest fr = new FriendRequest();
+        fr.setReceiver(friend1);
+        fr.setSender(friend2);
+        fr.setStatus(Status.ACCEPTED);
+
+        // Configuramos el mock para que devuelva un resultado positivo
+        when(friendRequestRepository.areFriends(friend1, friend2)).thenReturn(true);
+
+        // Llamamos al servicio
+        boolean result = friendRequestRepository.areFriends(friend1, friend2);
+
+        // Verificamos que el método del repositorio fue invocado con los parámetros
+        // correctos
+        verify(friendRequestRepository, times(1)).areFriends(friend1, friend2);
+
+        // Verificamos que el resultado es positivo
+        assertTrue(result);
+    }
+
+    @Test
+    public void testAreFriends_Negative() {
+        User friend1 = new User();
+        friend1.setUsername("f1");
+        User friend2 = new User();
+        friend2.setUsername("f2");
+
+        // Configuramos el mock para que devuelva un resultado negativo
+        when(friendRequestRepository.areFriends(friend1, friend2)).thenReturn(false);
+
+        // Llamamos al servicio
+        boolean result = friendRequestRepository.areFriends(friend1, friend2);
+
+        // Verificamos que el método del repositorio fue invocado con los parámetros
+        // correctos
+        verify(friendRequestRepository, times(1)).areFriends(friend1, friend2);
+
+        // Verificamos que el resultado es negativo
+        assertFalse(result);
+    }
+
 }

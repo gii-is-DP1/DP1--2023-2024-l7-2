@@ -8,10 +8,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
-import org.springframework.samples.dwarf.object.Object;
-import org.springframework.samples.dwarf.object.ObjectRestController;
-import org.springframework.samples.dwarf.object.ObjectService;
-
 import java.util.ArrayList;
 import java.util.List;
 
