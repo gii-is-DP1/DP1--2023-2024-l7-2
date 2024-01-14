@@ -8,8 +8,6 @@ import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.model.BaseEntity;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
@@ -26,9 +24,6 @@ public class MainBoard extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private CardDeck cardDeck;
 
-    // @OneToOne
-    // private SpecialCardDeck specialCardDeck;
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Location> locations;
 
@@ -37,10 +32,10 @@ public class MainBoard extends BaseEntity {
 
     public List<Card> getCards() {
         ArrayList<Card> res = new ArrayList<>();
-        for (Location lt:this.locations) {
+        for (Location lt : this.locations) {
             List<Card> locationCards = lt.getCards();
             Integer locationCardsLength = locationCards.size();
-            res.add(locationCards.get(locationCardsLength-1));
+            res.add(locationCards.get(locationCardsLength - 1));
         }
 
         return res;
@@ -48,12 +43,17 @@ public class MainBoard extends BaseEntity {
 
     public List<Card> getLocationCards(List<Location> locationsPassed) {
         ArrayList<Card> res = new ArrayList<>();
-        for (Location lt:locationsPassed) {
+        for (Location lt : locationsPassed) {
             List<Card> locationCards = lt.getCards();
             Integer locationCardsLength = locationCards.size();
-            res.add(locationCards.get(locationCardsLength-1));
+            res.add(locationCards.get(locationCardsLength - 1));
         }
 
         return res;
+    }
+
+    public void initialize() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
     }
 }

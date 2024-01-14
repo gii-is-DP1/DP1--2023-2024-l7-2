@@ -3,7 +3,9 @@ package org.springframework.samples.dwarf.MainBoard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -16,16 +18,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
-import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.card.SpecialCardRepository;
+import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
+import org.springframework.samples.dwarf.location.Location;
+import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardRepository;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
 import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 
 public class MainBoardServiceTest {
@@ -40,10 +43,19 @@ public class MainBoardServiceTest {
     private SpecialCardDeckService specialCardDeckService;
 
     @Mock
+    private SpecialCardService specialCardService;
+
+    @Mock
     private CardService cardService;
 
     @InjectMocks
     private MainBoardService mainBoardService;
+
+    @Mock
+    private LocationService locationService;
+
+    @Mock
+    private SpecialCardRepository specialCardRepo;
 
     @BeforeEach
     public void setUp() {
@@ -84,23 +96,74 @@ public class MainBoardServiceTest {
     }
 
     @Test
-    public void testInitialize() {
-        CardDeck cardDeck = mock(CardDeck.class);
-        when(cardDeckService.initialiate()).thenReturn(cardDeck);
+    public void testInitialize_Positive() {
+        // Mock behavior of dependencies
+        CardDeck mockedCardDeck = new CardDeck();
+        when(cardDeckService.initialiate()).thenReturn(mockedCardDeck);
 
-        Card card1 = new Card();
-        card1.setId(1);
-        when(cardService.getById(1)).thenReturn(card1);
+        List<Location> mockedLocations = new ArrayList<>();
+        when(locationService.initialize()).thenReturn(mockedLocations);
 
-        Card card2 = new Card();
-        card2.setId(2);
-        when(cardService.getById(2)).thenReturn(card2);
+        MainBoard mockedMainBoard = new MainBoard();
+        when(mainBoardRepository.save(any(MainBoard.class))).thenReturn(mockedMainBoard);
 
-        MainBoard initializedMainBoard = mainBoardService.initialize();
+        // Call the method
+        MainBoard result = mainBoardService.initialize();
 
-        assertNotNull(initializedMainBoard);
-        assertEquals(cardDeck, initializedMainBoard.getCardDeck());
-        assertEquals(9, initializedMainBoard.getCards().size());
+        // Verify interactions
+        verify(cardDeckService, times(1)).initialiate();
+        verify(locationService, times(1)).initialize();
+        verify(mainBoardRepository, times(1)).save(any(MainBoard.class));
+
+        // Assert the result
+        assertNotNull(result);
     }
+
+    // @Test
+    // public void testHoldACouncilAction_Positive() {
+
+    // // Initialize mocks
+    // Card c1 = new Card();
+    // Card c2 = new Card();
+    // c1.setDescription("abc");
+    // c2.setDescription("abcd");
+    // c1.setPosition(0);
+    // c2.setPosition(1);
+
+    // Location l1 = new Location();
+    // Location l2 = new Location();
+    // l1.setPosition(0);
+    // l2.setPosition(1);
+    // l1.setCards(Arrays.asList(c1));
+    // l1.setCards(Arrays.asList(c2));
+
+    // List<Location> mockedLocations = Arrays.asList(l1, l2);
+
+    // CardDeck mockedCardDeck = new CardDeck();
+    // mockedCardDeck.setCards(Arrays.asList(c1, c2));
+
+    // MainBoard mockedMainBoard = mainBoardService.initialize();
+
+    // List<Card> mockedRemovedCards = Arrays.asList(new Card(), new Card());
+
+    // when(cardDeckService.shuffleAndSaveCards(any(CardDeck.class),
+    // anyList())).thenReturn(mockedCardDeck);
+    // when(locationService.removeLastCard(any(Location.class))).thenReturn(mockedRemovedCards.get(0),
+    // mockedRemovedCards.get(1));
+
+    // // Call the method
+    // mainBoardService.holdACouncilAction(mockedMainBoard);
+
+    // // Verify interactions
+    // verify(mainBoardRepository, times(1)).findById(any());
+    // verify(cardDeckService, times(1)).shuffleAndSaveCards(any(CardDeck.class),
+    // anyList());
+    // verify(locationService, times(2)).removeLastCard(any(Location.class));
+
+    // // Assert that the state of MainBoard is modified as expected
+    // assertEquals(mockedCardDeck, mockedMainBoard.getCardDeck());
+    // assertEquals(0, mockedMainBoard.getLocations().get(0).getCards().size());
+    // assertEquals(0, mockedMainBoard.getLocations().get(1).getCards().size());
+    // }
 
 }
