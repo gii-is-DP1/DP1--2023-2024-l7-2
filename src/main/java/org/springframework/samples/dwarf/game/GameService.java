@@ -190,6 +190,7 @@ public class GameService {
         for (Dwarf d : dwarves) {
 
             Player p = d.getPlayer();
+            if (p == null) continue;
             
             Card c = d.getCard();
             if (!hasUsedSpecialCard.containsKey(p)) {
@@ -203,7 +204,7 @@ public class GameService {
                     hasUsedSpecialCard.put(p,true);
                 }
 
-                if (lastPlayer.getName().equals(p.getName())) {
+                if (lastPlayer != null && lastPlayer.getName().equals(p.getName())) {
                     // No se ha cambiado el turno, lo
                     // que significa que el jugador ha
                     // usado una carta especial con los dos dwarves
@@ -222,7 +223,7 @@ public class GameService {
                         usedSingleDwarfForSpecialCard = true;
                     }
 
-                    if (hasUsedSpecialCard.get(lastPlayer)) {
+                    if (lastPlayer != null && hasUsedSpecialCard.get(lastPlayer)) {
                         hasUsedSpecialCard.put(lastPlayer,false);
                     }
                 }
@@ -231,7 +232,7 @@ public class GameService {
 
                 if (hasUsedSpecialCard.get(p)) {
 
-                    if(lastPlayer.getName().equals(p.getName())) {
+                    if(lastPlayer != null && lastPlayer.getName().equals(p.getName())) {
                         extraDwarfWhenSpecialCard.add(p); // Algunas cartas especiales te dan un dwarf de mas
 
                         if(usedSingleDwarfForSpecialCard) {
@@ -308,7 +309,15 @@ public class GameService {
 
     @Transactional
     public Game handleRoundChange(Game g) {
-        ArrayList<Pair<Player, Card>> helpCards = mbs.faseResolucionAcciones(g);
+        ArrayList<Pair<Player, Card>> helpCards = null;
+        try {
+
+            helpCards = mbs.faseResolucionAcciones(g);
+        } catch (Exception e) {
+            System.out.println(e);
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
+        }
 
         if (helpCards != null) {
             g = changePlayerStart(g, helpCards);
@@ -506,9 +515,10 @@ public class GameService {
         return g;
     }
 
+    /* 
     public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p) {
 
-    }
+    }*/
 
     @Transactional
     public void resign(Game g, Player p) {
