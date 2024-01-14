@@ -154,11 +154,38 @@ public class GameServiceSocialTest {
 
         List<Player> returnedPlayers = gameService.getRemainingTurns(players,thisRoundDwarves,starter);
 
-        List<Player> expected = List.of(owner1,owner1,owner3,owner2);
+        List<Player> expected = List.of(owner1,owner1,owner3,owner2,owner3,owner2);
         // Tanto el owner3 como el owner2 han tirado una carta especial con un solo dwarf
         // Por lo tanto tienen que tirar su turno al final de la ronda en sentido contrario
 
         assertEquals(returnedPlayers.get(0).getName(), starter.getName());
+        assertEquals(returnedPlayers, expected);
+    }
+
+    @Test
+    @Transactional
+    void testTurnWhenOneSpecialCardUsedWithOneDwarf(){
+
+        Game g = gameService.getGameByCode("test-code");
+        
+        List<Player> players = g.getPlayers();
+        Player owner1 = players.get(0);
+        Player owner2 = players.get(1);
+        Player owner3 = players.get(2);
+        
+        Player starter = owner1;
+
+        List<Dwarf> dwarves = g.getDwarves();
+        Integer round = 5;
+        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
+                && d.getPlayer() != null).toList();
+
+        List<Player> returnedPlayers = gameService.getRemainingTurns(players,thisRoundDwarves,starter);
+
+        List<Player> expected = List.of(owner2,owner3,owner2,owner3,owner1,owner1);
+
+        System.out.println(returnedPlayers);
+
         assertEquals(returnedPlayers, expected);
     }
 
@@ -185,8 +212,6 @@ public class GameServiceSocialTest {
         System.out.println(returnedPlayers);
 
         List<Player> expected = List.of(owner1,owner2,owner3,owner1,owner2,owner3,owner2);
-        // Tanto el owner3 como el owner2 han tirado una carta especial con un solo dwarf
-        // Por lo tanto tienen que tirar su turno al final de la ronda en sentido contrario
 
         assertEquals(returnedPlayers.get(0).getName(), starter.getName());
         assertEquals(returnedPlayers, expected);

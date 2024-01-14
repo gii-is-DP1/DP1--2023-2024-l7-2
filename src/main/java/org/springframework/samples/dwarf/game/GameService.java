@@ -167,8 +167,13 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
-    public List<Player> getRemainingTurns(List<Player> plys, List<Dwarf> dwarves, Player starter) {
+    public List<Player> getRemainingTurns(List<Player> tmp_plys, List<Dwarf> dwarves, Player starter) {
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
+
+        ArrayList<Player> plys = new ArrayList<Player>();
+        for (Player p: tmp_plys) {
+            plys.add(p);
+        }
 
         // Asi se consigue que el que empieza la ronda sea
         // el jugador que debe empezarla
@@ -287,6 +292,7 @@ public class GameService {
         // con solo un dwarf y lo addeamos
         if (turnsOfSpecialCard.size() > 0){
             Collections.reverse(turnsOfSpecialCard);
+            remaining_turns.addAll(turnsOfSpecialCard);
             remaining_turns.addAll(turnsOfSpecialCard);
         }
 
