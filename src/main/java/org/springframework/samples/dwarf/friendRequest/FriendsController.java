@@ -63,15 +63,13 @@ public class FriendsController {
 
 	}
 
-	// @GetMapping("/{id}")
-	// public ResponseEntity<FriendRequest> findFriendRequest(@PathVariable("id")
-	// int id) {
-	// FriendRequest friendRequestToGet = friendRequestService.findById(id);
-	// if (friendRequestToGet == null)
-	// throw new ResourceNotFoundException("FriendRequest with id " + id + " not
-	// found!");
-	// return new ResponseEntity<FriendRequest>(friendRequestToGet, HttpStatus.OK);
-	// }
+	@GetMapping("/{id}")
+	public ResponseEntity<FriendRequest> findFriendRequest(@PathVariable("id") int id) {
+		FriendRequest friendRequestToGet = friendRequestService.findById(id);
+		if (friendRequestToGet == null)
+			throw new ResourceNotFoundException("FriendRequest with id " + id + " not found!");
+		return new ResponseEntity<FriendRequest>(friendRequestToGet, HttpStatus.OK);
+	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
