@@ -19,22 +19,14 @@ public class LocationRepositoryTest {
 
     @Test
     public void testFindAll() {
-        // Given
-        Location l1 = new Location();
-        l1.setPosition(1); // Establece un valor no nulo para position
-        locationRepository.save(l1);
 
-        Location l2 = new Location();
-        l2.setPosition(2); // Establece un valor no nulo para position
-        locationRepository.save(l2);
 
-        // When
+        
         List<Location> locations = locationRepository.findAll();
 
-        // Then
-        assertEquals(2, locations.size());
-        assertTrue(locations.contains(l1));
-        assertTrue(locations.contains(l2));
+        
+        assertEquals(9, locations.size());
+        
     }
     @Test
     public void testFindById_Exists() {

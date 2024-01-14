@@ -41,7 +41,7 @@ public class LocationServiceTest {
     }
 
     @Test
-    public void testGetById_Exists() {
+    public void testGetById() {
         // Datos de prueba
         int locationId = 1;
         Location expectedLocation = new Location();
