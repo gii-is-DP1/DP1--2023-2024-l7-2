@@ -183,20 +183,7 @@ public class MainBoardService {
     }
 
     @Transactional
-    public ArrayList<Pair<Player, Card>> faseResolucionAcciones(Game g) {
-        /*
-         * 1. Recibir ayuda
-         * 2. Defenter
-         * 3. Extraear mineral
-         * 4. Forjar
-         */
-        List<Dwarf> dwarves = g.getDwarves();
-        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()).toList();
-
-        //List<Player> plys = g.getPlayers();
-
-        // Obtenemos todas las cartas y las guardamos
-        // con su player para despues aplicarselo al player
+    private ArrayList<Pair<Player, Card>> getChoosedCards(List<Dwarf> dwarves) {
         ArrayList<Pair<Player, Card>> cards = new ArrayList<Pair<Player, Card>>();
         for (Dwarf d : dwarves) {
             if (d.getCard() == null) {
@@ -211,9 +198,11 @@ public class MainBoardService {
             }
             cards.add(playerPair);
         }
+        return cards;
+    }
 
-        // Separamos las cartas por su tipo para
-        // poder aplicar cada tipo en el ordern correcto
+    @Transactional
+    private HashMap<String, ArrayList<Pair<Player, Card>>> splitCardsByType(ArrayList<Pair<Player, Card>> cards) {
         HashMap<String, ArrayList<Pair<Player, Card>>> cardsByType = new HashMap<String, ArrayList<Pair<Player, Card>>>();
         for (Pair<Player, Card> c : cards) {
             String type = c.getSecond().getCardType().getName();
@@ -225,6 +214,29 @@ public class MainBoardService {
                 cardsByType.put(type, cardList);
             }
         }
+        return cardsByType;
+    }
+
+    @Transactional
+    public ArrayList<Pair<Player, Card>> faseResolucionAcciones(Game g) {
+        /*
+         * 1. Recibir ayuda
+         * 2. Defenter
+         * 3. Extraear mineral
+         * 4. Forjar
+         */
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getCard() != null).toList();
+
+        //List<Player> plys = g.getPlayers();
+
+        // Obtenemos todas las cartas y las guardamos
+        // con su player para despues aplicarselo al player
+        ArrayList<Pair<Player, Card>> cards = getChoosedCards(dwarves);
+
+        // Separamos las cartas por su tipo para
+        // poder aplicar cada tipo en el ordern correcto
+        HashMap<String, ArrayList<Pair<Player, Card>>> cardsByType = splitCardsByType(cards);
 
         // Obtenemos las cartas por su tipo
         ArrayList<Pair<Player, Card>> helpCards = cardsByType.get(helpCard);
