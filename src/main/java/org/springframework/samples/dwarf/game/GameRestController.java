@@ -1,10 +1,12 @@
 package org.springframework.samples.dwarf.game;
 
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.model.Resource;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,10 @@ import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.chat.Message;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
+import org.springframework.samples.dwarf.exceptions.ExistingUserException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.exceptions.AccessDeniedException;
+import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.invitation.Invitation;
 import org.springframework.samples.dwarf.invitation.InvitationService;
 import org.springframework.samples.dwarf.location.Location;
@@ -101,12 +106,12 @@ public class GameRestController {
         } else
             return gs.getAllGames();
     }
-
+    
     @GetMapping("/{id}")
     public Game getGameById(@PathVariable("id") Integer id) {
         Optional<Game> g = gs.getGameById(id);
         if (!g.isPresent())
-            throw new ResourceNotFoundException("Game", "id", id);
+            throw new ResourceNotFoundException("Game not found");
         return g.get();
     }
 
@@ -116,7 +121,7 @@ public class GameRestController {
         Game g = gs.getGameByCode(code);
 
         if (g == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Game not found");
         }
 
         g.setDwarves(null);
@@ -129,7 +134,7 @@ public class GameRestController {
         Game g = gs.getGameByCode(code);
 
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+           throw new ExistingUserException("Player not in the game");
         }
 
         List<Card> cards = g.getMainBoard().getCardDeck().getCards();
@@ -144,7 +149,7 @@ public class GameRestController {
         Game g = gs.getGameByCode(code);
 
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
         }
 
         ArrayList<List<Card>> res = new ArrayList<>();
@@ -161,7 +166,7 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
         }
 
         List<Card> cd = g.getMainBoard().getCards();
@@ -174,7 +179,8 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
+           
         }
         List<SpecialCard> cd = g.getMainBoard().getSCards();
 
@@ -192,7 +198,7 @@ public class GameRestController {
         // if a player already exists in a game he can just join the game :)
         if (g == null || u == null) {
 
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Player not in the game");
         }
 
         
@@ -213,7 +219,7 @@ public class GameRestController {
         Optional<Game> g_tmp = gs.getGameById(id);
 
         if (g_tmp.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            throw new AccessDeniedException("User unauthorized");
         }
         Game g = g_tmp.get();
 
@@ -245,12 +251,12 @@ public class GameRestController {
         // if a player already exists in a game he can just join the game :)
 
         if (g == null || u == null) {
-
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
+          
         }
         if (g.getStart() != null) {
 
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            throw new AccessDeniedException("User unauthorized");
         }
 
         if (!gs.gameContainsSpectator(g, u)) {
@@ -305,7 +311,7 @@ public class GameRestController {
         Game g = gs.getGameByCode(code);
 
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
         }
 
         Integer round = g.getRound();
@@ -321,7 +327,8 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
+
         }
 
         return new ResponseEntity<>(g.getPlayers(), HttpStatus.OK);
@@ -332,7 +339,7 @@ public class GameRestController {
         // Gets the lists of players and dwarfs. Turn is the next player
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+           throw new ExistingUserException("Player not in the game");
         }
 
         List<Player> plys = g.getPlayers();
@@ -382,7 +389,7 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
         }
 
         Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
@@ -398,7 +405,7 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
         }
 
         SpecialCard specialCard = request.getSpecialCard();
@@ -434,7 +441,7 @@ public class GameRestController {
     public ResponseEntity<LocalDateTime> startGame(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
         }
 
         User u = us.findCurrentUser();
@@ -445,7 +452,7 @@ public class GameRestController {
             gs.saveGame(g);
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            throw new AccessDeniedException("User unauthorized");
         }
 
     }
@@ -455,7 +462,7 @@ public class GameRestController {
 
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
         }
 
         g.setFinish(LocalDateTime.now());
@@ -485,7 +492,7 @@ public class GameRestController {
         Player p = gs.getPlayerByUserAndGame(u, g);
 
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-            return ResponseEntity.notFound().build();
+            throw new ExistingUserException("Player not in the game");
         }
 
         g.setFinish(LocalDateTime.now());
@@ -515,7 +522,7 @@ public class GameRestController {
     public ResponseEntity<List<Message>> getChat(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
         if (g == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("Game not found");
         }
         return new ResponseEntity<>(g.getChat().getMessages(), HttpStatus.OK);
     }
@@ -524,7 +531,7 @@ public class GameRestController {
     public ResponseEntity<Chat> receiveMessage(@PathVariable("code") String code, @Valid @RequestBody Message msg) {
         Game g = gs.getGameByCode(code);
         if (g == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("Game not found");
         }
 
         User u = us.findCurrentUser();

@@ -18,7 +18,7 @@ public class DwarfRepositoryTest {
 
         // Ejecutar el método del repositorio y verificar el resultado
         List<Dwarf> result =  dwarfRepository.findAll();
-        assertEquals(24, result.size(), "La lista de enanos no coincide");
+        assertEquals(29, result.size(), "La lista de enanos no coincide");
     }
 
 }

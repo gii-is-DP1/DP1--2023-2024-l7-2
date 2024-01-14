@@ -17,7 +17,7 @@ public class cardDeckRepositoryTest {
     @Test
     public void testFindAll() {
         List<CardDeck> cardDecks = cardDeckRepository.findAll();
-        assertEquals(1, cardDecks.size());
+        assertEquals(3, cardDecks.size());
     }
 
     @Test
