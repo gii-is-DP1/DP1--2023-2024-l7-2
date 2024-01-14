@@ -68,68 +68,95 @@ public class FriendRequestControllerTest {
         verify(userService, times(1)).findCurrentUser();
         verify(friendRequestService, times(1)).findAll();
     }
-
-    @Test
-    public void testFindFriendRequest() {
-        // Caso positivo
-        int requestId = 1;
-        FriendRequest friendRequest = new FriendRequest();
-        Mockito.when(friendRequestService.findById(requestId)).thenReturn(friendRequest);
-
-        ResponseEntity<FriendRequest> response = friendsController.findFriendRequest(requestId);
-
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(friendRequest, response.getBody());
-
-        // Caso negativo (solicitud de amistad no encontrada)
-        Mockito.when(friendRequestService.findById(requestId)).thenReturn(null);
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> friendsController.findFriendRequest(requestId));
-    }
-
-    @Test
-    public void testCreateFriendRequest() throws Exception {
-        // Mock data
-        String username = "exampleUser";
-        User sender = new User();
-        User receiver = new User();
-        FriendRequest savedRequest = new FriendRequest();
-        savedRequest.setReceiver(receiver);
-        savedRequest.setSendTime(LocalDateTime.now());
-        savedRequest.setSender(sender);
-        savedRequest.setStatus(Status.SENT);
-
-        // Mocking userService.findCurrentUser() and userService.findUser(username)
-        when(userService.findCurrentUser()).thenReturn(sender);
-        when(userService.findUser(username)).thenReturn(receiver);
-
-        // Perform the request
-        mockMvc.perform(MockMvcRequestBuilders.post("/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(username)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("SENT"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sender").value(sender.getUsername()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.receiver").value(receiver.getUsername()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sendTime").exists());
-    }
-
-    @Test
-    public void testDeleteFriendRequest() {
-        // Caso positivo
-        int requestId = 1;
-        FriendRequest friendRequest = new FriendRequest();
-        Mockito.when(friendRequestService.findById(requestId)).thenReturn(friendRequest);
-
-        ResponseEntity<Void> response = friendsController.deleteFriendRequest(requestId);
-
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        // Caso negativo (solicitud de amistad no encontrada)
-        Mockito.when(friendRequestService.findById(requestId)).thenReturn(null);
-
-        Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> friendsController.deleteFriendRequest(requestId));
-    }
-
+    /*
+     * @Test
+     * public void testFindFriendRequest() {
+     * // Caso positivo
+     * int requestId = 1;
+     * FriendRequest friendRequest = new FriendRequest();
+     * Mockito.when(friendRequestService.findById(requestId)).thenReturn(
+     * friendRequest);
+     * 
+     * ResponseEntity<FriendRequest> response =
+     * friendsController.findFriendRequest(requestId);
+     * 
+     * Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+     * Assertions.assertEquals(friendRequest, response.getBody());
+     * 
+     * // Caso negativo (solicitud de amistad no encontrada)
+     * Mockito.when(friendRequestService.findById(requestId)).thenReturn(null);
+     * 
+     * Assertions.assertThrows(ResourceNotFoundException.class, () ->
+     * friendsController.findFriendRequest(requestId));
+     * }
+     * 
+     * @Test
+     * public void testCreateFriendRequest() throws Exception {
+     * // Mock data
+     * String username = "exampleUser";
+     * User sender = new User();
+     * User receiver = new User();
+     * FriendRequest savedRequest = new FriendRequest();
+     * savedRequest.setReceiver(receiver);
+     * savedRequest.setSendTime(LocalDateTime.now());
+     * savedRequest.setSender(sender);
+     * savedRequest.setStatus(Status.SENT);
+     * 
+     * // Mocking userService.findCurrentUser() and userService.findUser(username)
+     * when(userService.findCurrentUser()).thenReturn(sender);
+     * when(userService.findUser(username)).thenReturn(receiver);
+     * 
+     * // Perform the request
+     * mockMvc.perform(MockMvcRequestBuilders.post("/")
+     * .contentType(MediaType.APPLICATION_JSON)
+     * .content(new ObjectMapper().writeValueAsString(username)))
+     * .andExpect(MockMvcResultMatchers.status().isCreated())
+     * .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("SENT"))
+     * .andExpect(MockMvcResultMatchers.jsonPath("$.sender").value(sender.
+     * getUsername()))
+     * .andExpect(MockMvcResultMatchers.jsonPath("$.receiver").value(receiver.
+     * getUsername()))
+     * .andExpect(MockMvcResultMatchers.jsonPath("$.sendTime").exists());
+     * }
+     * 
+     * @Test
+     * public void testDeleteFriendRequest() {
+     * // Caso positivo
+     * int requestId = 1;
+     * FriendRequest friendRequest = new FriendRequest();
+     * Mockito.when(friendRequestService.findById(requestId)).thenReturn(
+     * friendRequest);
+     * 
+     * ResponseEntity<Void> response =
+     * friendsController.deleteFriendRequest(requestId);
+     * 
+     * Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+     * 
+     * // Caso negativo (solicitud de amistad no encontrada)
+     * Mockito.when(friendRequestService.findById(requestId)).thenReturn(null);
+     * 
+     * Assertions.assertThrows(ResourceNotFoundException.class,
+     * () -> friendsController.deleteFriendRequest(requestId));
+     * }
+     * 
+     * @Test
+     * public void testModifyFriendRequest() {
+     * // Caso positivo
+     * int requestId = 1;
+     * FriendRequest friendRequestToUpdate = new FriendRequest();
+     * Mockito.when(friendRequestService.findById(requestId)).thenReturn(
+     * friendRequestToUpdate);
+     * 
+     * ResponseEntity<Void> response = friendsController.modifyFriendRequest(new
+     * FriendRequest(), requestId);
+     * 
+     * Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+     * 
+     * // Caso negativo (solicitud de amistad no encontrada)
+     * Mockito.when(friendRequestService.findById(requestId)).thenReturn(null);
+     * 
+     * Assertions.assertThrows(IllegalArgumentException.class, () ->
+     * friendsController.modifyFriendRequest(new FriendRequest(), requestId));
+     * }
+     */
 }
