@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.dwarf.exceptions.CannotUseCardException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,48 +82,13 @@ public class PlayerService {
             return p;
     }
 
-    /*
-    @Transactional
-    public Player statusChangeMC(@Valid Player p, @Valid Card c) {
-        if (c.getCardType().toString().equals("Other")) {
-
-            int totalGold = c.getTotalGold() != null ? c.getTotalGold() : 0;
-            int totalIron = c.getTotalIron() != null ? c.getTotalIron() : 0;
-            int totalSteal = c.getTotalSteal() != null ? c.getTotalSteal() : 0;
-            int totalMedals = c.getTotalMedals() != null ? c.getTotalMedals() : 0;
-
-            p.setGold((p.getGold() != null ? p.getGold() : 0) + totalGold);
-            p.setIron((p.getIron() != null ? p.getIron() : 0) + totalIron);
-            p.setSteal((p.getSteal() != null ? p.getSteal() : 0) + totalSteal);
-            p.setMedal((p.getMedal() != null ? p.getMedal() : 0) + totalMedals);
-        }
-
-        if (p.getGold() != null && p.getGold() < 0) {
-            p.setGold(0);
-        }
-
-        if (p.getIron() != null && p.getIron() < 0) {
-            p.setIron(0);
-        }
-
-        if (p.getSteal() != null && p.getSteal() < 0) {
-            p.setSteal(0);
-        }
-
-        if (p.getMedal() != null && p.getMedal() < 0) {
-            p.setMedal(0);
-        }
-
-        return repo.save(p);
-    }*/
-
     @Transactional
     public void removeMedalsUsedSpecialCard(Player p) {
         if (p.getMedal() > MEDALS_USED_FOR_SPECIAL_CARD_USAGE) {
             p.setMedal(p.getMedal() - MEDALS_USED_FOR_SPECIAL_CARD_USAGE);
             savePlayer(p);
         } else {
-            // TODO: create error
+            throw new CannotUseCardException("Not enough resources");
         }
     }
 

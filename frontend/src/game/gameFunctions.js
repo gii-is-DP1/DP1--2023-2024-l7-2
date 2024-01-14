@@ -67,8 +67,9 @@ function resign(code, jwt) {
       Accept: 'application/json',
     }
   })
-  .then(() => {
-    window.location.href = `/game/${code}/finish`;
+  .then((response) => {
+    console.log(response)
+    //window.location.href = `/game/${code}/finish`;
   })
 }
 

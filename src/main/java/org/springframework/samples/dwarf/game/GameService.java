@@ -16,6 +16,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.card.CardType;
+import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
@@ -45,6 +47,7 @@ public class GameService {
     MainBoardService mbs;
     CardDeckService cds;
     LocationService ls;
+    SpecialCardService scs;
     CardService cs;
     ChatService chatservice;
 
@@ -59,7 +62,7 @@ public class GameService {
 
     @Autowired
     public GameService(GameRepository gr, PlayerService ps, UserService us,
-            MainBoardService mbs, CardDeckService cds, LocationService ls, CardService cs, 
+            MainBoardService mbs, CardDeckService cds, LocationService ls,SpecialCardService scs, CardService cs, 
             DwarfService ds,
             ChatService chatService) {
         this.gr = gr;
@@ -68,7 +71,9 @@ public class GameService {
         this.mbs = mbs;
         this.cds = cds;
         this.ls = ls;
+        this.scs=scs;
         this.cs = cs;
+        this.ds=ds;
         this.chatservice = chatService;
     }
 
@@ -447,7 +452,7 @@ public class GameService {
 
     @Transactional
     public Game handleRoundChange(Game g) {
-        ArrayList<Pair<Player, Card>> helpCards = helpCards = mbs.faseResolucionAcciones(g);
+        ArrayList<Pair<Player, Card>> helpCards = mbs.faseResolucionAcciones(g);
 
         if (helpCards != null) {
             g = changePlayerStart(g, helpCards);
@@ -647,9 +652,34 @@ public class GameService {
     public void resign(Game g, Player p) {
         p.setGold(0);
         p.setIron(0);
-        p.setMedal(null);
-        p.setObjects(null);
+        p.setMedal(0);
+        p.setObjects(List.of());
         p.setSteal(0);
+    }
+
+    @Transactional
+    public void handleSpecialCard(Game g, SpecialCard specialCard, Boolean usesBothDwarves, Player p ,
+            SpecialCardRequestHandler request) {
+        Integer round = g.getRound();
+        scs.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
+
+        // Ahora vamos a darle la vuelta a la carta. Si hay
+        // un jugador en esa posicion, es decir, si se hay un
+        // dwarf en la base de datos con esa carta, se resuelve automaticamente.
+        // Despues, se coloca el dwarf del jugador que ha tirado la carta especial
+        // en esa posicion.
+        Card reverseCard = specialCard.getTurnedSide();
+        List<Dwarf> roundDwarves = getRoundDwarfs(g, round);
+        MainBoard mb = g.getMainBoard();
+
+        mbs.handleSpecialCardTurn(mb, reverseCard, specialCard, roundDwarves);
+
+        g.setMainBoard(mb);
+        saveGame(g);
+
+        g = scs.resolveSpecialCard(g, p, mb, request, round, roundDwarves);
+
+        saveGame(g);
     }
 
 }

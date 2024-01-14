@@ -119,9 +119,9 @@ INSERT INTO special_card(id, turned_side_id, name, description) VALUES
 
 
 
-INSERT INTO game(id,name,code,start,finish, winner_id, round, is_public) VALUES (1,'test1','test1',null,null,null,null, True),
-        (2, 'game1','super-secret','2023-04-11 15:20',null, 2, 1, True),
-        (3,'super cool game', '222','2023-04-11 18:20','2023-04-11 19:20', 2, null, False); 
+INSERT INTO game(id,name,code,start,finish, user_winner_id, round, is_public) VALUES (1,'test1','test1',null,null,null,null, True),
+        (2, 'game1','super-secret','2023-04-11 15:20',null, 4, 1, True),
+        (3,'super cool game', '222','2023-04-11 18:20','2023-04-11 19:20', 4, null, False); 
 
 
 INSERT INTO card_deck(id) VALUES (1),(2),(3);
@@ -147,7 +147,7 @@ INSERT INTO player(id,user_id,name,iron,gold,steal,medal,color) VALUES
         (1,4,'owner1',0,0,0,0,'red'),
         (2,5,'owner2',6,7,8,10,'blue'),
         (3,6,'owner3',10,20,50,30,'yellow');
-INSERT INTO game(id,name,player_creator_id,player_start_id,code,start,finish, winner_id, round, main_board_id, is_public) VALUES 
+INSERT INTO game(id,name,player_creator_id,player_start_id,code,start,finish, user_winner_id, round, main_board_id, is_public) VALUES 
         (4,'game-test',1,2,'test-code','2023-04-11 10:20',null,5,1,1, False);
 
 

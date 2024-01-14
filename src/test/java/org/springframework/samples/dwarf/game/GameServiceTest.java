@@ -63,7 +63,7 @@ public class GameServiceTest {
         gameRepository = mock(GameRepository.class);
         mbs = mock(MainBoardService.class);
         cds = mock(CardDeckService.class);
-        gameService = new GameService(gameRepository, null, userService, mbs, cds, null,null,null,null);
+        gameService = new GameService(gameRepository, null, userService, mbs, cds, null,null,null,null,null);
     }
 
     @Test

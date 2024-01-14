@@ -16,6 +16,7 @@ import org.springframework.samples.dwarf.chat.Chat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
@@ -34,8 +35,9 @@ public class Game extends NamedEntity {
     private LocalDateTime start;
     private LocalDateTime finish;
 
-    @OneToOne
+    @ManyToOne(optional = true)
     private User userWinner;
+
     Integer round;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

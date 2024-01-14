@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
+import org.springframework.samples.dwarf.exceptions.CannotUseCardException;
 import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.game.SpecialCardRequestHandler;
 import org.springframework.samples.dwarf.location.Location;
@@ -153,7 +154,7 @@ public class SpecialCardService {
             // Update player's state
             if (selectedGold > p.getGold() || selectedIron > p.getIron()
                     || selectedSteal > p.getSteal() || playerObjects.contains(selectedObject)) {
-                // TODO: Create error
+                throw new CannotUseCardException("Not enough resources");
             }
             p.setGold(p.getGold() - selectedGold);
             p.setIron(p.getIron() - selectedIron);
@@ -184,7 +185,7 @@ public class SpecialCardService {
 
             // Remove the selected object
             if (!playerObjects.contains(selectedObject)) {
-                // TODO: Create error
+                throw new CannotUseCardException("Not enough resources");
             }
             playerObjects.remove(selectedObject);
             p.setObjects(playerObjects);
@@ -212,7 +213,7 @@ public class SpecialCardService {
                 g.setDwarves(gameDwarvesTurnBack);
             }
         } else {
-            // TODO: create error
+            throw new CannotUseCardException("Position does not exist");
         }
         return g;
     }
@@ -227,7 +228,7 @@ public class SpecialCardService {
             locService.pastGloriesAction(selectedLocation, cardToBeOnTop);
 
             } else {
-                // TODO: create error
+                throw new CannotUseCardException("Not enough information to use this card");
             }
     }
 
