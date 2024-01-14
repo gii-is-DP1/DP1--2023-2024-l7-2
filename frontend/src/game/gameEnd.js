@@ -32,7 +32,7 @@ export default function EndGame(){
                     The game has ended!
                 </h1>
                 <h1>
-                    The winner is {winner ? winner.name: "Nobody!!"}
+                    The winner is {winner ? winner.username: "Nobody!!"}
                 </h1>
                 <div className="hero-div" style={{marginTop: "150px"}}>
                     <Button outline color="warning" size="lg">

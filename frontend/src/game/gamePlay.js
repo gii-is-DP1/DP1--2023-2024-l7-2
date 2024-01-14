@@ -156,11 +156,16 @@ export default function GamePlay() {
         Accept: 'application/json',
       }
     }).then(response => response.json()).then(response => {
-        if (cards !== response) {
-          setCards(response)
+        if (cards.length !== response.length) return;
+        for(const cardResponse in response) {
+
+          if (response[cardResponse].id != cards[cardResponse].id) {
+            setCards(response);
+            break;
+          }
         }
     })
-  }, [gameRound, specialCardToBeConfirmed])
+  }, [playerTurn, specialCardToBeConfirmed])
   
 
   function selectCard(id,card) {
@@ -274,6 +279,10 @@ export default function GamePlay() {
       code={code}
       playerObjects={player.objects}
       selectedCards={selectedCards}
+      myDwarves={myDwarves}
+      player={player}
+      setMessage={setMessage}
+      setVisible={setVisible}
     ></ConfirmSpecialCardModel>
 
     <ChatModel
@@ -325,7 +334,7 @@ export default function GamePlay() {
         <Button 
           onClick={() => {
             setShowChat(!showChat)}}
-          title="Resign"
+          title="showChat"
           color="#008000"
           style={{border: '3px solid black',padding: "3px"}}>
           Show Chat

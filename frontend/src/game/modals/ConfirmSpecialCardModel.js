@@ -9,11 +9,36 @@ import {FormTurnBack, resolveTurnBack} from './SpecialCardForms/TurnBackForm';
 import {FormApprentice, resolveApprentice} from './SpecialCardForms/ApprenticeForm'
 const jwt = tokenService.getLocalAccessToken();
 
+function resolveDefault(code, jwt, payload) {
+    fetch(`/api/v1/game/play/${code}/specialAction`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((response) => {
+      if (!response.success) {
+  
+        // Handle the case where the special sell item order is not successful
+        alert(payload.specialCard.name + "failed. Please try again.");
+      }
+    })
+    .catch((error) => {
+      alert(error);
+    });
+  }
+
 export default function ConfirmSpecialCardModel(props) {
 
     const [message, setMessage] = useState(null);
     const [visible, setVisible] = useState(false);
 
+    /*const [usedPositions, setUsedPositions] = useState([]);
+    const [unusedPositions, setUnusedPositions] = useState([1,2,3,4,5,6,7,8,9]);*/
     const [gold, setGold] = useState(0);
     const [steal, setSteal] = useState(0);
     const [iron, setIron] = useState(0);
@@ -29,7 +54,15 @@ export default function ConfirmSpecialCardModel(props) {
         setVisible,
         ""
       );
-    
+      /*
+    const [dwarves, setDwarves] = useFetchState(
+        [],
+        `/api/v1/game/play/${code}/dwarves`,
+        jwt,
+        setMessage,
+        setVisible,
+        code
+      );*/
     
 
     let title;
@@ -47,6 +80,17 @@ export default function ConfirmSpecialCardModel(props) {
             }
             setGameObjects(tmp_gameObjects)
         }
+
+        /*
+        if(dwarves) {
+            for (const i in dwarves ) {
+                if (dwarves[i].card) {
+                    let card = dwarves[i];
+                    setUsedPositions([...usedPositions,card.position]);
+                    setUnusedPositions(unusedPositions.filter((p) => p == card.position))
+                }
+            }
+        }*/
     }, [props.playerObjects])
 
     function resolveAction(numberOfDwarves) {
@@ -55,19 +99,21 @@ export default function ConfirmSpecialCardModel(props) {
         let objectToSend
         switch (title) {
             case "Special order":
-                console.log("Special order selected")
-                console.log(gameObjects)
-                console.log(objectSelected)
 
                 for (const i in gameObjects) {
                     if (gameObjects[i].name === objectSelected){
                         objectToSend = gameObjects[i]
-                        //setObjectSelected(gameObject[i])
                         break;
                     }
                 }
                 
-                resolveSellAnItem(props.code, jwt, {
+                console.log(parseInt(gold) + parseInt(iron) + parseInt(steal))
+                if (parseInt(gold) + parseInt(iron) + parseInt(steal) !== 5 || objectToSend == null) {
+                    alert("Special order failed. THIS Please try again.")
+                    break
+                } 
+
+                resolveSpecialOrder(props.code, jwt, {
                     specialCard: props.card,
                     usesBothDwarves: numberOfDwarves === 2,
                     selectedGold: gold,
@@ -77,17 +123,18 @@ export default function ConfirmSpecialCardModel(props) {
                 })
                 break;
             case "Sell an item":
-                console.log("sell an item selected")
-                console.log(gameObjects)
-                console.log(objectSelected)
 
-                for (const i in gameObjects) {
-                    if (gameObjects[i].name === objectSelected){
+                for (const i in props.playerObjects) {
+                    if (props.playerObjects[i].name === objectSelected){
                         objectToSend = gameObjects[i]
-                        //setObjectSelected(gameObject[i])
                         break;
                     }
                 }
+
+                if (parseInt(gold) + parseInt(iron) + parseInt(steal) != 5 || objectToSend == null) {
+                    alert("Sell an item failed. Please try again.")
+                    break
+                } 
                 
                 resolveSellAnItem(props.code, jwt, {
                     specialCard: props.card,
@@ -99,9 +146,13 @@ export default function ConfirmSpecialCardModel(props) {
                 })
                 break;
             case "Past Glories":
-                console.log("Past Glories selected")
-                console.log(position)
-                console.log(cardSelected)
+                if (!position || !cardSelected || position == -1 || cardSelected.name === "-") {
+                    
+                    alert("Past Glories failed. Please try again.")
+                    break
+                     
+                }
+
                 resolvePastGlories(props.code,jwt, {
                     specialCard: props.card,
                     usesBothDwarves: numberOfDwarves === 2,
@@ -111,8 +162,13 @@ export default function ConfirmSpecialCardModel(props) {
                 })
                 break
             case "Turn back":
-                console.log("Turn back selected")
-                console.log(position)
+                if (!position || position == -1) {
+                    
+                    alert("Past Glories failed. Please try again.")
+                    break
+                     
+                }
+
                 resolveTurnBack(props.code,jwt, {
                     specialCard: props.card,
                     usesBothDwarves: numberOfDwarves === 2,
@@ -122,14 +178,14 @@ export default function ConfirmSpecialCardModel(props) {
             case "Apprentice":
                 console.log("Apprentice selected")
                 console.log(position)
-                resolveTurnBack(props.code,jwt, {
+                resolveApprentice(props.code,jwt, {
                     specialCard: props.card,
                     usesBothDwarves: numberOfDwarves === 2,
                     position: position
                 })
                 break
             default:
-                resolveSellAnItem(props.code,jwt, {
+                resolveDefault(props.code,jwt, {
                     specialCard: props.card,
                     usesBothDwarves: numberOfDwarves === 2,
                 })
@@ -192,18 +248,24 @@ export default function ConfirmSpecialCardModel(props) {
 
 
                 <ModalFooter>
-                    <Button
-                        onClick={() => {resolveAction(2);props.toggle()}}>
-                        <div>
-                            Use two dwarves
-                        </div>
-                    </Button>
-                    <Button
-                        onClick={() => {resolveAction(1); props.toggle()}}>
-                        <div>
-                            Use one dwarf
-                        </div>
-                    </Button>
+                    {
+                        props.myDwarves && props.myDwarves.length == 0 &&
+                        <Button
+                            onClick={() => {resolveAction(2);props.toggle()}}>
+                            <div>
+                                Use two dwarves
+                            </div>
+                        </Button>
+                    }
+                    {
+                    props.myDwarves && props.myDwarves.length <= 1 &&
+                        <Button
+                            onClick={() => {resolveAction(1); props.toggle()}}>
+                            <div>
+                                Use one dwarf
+                            </div>
+                        </Button>
+                    }
                     <Button onClick={props.toggle}>
                         <div>
                             Cancel

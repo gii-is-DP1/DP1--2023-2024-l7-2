@@ -1,9 +1,6 @@
 package org.springframework.samples.dwarf.exceptions;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.samples.dwarf.game.Game;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import lombok.Getter;

@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {Input, FormGroup, Form, Label } from 'reactstrap'
 import tokenService from '../../../services/token.service';
-import getIdFromUrl from '../../../util/getIdFromUrl';
-import Card from '../../../cards/card';
-import useFetchState from "../../../util/useFetchState";
 
 
 function resolveApprentice(code, jwt, payload) {
@@ -21,11 +18,11 @@ function resolveApprentice(code, jwt, payload) {
     if (!response.success) {
 
       // Handle the case where the special sell item order is not successful
-      alert("Special sell item order failed. Please try again.");
+      alert("Apprentice card failed. Please try again.");
     }
   })
   .catch((error) => {
-    console.error("Error during special sell item order:", error);
+    console.error("Error during Apprentice card:", error);
   });
 }
 

@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
+import org.springframework.samples.dwarf.exceptions.CannotUseCardException;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,8 +132,7 @@ public class LocationService {
             }
         }
         if (!contains) {
-            // TODO: create error
-            return null;
+            throw new CannotUseCardException("Not enough resources");
         }
         locationCards.remove(c);
         locationCards.add(c);

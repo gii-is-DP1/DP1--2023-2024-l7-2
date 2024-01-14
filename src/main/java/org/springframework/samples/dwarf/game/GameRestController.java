@@ -24,6 +24,7 @@ import org.springframework.samples.dwarf.chat.Message;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.ExistingUserException;
+import org.springframework.samples.dwarf.exceptions.GameAlreadyStartedException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.samples.dwarf.exceptions.AccessDeniedException;
 import org.springframework.samples.dwarf.exceptions.BadRequestException;
@@ -63,29 +64,20 @@ public class GameRestController {
     private final GameService gs;
     private final UserService us;
     private final PlayerService ps;
-    private final MainBoardService mbs;
-    private final LocationService ls;
-    private final DwarfService ds;
     private final SpectatorService specservice;
     private final ChatService chatservice;
     private final InvitationService is;
-    private final SpecialCardService scs;
+    
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayerService ps,
-            MainBoardService mbs, DwarfService ds,
-            LocationService ls, SpectatorService specservice, ChatService chatservice, InvitationService is,
-            SpecialCardService scs) {
+        SpectatorService specservice, ChatService chatservice, InvitationService is) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
-        this.mbs = mbs;
-        this.ds = ds;
-        this.ls = ls;
         this.specservice = specservice;
         this.chatservice = chatservice;
         this.is = is;
-        this.scs = scs;
     }
 
 
@@ -204,8 +196,7 @@ public class GameRestController {
         
         if (!gs.gameContainsPlayer(g, u)) {
             if (g.getStart() != null) {
-    
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                throw new GameAlreadyStartedException("Game has already started");
             }
             gs.joinPlayer(g,u);
         } 
@@ -229,10 +220,14 @@ public class GameRestController {
         // if a player already exists in a game he cant just join the game :)
 
         if (!gs.gameContainsPlayer(g, u)) {
-            if (g.getIsPublic() == false || g.getStart() != null) {
+            if (g.getIsPublic() == false) {
+                throw new AccessDeniedException("User unauthorized");
+            }
+            
+            if (g.getStart() != null) {
 
                 // El juego ya ha comenzado
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                throw new GameAlreadyStartedException("Game has already started");
             }
             gs.joinPlayer(g,u);
 
@@ -256,7 +251,7 @@ public class GameRestController {
         }
         if (g.getStart() != null) {
 
-            throw new AccessDeniedException("User unauthorized");
+            throw new GameAlreadyStartedException("Game has already started");
         }
 
         if (!gs.gameContainsSpectator(g, u)) {
@@ -268,9 +263,7 @@ public class GameRestController {
 
             specservice.saveSpectator(s);
             gs.addSpectator(g, s);
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
-        }
+        } 
 
         return ResponseEntity.ok(g);
 
@@ -343,19 +336,9 @@ public class GameRestController {
         }
 
         List<Player> plys = g.getPlayers();
-        if (plys.size() < 1) {
-            // TODO: Create error
-            System.out.println("No players");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
         User u = us.findCurrentUser();
         Player p = gs.getPlayerByUserAndGame(u, g);
-        if (p == null) {
-            // TODO: Create error
-            System.out.println("no player");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
         List<Dwarf> dwarves = g.getDwarves();
         dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
@@ -413,26 +396,7 @@ public class GameRestController {
 
         Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
 
-        Integer round = g.getRound();
-        scs.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
-
-        // Ahora vamos a darle la vuelta a la carta. Si hay
-        // un jugador en esa posicion, es decir, si se hay un
-        // dwarf en la base de datos con esa carta, se resuelve automaticamente.
-        // Despues, se coloca el dwarf del jugador que ha tirado la carta especial
-        // en esa posicion.
-        Card reverseCard = specialCard.getTurnedSide();
-        List<Dwarf> roundDwarves = gs.getRoundDwarfs(g, round);
-        MainBoard mb = g.getMainBoard();
-
-        mbs.handleSpecialCardTurn(mb, reverseCard, specialCard, roundDwarves);
-
-        g.setMainBoard(mb);
-        gs.saveGame(g);
-
-        g = scs.resolveSpecialCard(g, p, mb, request, round, roundDwarves);
-
-        gs.saveGame(g);
+        gs.handleSpecialCard(g, specialCard, usesBothDwarves, p, request);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

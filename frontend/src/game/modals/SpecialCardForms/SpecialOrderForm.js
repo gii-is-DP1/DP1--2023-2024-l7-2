@@ -16,11 +16,11 @@ function resolveSpecialOrder(code, jwt, payload) {
         if (!response.success) {
 
           // Handle the case where the special sell item order is not successful
-          alert("Special sell item order failed. Please try again.");
+          alert("Special order failed. Please try again.");
         }
       })
       .catch((error) => {
-        console.error("Error during special sell item order:", error);
+        console.error("Error during special order:", error);
       });
   }
 

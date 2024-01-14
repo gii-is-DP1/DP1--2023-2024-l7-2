@@ -55,6 +55,9 @@ export default function GameJoin() {
             } else if(response.status == 404) {
                 setMessage("Game not found")
                 setVisible(true)
+            } else if(response.status == 400) {
+                setMessage("Game has already started")
+                setVisible(true)
             } else {
                 setMessage("Failed to join the game")
                 setVisible(true)
@@ -80,6 +83,9 @@ export default function GameJoin() {
             return response.json()
           } else if (response.status == 404) {
             setMessage("Game not found")
+            setVisible(true)
+        } else if(response.status == 400) {
+            setMessage("Game has already started")
             setVisible(true)
           } else {
             setMessage("Failed to join the game")

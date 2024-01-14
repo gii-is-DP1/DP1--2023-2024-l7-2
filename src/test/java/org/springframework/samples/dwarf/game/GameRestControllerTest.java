@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.card.SpecialCard;
@@ -25,14 +26,15 @@ import org.springframework.samples.dwarf.user.UserService;
 
 public class GameRestControllerTest {
 
+    @InjectMocks
     private GameRestController gameRestController;
 
     private GameService gameService;
     private UserService userService;
     private PlayerService playerService;
     private LocationService locationService;
-    private InvitationService invitationService;
 
+    /*
     @BeforeEach
     public void setUp() {
         gameService = mock(GameService.class);
@@ -43,7 +45,7 @@ public class GameRestControllerTest {
 
         gameRestController = new GameRestController(gameService, userService, playerService, null, null,
                 locationService, null, null, null, null);
-    }
+    }*/
 
     @Test
     public void testGetAllGames() {
