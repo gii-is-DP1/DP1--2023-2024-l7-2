@@ -126,8 +126,7 @@ public class GameService {
 
     @Transactional
     public Game addPlayer(Game g, Player p) {
-        ArrayList<Player> players = new ArrayList<Player>();
-        players.addAll(g.getPlayers());
+        List<Player> players = g.getPlayers();
         players.add(p);
         g.setPlayers(players);
         return saveGame(g);
@@ -135,8 +134,7 @@ public class GameService {
 
     @Transactional
     public Game addSpectator(Game g, Spectator s) {
-        ArrayList<Spectator> spectators = new ArrayList<Spectator>();
-        spectators.addAll(g.getSpectators());
+        List<Spectator> spectators = g.getSpectators();
         spectators.add(s);
         g.setSpectators(spectators);
         return saveGame(g);
@@ -176,45 +174,115 @@ public class GameService {
         // el jugador que debe empezarla
         if (!plys.get(0).equals(starter)) {
             Integer starterIndex = plys.indexOf(starter);
-            Collections.rotate(plys, starterIndex);
+            Collections.rotate(plys, -starterIndex);
         }
 
-        remaining_turns.addAll(plys);
-        remaining_turns.addAll(plys);
+
+
+        ArrayList<Player> turnsOfHelpCard = new ArrayList<Player>();
+        ArrayList<Player> turnsOfSpecialCard = new ArrayList<Player>();
         // Se ponen al final porque deben de ser los ultimos en tirar
         // Es decir, cuando se resuelven las acciones
         Map<Player,Boolean> hasUsedSpecialCard = new HashMap<Player,Boolean>();
         Player lastPlayer = null;
+        Boolean usedSingleDwarfForSpecialCard = false;
         for (Dwarf d : dwarves) {
 
             Player p = d.getPlayer();
-            lastPlayer = p;
+            
             Card c = d.getCard();
             if (!hasUsedSpecialCard.containsKey(p)) {
                 hasUsedSpecialCard.put(p, false);
             }
 
             // Se ha usado una carta especial
-            if (c == null) {
+            if (c == null){ 
+
                 if (!hasUsedSpecialCard.get(p)) {
-                    hasUsedSpecialCard.put(p, true);
+                    hasUsedSpecialCard.put(p,true);
                 }
-                continue;
-            }
 
-            // Si se ha tirado una carta despues de la carta especial significa que
-            // la carta especial te deja tirar un dwarf de mas.
-            if (lastPlayer.getName().equals(p.getName()) && hasUsedSpecialCard.get(p)) {
-                hasUsedSpecialCard.put(p, false);
-                remaining_turns.add(p);
-            }
+                if (lastPlayer.getName().equals(p.getName())) {
+                    // No se ha cambiado el turno, lo
+                    // que significa que el jugador ha
+                    // usado una carta especial con los dos dwarves
 
-            CardType ct = c.getCardType();
-            if (ct.getName().equals(helpCard)) {
-                remaining_turns.add(p);
-                remaining_turns.add(p);
+                    //hasUsedSpecialCard.put(p, false);
+                    usedSingleDwarfForSpecialCard = false;
+
+                } else {
+
+                    if (usedSingleDwarfForSpecialCard) {
+                        // Como el jugador ha usado solo un dwarf, el que le queda 
+                        // se usa al final de la ronda
+                        turnsOfSpecialCard.add(lastPlayer);
+                        plys.remove(lastPlayer);
+                    } else {
+                        usedSingleDwarfForSpecialCard = true;
+                    }
+
+                    if (hasUsedSpecialCard.get(lastPlayer)) {
+                        hasUsedSpecialCard.put(lastPlayer,false);
+                    }
+                }
+                
+            } else { // No se ha usado una carta especial
+
+                if (hasUsedSpecialCard.get(p)) {
+
+                    if(lastPlayer.getName().equals(p.getName())) {
+                        remaining_turns.add(p); // Algunas cartas especiales te dan un dwarf de mas
+
+                        if(usedSingleDwarfForSpecialCard) {
+                            turnsOfSpecialCard.add(lastPlayer);
+                            plys.remove(lastPlayer);
+                            usedSingleDwarfForSpecialCard = false;                            
+                        }
+
+                    } else if (usedSingleDwarfForSpecialCard) {
+                        turnsOfSpecialCard.add(lastPlayer);
+                        plys.remove(lastPlayer);
+                        usedSingleDwarfForSpecialCard = false;
+                    }
+                    hasUsedSpecialCard.put(p,false);
+                } 
+                
+                if (lastPlayer != null && hasUsedSpecialCard.get(lastPlayer)) {
+                    if (usedSingleDwarfForSpecialCard) {
+                        turnsOfSpecialCard.add(lastPlayer);
+                        plys.remove(lastPlayer);
+                        usedSingleDwarfForSpecialCard = false;
+                    }
+                    hasUsedSpecialCard.put(lastPlayer,false);
+                }
+                
+    
+                CardType ct = c.getCardType();
+                if (ct.getName().equals(helpCard)) {
+                    turnsOfHelpCard.add(p);
+                    turnsOfHelpCard.add(p);
+                }
             }
+            lastPlayer = p;
+
         }
+
+        // Primero los jugadores normales que no han usado cartas especiales
+        remaining_turns.addAll(plys);
+        remaining_turns.addAll(plys);
+
+        // Despues los turnos por la carta de ayuda
+        if (turnsOfHelpCard.size()>0) {
+            remaining_turns.addAll(turnsOfHelpCard);
+        }
+
+        //Invertimos los turnos de los jugadores que han seleccionado una carta especial 
+        // con solo un dwarf y lo addeamos
+        if (turnsOfSpecialCard.size() > 0){
+            Collections.reverse(turnsOfSpecialCard);
+            remaining_turns.addAll(turnsOfSpecialCard);
+        }
+
         return remaining_turns;
     }
 

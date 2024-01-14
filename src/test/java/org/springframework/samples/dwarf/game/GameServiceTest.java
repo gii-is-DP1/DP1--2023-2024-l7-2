@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardType;
@@ -33,6 +34,9 @@ import org.springframework.samples.dwarf.user.UserRepository;
 import org.springframework.samples.dwarf.user.UserService;
 
 public class GameServiceTest {
+
+    @Autowired
+    private GameService realGameService;
 
     private GameService gameService;
     private GameRepository gameRepository;
@@ -153,5 +157,22 @@ public class GameServiceTest {
         assertEquals(player3, game.getPlayerStart());
     }
     
-   
+   @Test
+   void testTurnWhenSpecialCard(){
+
+    Game g = realGameService.getGameByCode("test-code");
+    List<Player> players = g.getPlayers();
+    Player starter = g.getPlayerStart();
+
+
+    List<Dwarf> dwarves = g.getDwarves();
+    Integer round = g.getRound();
+    List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
+            && d.getPlayer() != null).toList();
+
+    List<Player> returnedPlayers = realGameService.getRemainingTurns(players,thisRoundDwarves,starter);
+
+    System.out.println(returnedPlayers);
+
+   }
 }

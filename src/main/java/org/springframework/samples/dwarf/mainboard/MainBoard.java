@@ -45,4 +45,15 @@ public class MainBoard extends BaseEntity {
 
         return res;
     }
+
+    public List<Card> getLocationCards(List<Location> locationsPassed) {
+        ArrayList<Card> res = new ArrayList<>();
+        for (Location lt:locationsPassed) {
+            List<Card> locationCards = lt.getCards();
+            Integer locationCardsLength = locationCards.size();
+            res.add(locationCards.get(locationCardsLength-1));
+        }
+
+        return res;
+    }
 }
