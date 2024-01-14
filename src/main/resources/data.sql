@@ -124,10 +124,13 @@ INSERT INTO game(id,name,code,start,finish, winner_id, round, is_public) VALUES 
         (3,'super cool game', '222','2023-04-11 18:20','2023-04-11 19:20', 2, null, False); 
 
 
-INSERT INTO card_deck(id) VALUES (1);
+INSERT INTO card_deck(id) VALUES (1),(2),(3);
 
 INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (1,1),(1,22),(1,33),(1,14),(1,25),(1,36),(1,37),(1,38),(1,9),(1,10),
                                                         (1,11),(1,12),(1,13),(1,24),(1,15),(1,26),(1,27),(1,28),(1,19);
+
+INSERT INTO card_deck_cards(card_deck_id,cards_id) VALUES (2,1),(2,19),(2,33),(2,14), (3,1),(3,19),(3,46),(3,14);
+
 
 INSERT INTO main_board(id, card_deck_id) VALUES (1, 1);
 
@@ -153,11 +156,13 @@ INSERT INTO player_objects(player_id, objects_id) VALUES (2,1), (3,1),(3,2),(3,3
 INSERT INTO game_players(game_id, players_id) VALUES (4,1),(4,2),(4,3);
 
 INSERT INTO dwarf(id, card_id, player_id, round) VALUES 
-        (1, 1, 1, 1),(2, 22, 2, 1),(3, 33, 3, 1),(4, 14, 1, 1),(5, 25, 2, 1),(6, 36, 3, 1),
+        (1, 1, 1, 1),(2, 22, 2, 1),(3, 33, 3, 1),(4, 14, 1, 1),(5, 25, 2, 1),--(6, 36, 3, 1),
         (7, 1, 1, 2),(8, 24, 2, 2),(9, 33, 3, 2),(10, 14, 1, 2),(11, 25, 2, 2),(12, 36, 3, 2),
-        (13, 1, 1, 3),(14, null, 2, 3),(15, null, 3, 3),(16, 14, 1, 3),(17, 25, 2, 3),(18, 36, 3, 3); 
+        (13, 1, 1, 3),(14, null, 2, 3),(15, null, 3, 3),(16, 14, 1, 3),(17, 25, 2, 3),(18, 36, 3, 3),
+        (19, 1, 1, 4),(20, null, 2, 4),(21, null, 2, 4),(22, 1, 2, 4),(23, 25, 3, 4),(24, 2, 1, 4),(25, 33, 3, 4); 
 
 INSERT INTO game_dwarves(dwarves_id, game_id) VALUES 
-        (1,4),(2,4),(3,4),(4,4),(5,4),(6,4),
+        (1,4),(2,4),(3,4),(4,4),(5,4),--(6,4),
         (7,4),(8,4),(9,4),(10,4),(11,4),(12,4),
-        (13,4),(14,4),(15,4),(16,4),(17,4),(18,4);
+        (13,4),(14,4),(15,4),(16,4),(17,4),(18,4),
+        (19,4),(20,4),(21,4),(22,4),(23,4),(24,4),(25,4);
