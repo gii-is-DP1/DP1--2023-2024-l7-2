@@ -126,6 +126,7 @@ public class SpecialCardService {
     public Game apprenticeAction(Game g,Player p, Integer round, 
         Integer selectedPosition, List<Dwarf> roundDwarvesApprentice) {
 
+        Boolean changed = false;
         for (Dwarf d : roundDwarvesApprentice) {
 
             if (!d.getPlayer().equals(p) && d.getCard().getPosition().equals(selectedPosition)) {
@@ -135,8 +136,12 @@ public class SpecialCardService {
                 List<Dwarf> gameDwarvesApprentice = g.getDwarves();
                 gameDwarvesApprentice.add(newDwarf);
                 g.setDwarves(gameDwarvesApprentice);
+                changed = true;
                 break;
             }
+        }
+        if (!changed) {
+            throw new CannotUseCardException("No user uses this position");
         }
         return g;
     }
@@ -200,6 +205,12 @@ public class SpecialCardService {
     
         if (selectedPosition >= POSITION_MIN && selectedPosition <= POSITION_MAX) {
             Location selectedLocation = newLocationsTurnBack.get(selectedPosition - 1);
+
+            for(Dwarf d:g.getDwarves()) {
+                if (d.getCard() != null && d.getCard().getPosition() == selectedPosition) {
+                    throw new CannotUseCardException("A user already uses this positions");
+                }
+            }
 
             Card removedCard = locService.removeLastCard(selectedLocation);
             if (removedCard != null) {

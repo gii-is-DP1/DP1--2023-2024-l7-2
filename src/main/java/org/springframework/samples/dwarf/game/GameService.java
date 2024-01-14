@@ -189,8 +189,8 @@ public class GameService {
         }
 
         // tiene que terminar en 6 rondas
-        if (finished || g.getRound() >= MAX_ROUNDS)
-            finished = true;
+        // if (finished || g.getRound() >= MAX_ROUNDS)
+        //     finished = true;
 
         if (finished || g.getFinish() != null)
             finished = true;
@@ -642,11 +642,6 @@ public class GameService {
 
         return g;
     }
-
-    /* 
-    public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p) {
-
-    }*/
 
     @Transactional
     public void resign(Game g, Player p) {

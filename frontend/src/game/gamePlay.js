@@ -279,6 +279,10 @@ export default function GamePlay() {
       code={code}
       playerObjects={player.objects}
       selectedCards={selectedCards}
+      myDwarves={myDwarves}
+      player={player}
+      setMessage={setMessage}
+      setVisible={setVisible}
     ></ConfirmSpecialCardModel>
 
     <ChatModel
