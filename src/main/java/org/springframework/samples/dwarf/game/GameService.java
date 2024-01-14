@@ -181,6 +181,7 @@ public class GameService {
 
         ArrayList<Player> turnsOfHelpCard = new ArrayList<Player>();
         ArrayList<Player> turnsOfSpecialCard = new ArrayList<Player>();
+        ArrayList<Player> extraDwarfWhenSpecialCard = new ArrayList<Player>();
         // Se ponen al final porque deben de ser los ultimos en tirar
         // Es decir, cuando se resuelven las acciones
         Map<Player,Boolean> hasUsedSpecialCard = new HashMap<Player,Boolean>();
@@ -231,7 +232,7 @@ public class GameService {
                 if (hasUsedSpecialCard.get(p)) {
 
                     if(lastPlayer.getName().equals(p.getName())) {
-                        remaining_turns.add(p); // Algunas cartas especiales te dan un dwarf de mas
+                        extraDwarfWhenSpecialCard.add(p); // Algunas cartas especiales te dan un dwarf de mas
 
                         if(usedSingleDwarfForSpecialCard) {
                             turnsOfSpecialCard.add(lastPlayer);
@@ -270,6 +271,11 @@ public class GameService {
         // Primero los jugadores normales que no han usado cartas especiales
         remaining_turns.addAll(plys);
         remaining_turns.addAll(plys);
+
+        // Los turnos especiales por el uso de una carta especial
+        if (extraDwarfWhenSpecialCard.size() > 0) {
+            remaining_turns.addAll(extraDwarfWhenSpecialCard);
+        }
 
         // Despues los turnos por la carta de ayuda
         if (turnsOfHelpCard.size()>0) {
