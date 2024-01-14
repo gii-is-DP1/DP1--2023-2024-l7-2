@@ -15,7 +15,6 @@ export default function StatsList() {
     victories: 0,
     defeated: 0,
     totalMatches: 0,
-    totalGameTime: 0,
     mediaPlayersPerGame: 0
   });
 
@@ -24,6 +23,7 @@ export default function StatsList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+
         const achievementsResponse = await fetch(`/api/v1/achievements/all/${user.username}`, {
           method: "GET",
           headers: {
@@ -41,11 +41,6 @@ export default function StatsList() {
 
         const achievementsData = await achievementsResponse.json();
         console.log('Achievements Data:', achievementsData);
-
-        if (achievementsData && achievementsData.message) {
-          setMessage(achievementsData.message);
-          setVisible(true);
-        }
 
         const winnedResponse = await fetch(`/api/v1/achievements/allWinnedGames/${user.id}`, {
           method: "GET",
@@ -65,15 +60,6 @@ export default function StatsList() {
           }
         });
 
-        const totalGameTimeResponse = await fetch(`/api/v1/achievements/gameTimeList/${user.username}`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${jwt}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          }
-        });
-
         const mediaResponse = await fetch(`/api/v1/achievements/mediaPlayers/${user.username}`, {
           method: "GET",
           headers: {
@@ -82,14 +68,6 @@ export default function StatsList() {
             "Content-Type": "application/json",
           }
         });
-
-        if (!totalGameTimeResponse.ok) {
-          throw new Error(`HTTP error! Status: ${totalGameTimeResponse.status}`);
-        }
-
-        if (!totalGamesPlayedResponse.ok) {
-          throw new Error(`HTTP error! Status: ${totalGameTimeResponse.status}`);
-        }
 
         if (!winnedResponse.ok) {
           throw new Error(`HTTP error! Status: ${winnedResponse.status}`);
@@ -105,9 +83,6 @@ export default function StatsList() {
         const gamesPlayedData = await totalGamesPlayedResponse.json();
         console.log('Games Played Data:', gamesPlayedData);
 
-        const totalGameTimeData = await totalGameTimeResponse.json();
-        console.log('Total Game Time Data:', totalGameTimeData);
-
         const mediaData = await mediaResponse.json();
         console.log('Media Data:', mediaData);
 
@@ -115,41 +90,115 @@ export default function StatsList() {
           ...prevStatistic,
           victories: winnedData,
           totalMatches: gamesPlayedData,
-          defeated: gamesPlayedData - winnedData, 
-          totalGameTime: totalGameTimeData,
+          defeated: gamesPlayedData - winnedData,
           mediaPlayersPerGame: mediaData
         }));
 
-        setStats(achievementsData);
+      setStats(achievementsData);
+
+      const statsAchievement = achievementsData.find((achievement) => achievement.description === "stats");
+
+        if (!statsAchievement) {
+          const createStatsAchievementResponse = await fetch("/api/v1/achievements", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${jwt}`,
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              totalMatches: 0,
+              totalVictories: 0,
+              totalIron: 0,
+              totalGold: 0,
+              totalSteal: 0,
+              totalObjects: 0,
+              description: "stats",
+            }),
+          });
+
+          if (!createStatsAchievementResponse.ok) {
+            throw new Error(`HTTP error! Status: ${createStatsAchievementResponse.status}`);
+          }
+
+          const createdStatsAchievement = await createStatsAchievementResponse.json();
+          console.log('Created Stats Achievement:', createdStatsAchievement);
+
+          // Actualizar el estado de stats con el nuevo logro creado
+          setStats((prevStats) => [...prevStats, createdStatsAchievement]);
+        }
+        
       } catch (error) {
         console.error('Error in fetchData:', error);
         alert(error.message);
       }
     };
+    function updateStatsAchievement(){
+      try {
+        const statsAchievement = stats.find((achievement) => achievement.description === "stats");
+  
+      if (!statsAchievement || !statsAchievement.id) {
+        console.error('Error: ID of the achievement is undefined or null');
+        return;
+      }
+  
+      const updateStatsAchievementResponse = fetch(`/api/v1/achievements/3`, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${jwt}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: statsAchievement.id,
+          description: "stats",
+          totalIron:0,
+          totalGold:0,
+          totalSteal:0,
+          totalObjects:0,
+          totalMatches: statistic.totalMatches,
+          totalVictories: statistic.victories,
+          totalGameTime: statistic.totalGameTime
+          // Puedes agregar más campos aquí según tus necesidades
+        }),
+      });
+  
+      if (!updateStatsAchievementResponse.ok) {
+        throw new Error(`HTTP error! Status: ${updateStatsAchievementResponse.status}`);
+      }
+  
+      console.log(statsAchievement)
+  
+      } catch (error) {
+        console.error('Error updating Stats Achievement:', error);
+        alert(error.message);
+      }
+    };
 
+    updateStatsAchievement()
     fetchData();
-  }, [user.id, user.username]);  // Agrega las dependencias necesarias para useEffect
+  }, []);
 
-  console.log(statistic.victories);
+  console.log(statistic)
 
   const filteredStats = stats.filter((achievement) => achievement.description === "stats");
 
-const statsList = Array.isArray(filteredStats) && filteredStats.map((request) => (
-  <tr key={request.id}>
+  const statsList = Array.isArray(filteredStats) && filteredStats.map((request, index) => (
+    <tr key={index}>
+      <td>{statistic.totalMatches}</td>
+      <td>{statistic.victories}</td>
+      <td>{statistic.defeated}</td>
+      <td>{statistic.mediaPlayersPerGame}</td>
+    </tr>
+  ));
 
-    <td>{statistic.totalMatches}</td>
-    <td>{statistic.victories}</td>
-    <td>{statistic.defeated}</td>
-    <td>{statistic.totalGameTime}</td>
-    <td>{statistic.mediaPlayersPerGame}</td>
-  </tr>
-));
 
   return (
     <div className="auth-page-container" style={{ height: "100vh", marginTop: "65px", textAlign: "center" }}>
       <div className="friends" style={{ marginTop: "10px" }}>
         <h3 style={{ marginTop: "30px" }}>My Stats</h3>
-        <table>
+      </div>
+      <table>
           <thead>
             <tr>
               <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
@@ -162,16 +211,12 @@ const statsList = Array.isArray(filteredStats) && filteredStats.map((request) =>
                 Total Defeates
               </th>
               <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
-                Total Game Time
-              </th>
-              <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
                 Media Players Per Game
               </th>
             </tr>
           </thead>
-          <tbody>{statsList}</tbody>
+          <tbody>{statsList[0]}</tbody>
         </table>
-      </div>
     </div>
   );
 };
