@@ -3,8 +3,10 @@ package org.springframework.samples.dwarf.statistic;
 import java.time.LocalDateTime;
 
 import org.springframework.samples.dwarf.model.NamedEntity;
+import org.springframework.samples.dwarf.user.User;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -26,5 +28,4 @@ public class Achievement extends NamedEntity {
     private Integer totalObjects;
     private Integer totalMatches;
     private Integer totalVictories;
-    private Long totalGameTime;
 }
