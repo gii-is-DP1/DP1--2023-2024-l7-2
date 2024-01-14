@@ -31,7 +31,24 @@ public class CardServiceTest {
     @Autowired
     private GameService gameService;
 
-   
+    @Test
+    public void testSaveCard() {
+        Card newCard = new Card();
+
+        CardType newCardType = cardService.getById(1).getCardType();
+
+        newCard.setName("sample name");
+        newCard.setDescription("sample description");
+        newCard.setPosition(2);
+        newCard.setCardType(newCardType);
+
+        Card savedCard = cardService.saveCard(newCard);
+
+        assertNotNull(savedCard.getId());
+
+        assertEquals(101,savedCard.getId());
+
+    }
 
     @Test
     public void testGetCards() {
@@ -55,24 +72,7 @@ public class CardServiceTest {
 
     }
 
-    @Test
-    public void testSaveCard() {
-        Card newCard = new Card();
 
-        CardType newCardType = cardService.getById(1).getCardType();
-
-        newCard.setName("sample name");
-        newCard.setDescription("sample description");
-        newCard.setPosition(2);
-        newCard.setCardType(newCardType);
-
-        Card savedCard = cardService.saveCard(newCard);
-
-        assertNotNull(savedCard.getId());
-
-        assertEquals(savedCard.getId(),100);
-
-    }
 
     @Test
     public void testDeleteCardById() {
@@ -271,7 +271,7 @@ public class CardServiceTest {
     }
 
     @Test
-    public void testForjarn_CannotApplyCard() {
+    public void testForjar_CannotApplyCard() {
         
         Player player = new Player();
         player.setGold(5);
