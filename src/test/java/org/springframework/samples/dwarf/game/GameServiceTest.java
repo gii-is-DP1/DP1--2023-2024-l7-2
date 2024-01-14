@@ -22,17 +22,22 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
+import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.card.CardType;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
+import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
+import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.game.GameRepository;
 import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.samples.dwarf.location.Location;
+import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
+import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.samples.dwarf.spectator.Spectator;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserRepository;
@@ -43,18 +48,22 @@ public class GameServiceTest {
     private GameService realGameService;
     private GameService gameService;
     private GameRepository gameRepository;
-    private PlayerRepository playerRepository;
     private UserService userService;
     private MainBoardService mbs;
     private CardDeckService cds;
+    private PlayerService ps;
+    private LocationService ls;
+    private CardService cs;
+    private ChatService chatservice;
+
+    private PlayerRepository playerRepository;
 
     @BeforeEach
     public void setUp() {
         gameRepository = mock(GameRepository.class);
-        playerRepository = mock(PlayerRepository.class);
         mbs = mock(MainBoardService.class);
         cds = mock(CardDeckService.class);
-        gameService = new GameService(gameRepository, playerRepository, userService, mbs, cds, null,null);
+        gameService = new GameService(gameRepository, null, userService, mbs, cds, null,null,null,null);
     }
 
     @Test

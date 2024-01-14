@@ -8,7 +8,6 @@ import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.model.BaseEntity;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

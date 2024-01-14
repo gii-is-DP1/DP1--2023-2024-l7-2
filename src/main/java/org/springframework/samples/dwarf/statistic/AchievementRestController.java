@@ -115,9 +115,9 @@ public class AchievementRestController {
 	@GetMapping("/allWinnedGames/{id}")
 	public ResponseEntity<Integer> findAllWinnedGames(@PathVariable("id") Integer id) {
 		List<Game> gamesToGet = achievementService.getAllWinnedGames(id);
+		if (gamesToGet == null)
+			throw new ResourceNotFoundException("Games with name " + id + " not found!");
 	 	Integer res = gamesToGet.size();
-	 	if (gamesToGet == null)
-	 		throw new ResourceNotFoundException("Games with name " + id + " not found!");
 	 	return new ResponseEntity<Integer>(res, HttpStatus.OK);
 	}
 

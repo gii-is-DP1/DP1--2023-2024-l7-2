@@ -6,7 +6,7 @@ import { Button, ButtonGroup, Table } from "reactstrap";
 import getIdFromUrl from "./../util/getIdFromUrl";
 import Card from "./../cards/card"
 import SpecialCard from "../cards/specialCard";
-import  { isFinished, sendCard, isStart, resign}  from "./gameFunctions";
+import  { isFinished, sendCard, isStart, resign, checkResourcesSelectCard}  from "./gameFunctions";
 import ConfirmSpecialCardModel from "./modals/ConfirmSpecialCardModel";
 import ChatModel from "./modals/ChatModel";
 import InviteFormModel from "./modals/InviteFormModel";
@@ -25,7 +25,7 @@ export default function GamePlay() {
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
 
-  const [apprenticeAction, setApprenticeAction] = useState(false)
+  const [myDwarves, setMyDwarves] = useState([]);
   const [gameStarted, setGameStarted] = useState(null);
   const [gameRound, setGameRound] = useState(null);
   const [choosedCard, setChoosedCard] = useState(null);
@@ -55,16 +55,6 @@ export default function GamePlay() {
     7: null,8: null,9: null}
   const [selectedCards,setSelectedCards] = useState(emptySelectedCards)
 
-  
-  // const emptyHistoricalCards = {1: [],2: [],3: [],
-  //   4: [],5: [],6: [],
-  //   7: [],8: [],9: []}
-  // const [cardsHistorical,setCardsHistorical] = useState(emptyHistoricalCards)
-
-
-  //const emptySelectedSpecialCards = {1: null,2: null,3: null}
-  //const [selectedSpecialCards,setSelectedSpecialCards] = useState(emptySelectedSpecialCards)
-
   const [game, setGame] = useIntervalFetchState(
       {},
       `/api/v1/game/play/${code}`,
@@ -86,8 +76,9 @@ export default function GamePlay() {
   let player = players.filter(p => p.name === user.username)[0];
   if (player == null) player = {};
 
-  const [isMyTurn, setIsMyTurn] = useIntervalFetchState(
-    false,
+  const [isMyTurn, setIsMyTurn] = useState(false);
+  const [playerTurn, setPlayerTurn] = useIntervalFetchState(
+    null,
     `/api/v1/game/play/${code}/isMyTurn`,
     jwt,
     setMessage,
@@ -95,6 +86,7 @@ export default function GamePlay() {
     code
   );
 
+  
   const [dwarves, setDwarves] = useIntervalFetchState(
     [],
     `/api/v1/game/play/${code}/dwarves`,
@@ -107,16 +99,36 @@ export default function GamePlay() {
 
   const modal = getErrorModal(setVisible, visible, message);
 
+  useEffect(()=>{
+    if(playerTurn && playerTurn.name && player.name) {
+      if (player.name === playerTurn.name) {
+        if (!isMyTurn){
+          setIsMyTurn(true)
+        }
+      } else {
+        if (isMyTurn){
+          setIsMyTurn(false)
+        }
+      }
+    } 
+  },[playerTurn])
+
   useEffect(() => {
     let updated = {1: null,2: null,3: null,
       4: null,5: null,6: null,
       7: null,8: null,9: null};
+    
+    let updatedDwarves = [];
     for (const d of dwarves) {
         if (!d.player) continue;
         const c = d.card;
         if (c==null) {
           continue;
         }
+        if (d.player.name === player.name) {
+          updatedDwarves.push(d);
+        }
+
         const pacolor = d.player.color;
         //console.log(c.id + " to color => " + pacolor);
         updated[c.position] = pacolor;  
@@ -126,6 +138,7 @@ export default function GamePlay() {
       setGameStarted(true)
     }
 
+    setMyDwarves(updatedDwarves)
     setSelectedCards(updated)
 
     if (game.round !== gameRound) {
@@ -149,24 +162,6 @@ export default function GamePlay() {
     })
   }, [gameRound, specialCardToBeConfirmed])
   
-  useEffect(() => {if(apprenticeAction)setApprenticeAction(false)},[gameRound])
-
-  function checkResourcesSelectCard(card) {
-    
-    if (card.totalGold * -1 > player.gold) {
-      return false;
-    }
-
-    if (card.totalIron * -1 > player.iron) {
-      return false;
-    }
-
-    if (card.totalSteal * -1 > player.gold) {
-      return false;
-    }
-
-    return true;
-  }
 
   function selectCard(id,card) {
     if (isMyTurn === false) {
@@ -175,14 +170,22 @@ export default function GamePlay() {
       return false; // Just a random return to ensure that function exits
     }
 
-    if (!apprenticeAction && selectedCards[id] !== null && selectedCards[id] !== undefined) {
+    if (selectedCards[id] !== null && selectedCards[id] !== undefined) {
       // Card is already selected, you can't select it
       setMessage("Card already selected");
       setVisible(true);
       return false;
     }
 
-    if (!checkResourcesSelectCard(card)) {
+    let cards= []
+    for (const dwarf in myDwarves) {
+      cards.push(myDwarves[dwarf].card)
+    }
+    cards.push(card)
+
+    console.log(cards)
+
+    if (!checkResourcesSelectCard(cards,player)) {
       setMessage("You don't have enough resources to select this card");
       setVisible(true);
       return false;
@@ -201,6 +204,12 @@ export default function GamePlay() {
   }
 
   function selectSpecialCard(id,specialCard) {
+    if (!gameStarted) {
+      setMessage("Game has not started yet");
+      setVisible(true);
+      return false; // Just a random return to ensure that function exits
+    }
+
     if (isMyTurn === false) {
       setMessage("It is not your turn");
       setVisible(true);
@@ -225,7 +234,7 @@ export default function GamePlay() {
 
   const playerList = players.map((play) => {
     return (
-      <tr key={play.id} style={{ color: play.color }}>
+      <tr key={play.id} style={{ color: play.color, backgroundColor: "grey" }}>
         <td style={{ color: play.color }} className="text-center">{play.name}</td>
         <td style={{ color: play.color }} className="text-center">Iron: {play.iron}</td>
         <td style={{ color: play.color }} className="text-center">Gold: {play.gold}</td>
@@ -240,10 +249,15 @@ export default function GamePlay() {
             )
           }
         )}</td>
+        {game.playerStart && play.name === game.playerStart.name && 
+            <td style={{ color: "red" }} >Round Starter</td>
+        }        
+        {playerTurn && playerTurn.name && play.name === playerTurn.name && 
+            <td style={{ color: "red" }} >Current turn</td>
+        }
       </tr>
     )
   })
-
   const buttonStartGame = () => {
     setGameStarted(true);
     isStart(code,jwt);
@@ -259,7 +273,6 @@ export default function GamePlay() {
       card={choosedSpecialCard}
       code={code}
       playerObjects={player.objects}
-      setApprenticeAction={setApprenticeAction}
       selectedCards={selectedCards}
     ></ConfirmSpecialCardModel>
 
@@ -348,11 +361,7 @@ export default function GamePlay() {
 
           { isMyTurn && <h2>Is your turn!</h2>}
           
-          <div style={{ position: 'fixed', top: '120px', right: '10px', border: '2px solid black', padding: '10px' }}>
-            {player.name === game.playerStart.name ? (
-              <h2>Player Starter</h2>
-            ) : null}
-          </div>
+
         </section>
           }
 
