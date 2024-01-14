@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.dwarf.card.Card;
-import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,8 +62,7 @@ public class DwarfService {
     }
 
     @Transactional
-    public void updateDwarvesWhenUpdatedCards(List<Dwarf> dwarves, MainBoard mb) {
-        List<Card> cards = mb.getCards();
+    public void updateDwarvesWhenUpdatedCards(List<Dwarf> dwarves, List<Card> cards) {
         for (Dwarf d: dwarves) {
             Card originalCard = d.getCard();
             Integer position = originalCard.getPosition();

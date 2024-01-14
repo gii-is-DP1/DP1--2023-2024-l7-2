@@ -9,5 +9,4 @@ import org.springframework.stereotype.Repository;
 public interface DwarfRepository extends CrudRepository<Dwarf, Integer> {
 
     List<Dwarf> findAll();
-    // public Dwarf findByColor(String color);
 }

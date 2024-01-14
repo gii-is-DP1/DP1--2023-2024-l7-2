@@ -9,9 +9,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.samples.dwarf.dwarf.Dwarf;
-import org.springframework.samples.dwarf.dwarf.DwarfRepository;
-import org.springframework.samples.dwarf.dwarf.DwarfService;
+import org.springframework.samples.dwarf.card.Card;
 
 public class DwarfServiceTest {
 
@@ -88,5 +86,45 @@ public class DwarfServiceTest {
     public void testDeleteDwarf_WithNullDwarf() {
         
         assertDoesNotThrow(() -> dwarfService.deleteDwarf(null));
+    }
+
+    @Test
+    public void testUpdateDwarvesWhenUpdatedCards(){
+
+        Card card1 = new Card();
+        card1.setName("sample1");
+        card1.setId(56);
+        card1.setDescription("asdasd");
+        card1.setPosition(1);
+    
+        Card card2 = new Card();
+        card2.setName("sample2");
+        card2.setId(57);
+        card2.setDescription("asdasd");
+        card2.setPosition(2);
+
+        Card card3 = new Card();
+        card3.setName("sample3");
+        card3.setId(58);
+        card3.setDescription("asdasd");
+        card3.setPosition(2);
+
+        Dwarf mockDwarf1 = new Dwarf();
+        mockDwarf1.setId(1);
+        mockDwarf1.setCard(card1);
+        mockDwarf1.setRound(1);
+
+        Dwarf mockDwarf2 = new Dwarf();
+        mockDwarf2.setId(2);
+        mockDwarf2.setCard(card2);
+        mockDwarf2.setRound(1);
+
+        List<Dwarf> dwarves = List.of(mockDwarf1,mockDwarf2);
+        List<Card> cards = List.of(card1,card3);
+
+        dwarfService.updateDwarvesWhenUpdatedCards(dwarves, cards);
+
+        assertEquals(dwarves.get(0).getCard(), card1);
+        assertEquals(dwarves.get(1).getCard(), card3);
     }
 }

@@ -110,7 +110,7 @@ public class SpecialCardService {
 
     @Transactional
     public Game musterAnArmyAction(Game g, Integer round, List<Card> gameCards) {
-        ArrayList<Dwarf> gameDwarves = new ArrayList<>(g.getDwarves());
+        List<Dwarf> gameDwarves = g.getDwarves();
         for (Card c : gameCards) {
             if (c.getCardType().getName().equals(ORC_CARD)) {
                 Dwarf d = dwService.genAndSave(null, round, c);
@@ -207,7 +207,7 @@ public class SpecialCardService {
 
                 Dwarf newDwarfTurnBack = dwService.genAndSave(p, round, newTopCard);
 
-                List<Dwarf> gameDwarvesTurnBack = new ArrayList<>(g.getDwarves());
+                List<Dwarf> gameDwarvesTurnBack = g.getDwarves();
                 gameDwarvesTurnBack.add(newDwarfTurnBack);
                 g.setDwarves(gameDwarvesTurnBack);
             }
@@ -243,6 +243,7 @@ public class SpecialCardService {
         Integer selectedPosition = request.getPosition();
         Card cardToBeOnTop = request.getPastCard();
         List<Location> locations;
+        List<Card> cards;
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case SPECIAL_CARD_MUSTER_AN_ARMY:
@@ -255,20 +256,23 @@ public class SpecialCardService {
                 break;
 
             case SPECIAL_CARD_HOLD_A_COUNCIL:
-                mb = mbService.holdACouncilAction(mb);
-                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, mb);
+                mbService.holdACouncilAction(mb);
+                cards = mb.getLocationCards(mb.getLocations());
+                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, cards);
                 break;
 
             case SPECIAL_CARD_COLLAPSE_THE_SHAFTS:
-                mb = mbService.collapseTheShaftsAction(mb);
-                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, mb);
+                locations = mbService.collapseTheShaftsAction(mb);
+                cards = mb.getLocationCards(mb.getLocations());
+                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, cards);
                 break;
 
             case SPECIAL_CARD_RUN_AMOK:
-                mb = mbService.runAmokAction(mb);
-                mb = mbService.saveMainBoard(mb);
-                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, mb);
-                g.setMainBoard(mb);
+                locations = mbService.runAmokAction(mb);
+//                mb = mbService.saveMainBoard(mb);
+                cards = mb.getLocationCards(mb.getLocations());
+                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, cards);
+                //g.setMainBoard(mb);
                 break;
 
             case SPECIAL_CARD_SELL_AN_ITEM:
@@ -281,13 +285,13 @@ public class SpecialCardService {
                 break;
 
             case SPECIAL_CARD_TURN_BACK:
-                locations = new ArrayList<>(mb.getLocations());
+                locations = mb.getLocations();
 
                 g = turnBackAction(g, p, round, selectedPosition, locations);
-                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, g.getMainBoard());
+                dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, g.getMainBoard().getCards());
                 break;
             case SPECIAL_CARD_PAST_GLORIES:
-                locations = new ArrayList<>(mb.getLocations());
+                locations = mb.getLocations();
                 pastGloriesAction(selectedPosition, cardToBeOnTop, locations);
 
                 break;
