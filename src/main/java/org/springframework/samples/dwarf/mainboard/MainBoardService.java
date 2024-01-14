@@ -107,9 +107,9 @@ public class MainBoardService {
     }
 
     @Transactional
-    public MainBoard holdACouncilAction(MainBoard mb) {
+    public void holdACouncilAction(MainBoard mb) {
         CardDeck cd = mb.getCardDeck();
-        ArrayList<Card> cardsRemovedFromLocations = new ArrayList<>();
+        List<Card> cardsRemovedFromLocations = new ArrayList<>();
 
         for (Location lc:mb.getLocations()) {
             Card removedCard = ls.removeLastCard(lc);
@@ -120,31 +120,33 @@ public class MainBoardService {
 
         cd = cds.shuffleAndSaveCards(cd, cardsRemovedFromLocations);
 
-        return saveMainBoard(mb);
+        // mb = saveMainBoard(mb);
+        //return mb;
     }
 
     @Transactional
-    public MainBoard collapseTheShaftsAction(MainBoard mb) {
+    public List<Location> collapseTheShaftsAction(MainBoard mb) {
 
-        List<Location> locations = new ArrayList<Location>();
+        List<Location> locations = new ArrayList<>();
         for (Location lc:mb.getLocations()) {
             Location l = ls.putFirstCardAtEnd(lc);
             locations.add(l);
         }
-        mb.setLocations(locations);
-        mb = saveMainBoard(mb);
-        return mb;
+        //mb.setLocations(locations);
+        //mb = saveMainBoard(mb);
+        return locations;
     }
 
     @Transactional
-    public MainBoard runAmokAction(MainBoard mb) {
-        ArrayList<Location> newLocations = new ArrayList<>();
+    public List<Location> runAmokAction(MainBoard mb) {
+        List<Location> newLocations = new ArrayList<>();
         for (Location lc:mb.getLocations()) {
             Location newLocation = ls.shuffleLocation(lc);
             newLocations.add(newLocation);
         }
-        mb.setLocations(newLocations);
-        return saveMainBoard(mb);
+        //mb.setLocations(newLocations);
+        //mb = saveMainBoard(mb);
+        return newLocations;
     }
     
 
@@ -342,8 +344,7 @@ public class MainBoardService {
 
     @Transactional
     public MainBoard removeUsedSpecialCard(MainBoard mb, SpecialCard sc) {
-        ArrayList<SpecialCard> newSpecCards = new ArrayList<>();
-        newSpecCards.addAll(mb.getSCards());
+        List<SpecialCard> newSpecCards = mb.getSCards();
         
         for( int i = 0 ; i < newSpecCards.size() ; i++) {
             SpecialCard tmp = newSpecCards.get(i);
@@ -361,8 +362,7 @@ public class MainBoardService {
     @Transactional
     public MainBoard putReverseSpecialCard(MainBoard mb, Card reverseCard) {
         //MainBoard mb = g.getMainBoard();
-        ArrayList<Location> newLocations = new ArrayList<>();
-        newLocations.addAll(mb.getLocations());
+        List<Location> newLocations = mb.getLocations();
         Location locationToUpdate = newLocations.get(reverseCard.getPosition() - 1);
         locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
         newLocations.set(reverseCard.getPosition() - 1, locationToUpdate);

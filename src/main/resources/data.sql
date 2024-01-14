@@ -144,8 +144,8 @@ INSERT INTO player(id,user_id,name,iron,gold,steal,medal,color) VALUES
         (1,4,'owner1',0,0,0,0,'red'),
         (2,5,'owner2',6,7,8,10,'blue'),
         (3,6,'owner3',10,20,50,30,'yellow');
-INSERT INTO game(id,name,player_creator_id,code,start,finish, winner_id, round, main_board_id, is_public) VALUES 
-        (4,'game-test',1,'test-code','2023-04-11 10:20',null,5,1,1, False);
+INSERT INTO game(id,name,player_creator_id,player_start_id,code,start,finish, winner_id, round, main_board_id, is_public) VALUES 
+        (4,'game-test',1,2,'test-code','2023-04-11 10:20',null,5,1,1, False);
 
 
 INSERT INTO player_objects(player_id, objects_id) VALUES (2,1), (3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8);
@@ -153,6 +153,11 @@ INSERT INTO player_objects(player_id, objects_id) VALUES (2,1), (3,1),(3,2),(3,3
 INSERT INTO game_players(game_id, players_id) VALUES (4,1),(4,2),(4,3);
 
 INSERT INTO dwarf(id, card_id, player_id, round) VALUES 
-        (1, 1, 1, 1),(2, 22, 2, 1),(3, 33, 3, 1),(4, 14, 1, 1),(5, 25, 2, 1),(6, 36, 3, 1); 
+        (1, 1, 1, 1),(2, 22, 2, 1),(3, 33, 3, 1),(4, 14, 1, 1),(5, 25, 2, 1),(6, 36, 3, 1),
+        (7, 1, 1, 2),(8, 24, 2, 2),(9, 33, 3, 2),(10, 14, 1, 2),(11, 25, 2, 2),(12, 36, 3, 2),
+        (13, 1, 1, 3),(14, null, 2, 3),(15, null, 3, 3),(16, 14, 1, 3),(17, 25, 2, 3),(18, 36, 3, 3); 
 
-INSERT INTO game_dwarves(dwarves_id, game_id) VALUES (1,4),(2,4),(3,4),(4,4),(5,4),(6,4);
+INSERT INTO game_dwarves(dwarves_id, game_id) VALUES 
+        (1,4),(2,4),(3,4),(4,4),(5,4),(6,4),
+        (7,4),(8,4),(9,4),(10,4),(11,4),(12,4),
+        (13,4),(14,4),(15,4),(16,4),(17,4),(18,4);

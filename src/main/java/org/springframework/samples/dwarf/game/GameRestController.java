@@ -220,10 +220,13 @@ public class GameRestController {
             p.setColor(ps.getRandomColor(g.getPlayers()));
 
             p.setUser(u);
-            p.setObjects(new ArrayList<Object>());
 
-            ps.savePlayer(p);
-            gs.addPlayer(g, p);
+            p = ps.savePlayer(p);
+            try {
+                gs.addPlayer(g, p);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         } else {
             
            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
@@ -259,6 +262,7 @@ public class GameRestController {
 
             ps.savePlayer(p);
             gs.addPlayer(g, p);
+
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
             
@@ -391,6 +395,7 @@ public class GameRestController {
 
         List<Player> plys = g.getPlayers();
         if (plys.size() < 1) {
+            // TODO: Create error
             System.out.println("No players");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -398,6 +403,7 @@ public class GameRestController {
         User u = us.findCurrentUser();
         Player p = gs.getPlayerByUserAndGame(u, g);
         if (p == null) {
+            // TODO: Create error
             System.out.println("no player");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -410,7 +416,6 @@ public class GameRestController {
         }
 
         List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
-        System.out.println(dwarves_players);
 
         ArrayList<Player> remaining_turns = new ArrayList<Player>();
         remaining_turns.addAll(gs.getRemainingTurns(plys, dwarves, g.getPlayerStart()));
