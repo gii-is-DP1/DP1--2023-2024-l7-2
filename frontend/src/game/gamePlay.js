@@ -285,6 +285,8 @@ export default function GamePlay() {
 
       <div className="admin-page-container">
         <h1 className="text-center">Game: {game.name} - Round: {game.round}</h1>
+
+
         { game != {} && game.playerCreator && game.playerCreator.name === user.username 
           && players && players.length > 1 && !gameStarted &&
           <Button
@@ -345,6 +347,12 @@ export default function GamePlay() {
             )}
 
           { isMyTurn && <h2>Is your turn!</h2>}
+          
+          <div style={{ position: 'fixed', top: '120px', right: '10px', border: '2px solid black', padding: '10px' }}>
+            {player.name === game.playerStart.name ? (
+              <h2>Player Starter</h2>
+            ) : null}
+          </div>
         </section>
           }
 
