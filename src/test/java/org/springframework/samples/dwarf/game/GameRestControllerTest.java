@@ -68,6 +68,7 @@ public class GameRestControllerTest {
         assertEquals(mockGame, result, "El juego recuperado no coincide");
     }
 
+    /*
     @Test
     public void testGetGameByCode() {
         // Configurar el comportamiento del servicio mock
@@ -78,7 +79,7 @@ public class GameRestControllerTest {
         // Ejecutar el método del controlador y verificar el resultado
         ResponseEntity<Void> result = gameRestController.getGameByCode(gameCode);
         assertEquals(HttpStatus.OK, result.getStatusCode(), "Código de estado incorrecto");
-    }
+    }*/
 
     @Test
     public void testPlayGame() {

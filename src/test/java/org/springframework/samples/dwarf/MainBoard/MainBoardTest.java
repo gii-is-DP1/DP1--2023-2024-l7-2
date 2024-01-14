@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
 
 public class MainBoardTest {
 

@@ -83,6 +83,7 @@ public class GameRestController {
         this.scs = scs;
     }
 
+
     @GetMapping
     public List<Game> getAllGames(@ParameterObject() @RequestParam(value = "name", required = false) String name,
             @ParameterObject @RequestParam(value = "status", required = false) GameStatus status) {
@@ -107,22 +108,6 @@ public class GameRestController {
         if (!g.isPresent())
             throw new ResourceNotFoundException("Game", "id", id);
         return g.get();
-    }
-
-    @GetMapping("/check/{code}")
-    public ResponseEntity<Void> getGameByCode(@PathVariable("code") String code) {
-        Game g = null;
-        try {
-            g = gs.getGameByCode(code);
-
-            if (g == null) {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            System.out.println("Exception =>" + e);
-        }
-
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/play/{code}")
@@ -210,27 +195,14 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        if (g.getStart() != null) {
-
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
+        
         if (!gs.gameContainsPlayer(g, u)) {
-            Player p = ps.initialize(u.getUsername());
-            p.setColor(ps.getRandomColor(g.getPlayers()));
-
-            p.setUser(u);
-
-            p = ps.savePlayer(p);
-            try {
-                gs.addPlayer(g, p);
-            } catch (Exception e) {
-                System.out.println(e);
+            if (g.getStart() != null) {
+    
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
-        } else {
-
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
-        }
+            gs.joinPlayer(g,u);
+        } 
 
         return ResponseEntity.ok(g);
     }
@@ -245,26 +217,18 @@ public class GameRestController {
         }
         Game g = g_tmp.get();
 
-        if (g.getIsPublic() == false || g.getStart() != null) {
 
-            // El juego ya ha comenzado
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
 
         User u = us.findCurrentUser();
         // if a player already exists in a game he cant just join the game :)
 
         if (!gs.gameContainsPlayer(g, u)) {
-            Player p = ps.initialize(u.getUsername());
-            p.setColor(ps.getRandomColor(g.getPlayers()));
-            p.setUser(u);
-            p.setObjects(new ArrayList<Object>());
+            if (g.getIsPublic() == false || g.getStart() != null) {
 
-            ps.savePlayer(p);
-            gs.addPlayer(g, p);
-
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
+                // El juego ya ha comenzado
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            gs.joinPlayer(g,u);
 
         }
 
@@ -312,28 +276,7 @@ public class GameRestController {
 
         User u = us.findCurrentUser();
 
-        MainBoard mb = mbs.initialize();
-        g.setMainBoard(mb);
-
-        Player p = ps.initialize(u.getUsername());
-        p.setColor(ps.getRandomColor(List.of()));
-        // p.setGame(g);
-        p.setUser(u);
-        p.setObjects(new ArrayList<Object>());
-        p = ps.savePlayer(p);
-
-        // Si no se hace asi da error porque
-        // al guardarse el game en player, el game todavia no existe
-        // y si se asigna a game el player, el player todavia no existe
-
-        g.setPlayerCreator(p);
-        g.setPlayerStart(p);
-        g.setPlayers(List.of(p));
-
-        Chat chat = chatservice.initialize();
-        g.setChat(chat);
-
-        gs.saveGame(g);
+        g = gs.initalize(g, u);
 
         // TODO: revisar
         g.setMainBoard(null);
@@ -385,9 +328,8 @@ public class GameRestController {
     }
 
     @GetMapping("/play/{code}/isMyTurn")
-    public ResponseEntity<Boolean> getTurn(@PathVariable("code") String code) {
+    public ResponseEntity<Player> getTurn(@PathVariable("code") String code) {
         // Gets the lists of players and dwarfs. Turn is the next player
-        Boolean res = false;
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             return ResponseEntity.notFound().build();
@@ -412,33 +354,13 @@ public class GameRestController {
         dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
         if (gs.checkRoundNeedsChange(g, dwarves)) {
             gs.handleRoundChange(g);
-            return new ResponseEntity<>(res, HttpStatus.OK);
+            return new ResponseEntity<>(p,HttpStatus.OK);
         }
 
-        List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
 
-        ArrayList<Player> remaining_turns = new ArrayList<Player>();
-        remaining_turns.addAll(gs.getRemainingTurns(plys, dwarves, g.getPlayerStart()));
+        p = gs.getCurrentTurnPlayer(plys, dwarves, g.getPlayerStart());
 
-        // Partimos de la premisa de que cada ronda se componen de 2 turnos por cada
-        // jugador
-        for (Player p_dwarf : dwarves_players) {
-            // ArrayList<Player> tmp_remaining_turns = new ArrayList<>(remaining_turns);
-            for (int i = 0; i < remaining_turns.size(); i++) {
-                if (remaining_turns.get(i).equals(p_dwarf)) {
-                    remaining_turns.remove(i);
-                    break;
-                }
-            }
-        }
-
-        if (remaining_turns.size() > 0) {
-            if (remaining_turns.get(0).equals(p)) {
-                res = true;
-            }
-        }
-
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>(p, HttpStatus.OK);
     }
 
     @GetMapping("/play/{code}/isFinished")
@@ -448,25 +370,9 @@ public class GameRestController {
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             return ResponseEntity.notFound().build();
         }
+        Boolean finished = gs.needsToEnd(g);
 
-        List<Player> plys = g.getPlayers();
 
-        Boolean finished = false;
-
-        // tiene que terminar si un jugador consigue 4 objetos
-        for (Player p : plys) {
-            if (p.getObjects() != null && p.getObjects().size() >= 4) {
-                finished = true;
-                break;
-            }
-        }
-
-        // tiene que terminar en 6 rondas
-        if (finished || g.getRound() >= 6)
-            finished = true;
-
-        if (finished || g.getFinish() != null)
-            finished = true;
 
         return new ResponseEntity<>(finished, HttpStatus.OK);
     }
@@ -479,20 +385,8 @@ public class GameRestController {
             return ResponseEntity.notFound().build();
         }
 
-        Dwarf dwarf = new Dwarf();
         Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
-
-        dwarf.setPlayer(p);
-        dwarf.setRound(g.getRound());
-        dwarf.setCard(card);
-
-        ds.saveDwarf(dwarf);
-
-        List<Dwarf> dwarves = g.getDwarves();
-        dwarves.add(dwarf);
-        g.setDwarves(dwarves);
-
-        gs.saveGame(g);
+        g = gs.addDwarf(g, p, card);
 
         return new ResponseEntity<>(HttpStatus.OK);
 
@@ -567,21 +461,20 @@ public class GameRestController {
         g.setFinish(LocalDateTime.now());
 
         Player p = gs.getGameWinner(g);
-        System.out.println(p);
 
-        g.setWinner_id(p.getId());
+        g.setUserWinner(p.getUser());
 
         gs.saveGame(g);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/play/{code}/winner")
-    public ResponseEntity<Player> getWinner(@PathVariable("code") String code) {
+    public ResponseEntity<User> getWinner(@PathVariable("code") String code) {
         Game g = gs.getGameByCode(code);
         if (g == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(ps.getById(g.getWinner_id()), HttpStatus.OK);
+        return new ResponseEntity<>(g.getUserWinner(), HttpStatus.OK);
     }
 
     @PostMapping("/play/{code}/resign")
@@ -599,9 +492,8 @@ public class GameRestController {
         gs.resign(g, p);
 
         Player winner = gs.getGameWinner(g);
-        System.out.println(winner);
 
-        g.setWinner_id(winner.getId());
+        g.setUserWinner(winner.getUser());
 
         gs.saveGame(g);
         return ResponseEntity.noContent().build();

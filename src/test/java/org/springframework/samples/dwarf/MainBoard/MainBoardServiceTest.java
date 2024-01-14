@@ -16,17 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
-import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardRepository;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeck;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
 
 public class MainBoardServiceTest {
 
@@ -36,8 +32,6 @@ public class MainBoardServiceTest {
     @Mock
     private CardDeckService cardDeckService;
 
-    @Mock
-    private SpecialCardDeckService specialCardDeckService;
 
     @Mock
     private CardService cardService;
