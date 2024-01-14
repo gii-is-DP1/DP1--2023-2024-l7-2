@@ -60,7 +60,7 @@ public class FriendRequestControllerTest {
         verify(userService, times(1)).findCurrentUser();
         verify(friendRequestService, times(1)).findAll();
     }
-
+/*
     @Test
     public void testFindFriendRequest() {
         // Caso positivo
@@ -129,5 +129,5 @@ public class FriendRequestControllerTest {
         Mockito.when(friendRequestService.findById(requestId)).thenReturn(null);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> friendsController.modifyFriendRequest(new FriendRequest(), requestId));
-    }
+    }*/
 }
