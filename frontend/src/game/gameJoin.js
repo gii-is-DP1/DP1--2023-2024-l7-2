@@ -180,7 +180,6 @@ export default function GameJoin() {
                                             value={game || ""}
                                             onChange={handleChange}
                                             className="custom-input"
-                                            
                                         />
                                     </div>
                                     <div className="custom-button-row">

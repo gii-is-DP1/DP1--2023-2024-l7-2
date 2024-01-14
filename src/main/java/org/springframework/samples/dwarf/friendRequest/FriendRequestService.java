@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class FriendRequestService {
 
-    private final String FRIEND_REQUEST_STATUS_ACCEPTED = "Accepted";
-
     private FriendRequestRepository friendRequestRepository;
 
     @Autowired

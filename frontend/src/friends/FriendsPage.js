@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import tokenService from "../services/token.service";
 import useFetchState from "../util/useFetchState";
 
-import { Form, Button, Input, Label  } from "reactstrap";
+import { Button, ButtonGroup, Table  } from "reactstrap";
 import { Link } from "react-router-dom";
+import RequestFormModel from "./RequestFormModel";
 
 const jwt = tokenService.getLocalAccessToken();
 
 export default function FriendList() {
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
-  const [friends, setFriends] = useFetchState(
+  const [showRequestForm, setShowRequestForm] = useState(false)
+  const [requests, setRequests] =  useFetchState(
     [],
     `/api/v1/friends`,
     jwt,
@@ -18,280 +20,184 @@ export default function FriendList() {
     setVisible
   );
 
-  const [req, setReq] = useState({
-    id: null,
-    sender: null,
-    receiver: null,
-    status: {id:1, name:"Accepted"},
-    sendTime:null
-  })
-  
-  const user = tokenService.getUser();
+  function showRequest(req) {
+    return (
+      <tr key={req.id}>
+        <td className="text-center">{req.receiver.username}</td>
+        <td className="text-center">{req.sender.username}</td>
+        <td className="text-center">{req.status}</td>
+        <td className="text-center">
+          {req.sender.username!==tokenService.getUsername ?
+              <Button
+                size="sm"
+                color="danger"
+                aria-label="Delete"
+                onClick={() => {
+                  let confirmMessage = window.confirm("Are you sure you want to delete it?");
 
-  function acceptRequest(url) {
-    let confirmMessage = window.confirm("Are you sure you want to accept the request?");
-    if (confirmMessage) {
-      fetch(url, {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${jwt}`,
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req)
-      })
-      
-      .then((response) => {
-        console.log('Response:', response);
-        window.location.reload();
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json().catch(() => ({}));
-      })
-      .then((data) => {
-        console.log('Data:', data);
-        if (data && data.message) {
-          setMessage(data.message);
-          setVisible(true);
-        }})
-        .catch((error) => {
-          console.error('Error:', error);
-          if (error instanceof SyntaxError) {
-            console.error('SyntaxError. Response body:', error.body);
-          }
-          alert(error.message);
-        });
-    }
+                  if(!confirmMessage) return;
+
+                  fetch(`/api/v1/friends/${req.id}`, {
+                    method: "DELETE",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${jwt}`,
+                    },
+                  })
+                    .then((res) => {
+                      if (res.status === 204) {
+                        setMessage("Deleted successfully");
+                        setVisible(true);
+                        setRequests(requests.filter((r) => r.id!=req.id));
+                      }
+                    })
+                    .catch((err) => {
+                      setMessage(err.message);
+                      setVisible(true);
+                    });
+                }}
+              >
+                Delete
+              </Button>
+          : <tb></tb>}
+          {req.receiver.username==tokenService.getUsername ?
+            <div className="custom-button-row">
+              <ButtonGroup>
+                <Button
+                  size="sm"
+                  color="danger"
+                  aria-label="Deny"
+                  onClick={() => {
+                    let confirmMessage = window.confirm("Are you sure you want dismiss this friend petition?");
+
+                    if(!confirmMessage) return;
+
+                    fetch(`/api/v1/friends/${req.id}/deny`, {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${jwt}`,
+                      },
+                    })
+                      .then((res) => {
+                        if (res.status === 200) {
+                          setMessage("Petition enied");
+                          setVisible(true);
+                          setRequests(requests.filter((r) => r.id!=req.id));
+                        }
+                      })
+                      .catch((err) => {
+                        setMessage(err.message);
+                        setVisible(true);
+                      });
+                  }}
+                >
+                  Deny
+                </Button>
+                <Button
+                  size="sm"
+                  color="green"
+                  aria-label="Accept"
+                  onClick={() => {
+
+                    fetch(`/api/v1/friends/${req.id}/accept`, {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${jwt}`,
+                      },
+                    })
+                      .then((res) => {
+                        if (res.status === 200) {
+                          setMessage("Petition accepted");
+                          setVisible(true);
+                          setRequests(requests.filter((r) => r.id!=req.id));
+                        }
+                      })
+                      .catch((err) => {
+                        setMessage(err.message);
+                        setVisible(true);
+                      });
+                  }}
+                >
+                  Accept
+                </Button>
+              </ButtonGroup>
+            </div>
+          : <tb></tb>}
+        </td>
+      </tr>
+    );
   }
 
-  function deniedRequest(url) {
-    let confirmMessage = window.confirm("Are you sure you want to denie the request?");
-    if (confirmMessage) {
-      fetch(url, {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${jwt}`,
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req)
-      })
-      
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        window.location.reload();
-        return response.json().catch(() => ({}));
-      })
-      .then((data) => {
-        if (data && data.message) {
-          setMessage(data.message);
-          setVisible(true); 
-        }})
-        .catch((error) => {
-          console.error('Error:', error);
-          if (error instanceof SyntaxError) {
-            console.error('SyntaxError. Response body:', error.body);
-          }
-          alert(error.message);
-        });
-    }
-  }
+  const receivedRequests =
+  requests.map((request) => {
+    if(requests.receiver!==tokenService.getUser())
+      return showRequest(request)
+  });
 
-function deleteFriends(url, id) {
-  let confirmMessage = window.confirm("Are you sure you want to delete this friend?");
-  if (confirmMessage) {
-    fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${jwt}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      }
-    })
-    .then((response) => {
-      setFriends(friends.filter((i) => i.id !== id));
-      window.location.reload();
-      return response.text();
-    })
-      .catch((err) => {
-        console.log(err);
-        alert("Error accepting request");
-      });
-  }
-}
+  const sentRequests =
+  requests.map((request) => {
+    if(requests.sender==tokenService.getUser())
+      return showRequest(request)
+  });
 
-function blockFriend(url) {
-  let confirmMessage = window.confirm("Are you sure you want to block this friend?");
-  if (confirmMessage) {
-    fetch(url, {
-      method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${jwt}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(req)
-    })
-    
-    .then((response) => {
-      console.log('Response:', response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      window.location.reload();
-      return response.json().catch(() => ({}));
-    })
-    .then((data) => {
-      console.log('Data:', data);
-      if (data && data.message) {
-        setMessage(data.message);
-        setVisible(true);
-      }})
-      .catch((error) => {
-        console.error('Error:', error);
-        if (error instanceof SyntaxError) {
-          console.error('SyntaxError. Response body:', error.body);
-        }
-        alert(error.message);
-      });
-  }
-}
+  <RequestFormModel
+    isOpen={showRequestForm}
+    toggle={() => {
+      setShowRequestForm(!showRequestForm)
+      console.log(jwt)
+    }}
+  ></RequestFormModel>
 
-const friendRequest = friends.map((request) => (
-  <tr key={request.id}>
-    <td>{request.receiver.username === user.username
-        ? request.sender.username
-        : null}</td>
-    <td>
-    {request.sender.username === user.username
-        ? request.receiver.username
-        : null}
-    </td>
-    <td>{request.status.name}</td>
-    <td>
-      {request.status.id === 1 && request.receiver.username === user.username ? (
-        <h1>
-          <Button outline color="success" margin="10px" >
-            <Link
-              to="/friends"
-              onClickCapture={() => {setReq(req.id = request.id)
-                setReq(req.sender = request.sender)
-                setReq(req.receiver = request.receiver)
-                setReq(req.status = {id: 2, name: 'Accepted'})
-                setReq(req.sendTime = request.sendTime)
-              acceptRequest(`/api/v1/friends/${request.id}`)}}
-              className="btn sm"
-              style={{ textDecoration: "none" }}
-            >
-              Accept
-            </Link>
-          </Button>
-          <Button outline color="danger" margin="15px">
-            <Link
-              to="/friends"
-              onClickCapture={() => {
-                setReq(req.id = request.id)
-                setReq(req.sender = request.sender)
-                setReq(req.receiver = request.receiver)
-                setReq(req.status = {id: 3, name: 'Denied'})
-                setReq(req.sendTime = request.sendTime)
-                deniedRequest(`/api/v1/friends/${request.id}`)}}
-              className="btn sm"
-              style={{ textDecoration: "none" }}
-            >
-              Rechazar
-            </Link>
-          </Button>
-        </h1>
-      ) : null}
-    </td>
-  </tr>
-));
 
-const friendList = friends.map((request) => (
-  <tr key={request.id}>
-    <td>
-      {request.status.name === 'Accepted' ? (
-        <h2>{request.receiver.username == user.username? request.sender.username: request.receiver.name}</h2>
-      ) : null}
-    </td>
-    <td>
-      {request.status.id === 2 ? (
-        <h1>
-          {/* Botón solo para solicitudes aceptadas */}
-          <Button outline color="danger" margin="15px">
-            <Link
-              to="/friends"
-              onClickCapture={() => deleteFriends(`/api/v1/friends/${request.id}`, request.id)}
-              className="btn sm"
-              style={{ textDecoration: "none" }}
-            >
-              Delete friend
-            </Link>
-          </Button>
-          <Button outline color="danger" margin="15px">
-            <Link
-              to="/friends"
-              onClickCapture={() => {
-                setReq(req.id = request.id)
-                setReq(req.sender = request.sender)
-                setReq(req.receiver = request.receiver)
-                setReq(req.status = {id: 4, name: 'Blocked'})
-                setReq(req.sendTime = request.sendTime)
-                blockFriend(`/api/v1/friends/${request.id}`, request.id)}}
-              className="btn sm"
-              style={{ textDecoration: "none" }}
-            >
-              Block friend
-            </Link>
-          </Button>
-        </h1>
-      ) : null}
-    </td>
-  </tr>
-));
 
   return (
-    <div className="auth-page-container" style={{ height: "100vh", marginTop: "65px", textAlign: "center" }}>
-      <div className="friends" style={{ marginTop: "10px" }}>
-              <Link
-                to={`/friendRequest/SentRequest`}
-                className="auth-button"
-                style={{ textDecoration: "none" }}
-              >
-                To send request to someone
-              </Link>
-              <Link
-                to={`/friendRequest/BlockRequest`}
-                className="auth-button"
-                style={{ textDecoration: "none" }}
-              >
-                To block someone
-              </Link>
-        <h3 style={{ marginTop: "30px" }}>Friend Requests</h3>
-        <table>
-          <thead>
-            <tr>
-              <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
-                Sender User
-              </th>
-              <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
-                Receiver User
-              </th>
-              <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>{friendRequest}</tbody>
-        </table>
-        <h3>Friend List</h3>
-        <table>
-          <tbody>{friendList}</tbody>
-        </table>
+    <div>
+      <div className="admin-page-container" style={{marginTop: "70px"}}>
+        <h1 className="text-center">Social hub</h1>        
+        <Button 
+            onClick={() => {setShowRequestForm(!showRequestForm)}}
+            title="Send request"
+            className="btn btn-dark btn-lg" 
+            outline color="warning" 
+            size="lg">
+            Send request
+        </Button>
+        {/* <Link
+          to={`/friendRequest/SentRequest`}
+          className="btn btn-dark btn-lg" 
+          outline color="warning">
+          Send request
+        </Link> */}
+        <br></br>
+        <div>
+          <h2 className="text-center">Friends</h2>  
+          <Table aria-label="friends" className="mt-4">
+            <thead>
+              <tr>
+                <th width="15%" className="text-center">Receiber</th>
+                <th width="15%" className="text-center">Sender</th>
+                <th width="15%" className="text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>{receivedRequests}</tbody>
+          </Table>
+        </div>
+        <br></br>
+        <div>
+          <h2 className="text-center">Requests</h2>  
+          <Table aria-label="requests" className="mt-4">
+            <thead>
+              <tr>
+                <th width="15%" className="text-center">Receiver</th>
+                <th width="15%" className="text-center">Sender</th>
+                <th width="15%" className="text-center">State</th>
+              </tr>
+            </thead>
+            <tbody>{sentRequests}</tbody>
+          </Table>
+        </div>
       </div>
     </div>
   );

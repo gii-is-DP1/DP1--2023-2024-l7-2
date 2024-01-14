@@ -69,8 +69,8 @@ public class GameRestController {
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayerService ps,
             MainBoardService mbs, DwarfService ds,
-            LocationService ls, SpectatorService specservice, ChatService chatservice, InvitationService is
-            , SpecialCardService scs) {
+            LocationService ls, SpectatorService specservice, ChatService chatservice, InvitationService is,
+            SpecialCardService scs) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
@@ -206,12 +206,12 @@ public class GameRestController {
 
         // if a player already exists in a game he can just join the game :)
         if (g == null || u == null) {
-            
+
             return ResponseEntity.notFound().build();
         }
 
         if (g.getStart() != null) {
-            
+
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -225,8 +225,8 @@ public class GameRestController {
             ps.savePlayer(p);
             gs.addPlayer(g, p);
         } else {
-            
-           return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
         }
 
         return ResponseEntity.ok(g);
@@ -243,7 +243,7 @@ public class GameRestController {
         Game g = g_tmp.get();
 
         if (g.getIsPublic() == false || g.getStart() != null) {
-            
+
             // El juego ya ha comenzado
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -261,7 +261,7 @@ public class GameRestController {
             gs.addPlayer(g, p);
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(g);
-            
+
         }
 
         return ResponseEntity.ok(g);
@@ -277,11 +277,11 @@ public class GameRestController {
         // if a player already exists in a game he can just join the game :)
 
         if (g == null || u == null) {
-            
+
             return ResponseEntity.notFound().build();
         }
         if (g.getStart() != null) {
-            
+
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -457,8 +457,8 @@ public class GameRestController {
         }
 
         // tiene que terminar en 6 rondas
-        // if (finished || g.getRound() >= 6)
-        // finished = true;
+        if (finished || g.getRound() >= 6)
+            finished = true;
 
         if (finished || g.getFinish() != null)
             finished = true;
@@ -510,7 +510,6 @@ public class GameRestController {
         Integer round = g.getRound();
         scs.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
 
-
         // Ahora vamos a darle la vuelta a la carta. Si hay
         // un jugador en esa posicion, es decir, si se hay un
         // dwarf en la base de datos con esa carta, se resuelve automaticamente.
@@ -521,7 +520,7 @@ public class GameRestController {
         MainBoard mb = g.getMainBoard();
 
         mbs.handleSpecialCardTurn(mb, reverseCard, specialCard, roundDwarves);
-        
+
         g.setMainBoard(mb);
         gs.saveGame(g);
 

@@ -39,13 +39,13 @@ public class Game extends NamedEntity {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private MainBoard mainBoard;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.DETACH })
     private List<Dwarf> dwarves;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany
     private List<Player> players;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany
     private List<Spectator> spectators;
 
     @OneToOne
@@ -61,7 +61,6 @@ public class Game extends NamedEntity {
     Chat chat;
 
     @OneToMany
- 	private Collection<Achievement> achievements;
-
+    private Collection<Achievement> achievements;
 
 }

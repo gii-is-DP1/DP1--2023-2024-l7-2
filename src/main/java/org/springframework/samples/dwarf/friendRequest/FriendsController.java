@@ -1,5 +1,6 @@
 package org.springframework.samples.dwarf.friendRequest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.invitation.Invitation;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.validation.BindingResult;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,16 +34,16 @@ import jakarta.validation.Valid;
 @SecurityRequirement(name = "bearerAuth")
 public class FriendsController {
 
-    private FriendRequestService friendRequestService;
+	private FriendRequestService friendRequestService;
 	private UserService us;
 
-    @Autowired
+	@Autowired
 	public FriendsController(FriendRequestService friendRequestService, UserService us) {
 		this.friendRequestService = friendRequestService;
 		this.us = us;
 	}
 
-    @GetMapping
+	@GetMapping
 	public ResponseEntity<List<FriendRequest>> findAll() {
 		User u = us.findCurrentUser();
 
@@ -49,38 +53,43 @@ public class FriendsController {
 
 		List<FriendRequest> res = null;
 
-		if (u.getAuthority().getAuthority().equals("ADMIN"))
-		{
+		if (u.getAuthority().getAuthority().equals("ADMIN")) {
 			res = friendRequestService.findAll();
 		} else {
 			res = friendRequestService.findByUser(u);
 		}
-		
-		
+
 		return new ResponseEntity<>(res, HttpStatus.OK);
-		
+
 	}
 
-    @GetMapping("/{id}")
-	public ResponseEntity<FriendRequest> findFriendRequest(@PathVariable("id") int id) {
-		FriendRequest friendRequestToGet = friendRequestService.findById(id);
-		if (friendRequestToGet == null)
-			throw new ResourceNotFoundException("FriendRequest with id " + id + " not found!");
-		return new ResponseEntity<FriendRequest>(friendRequestToGet, HttpStatus.OK);
-	}
-	
+	// @GetMapping("/{id}")
+	// public ResponseEntity<FriendRequest> findFriendRequest(@PathVariable("id")
+	// int id) {
+	// FriendRequest friendRequestToGet = friendRequestService.findById(id);
+	// if (friendRequestToGet == null)
+	// throw new ResourceNotFoundException("FriendRequest with id " + id + " not
+	// found!");
+	// return new ResponseEntity<FriendRequest>(friendRequestToGet, HttpStatus.OK);
+	// }
+
 	@PostMapping
-	public ResponseEntity<FriendRequest> createRequest(@Valid @RequestBody FriendRequest sendRequest, BindingResult br) {
-		FriendRequest result = null;
-		if (!br.hasErrors()){
-		result = friendRequestService.saveFriendRequest(sendRequest);
-		}else{
-			throw new BadRequestException(br.getAllErrors());
-		}
-		return new ResponseEntity<>(result, HttpStatus.CREATED);
+	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<FriendRequest> create(@RequestBody @Valid String username) {
+
+		User sender = us.findCurrentUser();
+		User receiver = us.findUser(username);
+		FriendRequest savedRequest = new FriendRequest();
+
+		savedRequest.setReceiver(receiver);
+		savedRequest.setSendTime(LocalDateTime.now());
+		savedRequest.setSender(sender);
+		savedRequest.setStatus(Status.SENT);
+
+		return new ResponseEntity<>(savedRequest, HttpStatus.CREATED);
 	}
 
-    @DeleteMapping("/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteFriendRequest(@PathVariable("id") int id) {
 		FriendRequest friendRequestToGet = friendRequestService.findById(id);
 		if (friendRequestToGet == null)
@@ -89,14 +98,42 @@ public class FriendsController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-    @PutMapping("/{id}")
-	public ResponseEntity<Void> modifyFriendRequest(@RequestBody @Valid FriendRequest fr, @PathVariable("id") Integer id) {
+	@GetMapping("/{username}")
+	public ResponseEntity<List<User>> getFriends(@RequestParam @Valid String username) {
+
+		List<User> res = friendRequestService.getFriends(us.findUser(username));
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
+	@PutMapping("/{id}/deny")
+	public ResponseEntity<Void> deny(@PathVariable("id") Integer id) {
 		FriendRequest friendRequestToUpdate = friendRequestService.findById(id);
-		
-			BeanUtils.copyProperties(fr, friendRequestToUpdate, "id");
-			friendRequestService.saveFriendRequest(friendRequestToUpdate);
-		
+
+		friendRequestToUpdate.setStatus(Status.DENIED);
+		friendRequestService.saveFriendRequest(friendRequestToUpdate);
+
 		return ResponseEntity.noContent().build();
 	}
-        
+
+	@PutMapping("/{id}/accept")
+	public ResponseEntity<Void> accept(@PathVariable("id") Integer id) {
+		FriendRequest friendRequestToUpdate = friendRequestService.findById(id);
+
+		friendRequestToUpdate.setStatus(Status.ACCEPTED);
+		friendRequestService.saveFriendRequest(friendRequestToUpdate);
+
+		return ResponseEntity.noContent().build();
+	}
+
+	@PutMapping("/{id}/block")
+	public ResponseEntity<Void> block(@PathVariable("id") Integer id) {
+		FriendRequest friendRequestToUpdate = friendRequestService.findById(id);
+
+		friendRequestToUpdate.setStatus(Status.BLOCKED);
+		friendRequestService.saveFriendRequest(friendRequestToUpdate);
+
+		return ResponseEntity.noContent().build();
+	}
+
 }
