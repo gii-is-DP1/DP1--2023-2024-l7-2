@@ -1,12 +1,9 @@
 package org.springframework.samples.dwarf.MainBoard;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-<<<<<<< HEAD
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-=======
->>>>>>> main
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;

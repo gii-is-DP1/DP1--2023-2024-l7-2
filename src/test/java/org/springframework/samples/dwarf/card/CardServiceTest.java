@@ -267,14 +267,8 @@ public class CardServiceTest {
     }
 
     @Test
-<<<<<<< HEAD
     public void testForjarn_CannotApplyCard() {
 
-=======
-
-    public void testForjar_CannotApplyCard() {
-        
->>>>>>> main
         Player player = new Player();
         player.setGold(5);
         player.setSteal(2);
