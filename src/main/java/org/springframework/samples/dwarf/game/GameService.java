@@ -25,6 +25,7 @@ import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
+import org.springframework.samples.dwarf.exceptions.CodeAlreadyTakenException;
 import org.springframework.samples.dwarf.exceptions.WrongTurnException;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.location.LocationService;
@@ -145,6 +146,13 @@ public class GameService {
 
     @Transactional
     public Game initalize(Game g, User u) {
+
+        Game sameCode = getGameByCode(g.getCode());
+
+        if (sameCode != null) {
+            throw new CodeAlreadyTakenException("Another game already has this code");
+        }
+
         MainBoard mb = mbs.initialize();
         g.setMainBoard(mb);
 
