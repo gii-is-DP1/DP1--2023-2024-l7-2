@@ -105,19 +105,6 @@ public class LocationService {
         }
         return toRemove;
     }
-/* 
-    @Transactional
-    public List<Card> removeAllCardsExceptOne(Location location) {
-        List<Card> res = location.getCards();
-        Card remainingCard = res.get(0);
-        res.remove(remainingCard);
-
-        location.setCards(List.of(remainingCard));
-        save(location);
-
-        return res;
-    }
-*/
     @Transactional
     public Location pastGloriesAction(Location location, Card c) {
         List<Card> locationCards = location.getCards();
