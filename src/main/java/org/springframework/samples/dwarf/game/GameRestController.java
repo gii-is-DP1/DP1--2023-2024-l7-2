@@ -188,7 +188,7 @@ public class GameRestController {
         // if a player already exists in a game he can just join the game :)
         if (g == null || u == null) {
 
-            throw new ResourceNotFoundException("Player not in the game");
+            throw new ResourceNotFoundException("Game not found");
         }
 
         
