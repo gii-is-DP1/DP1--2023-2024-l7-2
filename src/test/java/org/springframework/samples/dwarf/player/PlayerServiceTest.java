@@ -61,9 +61,9 @@ public class PlayerServiceTest {
         Player player = new Player();
         player.setName("John");
 
-        when(playerRepository.findByName("John")).thenReturn(player);
+        when(playerRepository.findByName("John")).thenReturn(List.of(player));
 
-        Player retrievedPlayer = playerService.getByName("John");
+        Player retrievedPlayer = playerService.getByName("John").get(0);
 
         assertNotNull(retrievedPlayer);
         assertEquals("John", retrievedPlayer.getName());

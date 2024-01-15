@@ -27,6 +27,11 @@ public class DwarfService {
     }
 
     @Transactional
+    public List<Dwarf> getDwarvesUsername(String username) {
+        return repo.findDwarvesByUserName(username);
+    }
+
+    @Transactional
     public Dwarf saveDwarf(@Valid Dwarf newDwarf) {
         return repo.save(newDwarf);
     }

@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.auth.payload.response.MessageResponse;
+import org.springframework.samples.dwarf.game.GameService;
 import org.springframework.samples.dwarf.util.RestPreconditions;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,12 +49,15 @@ class UserRestController {
 	private final UserService userService;
 	private final AuthoritiesService authService;
 	private final UserRepository userRepository;
+	private final GameService gameService;
 
 	@Autowired
-	public UserRestController(UserService userService, AuthoritiesService authService, UserRepository userRepository) {
+	public UserRestController(UserService userService, AuthoritiesService authService, 
+			UserRepository userRepository, GameService gameService) {
 		this.userService = userService;
 		this.authService = authService;
 		this.userRepository = userRepository;
+		this.gameService = gameService;
 	}
 
 	@GetMapping
@@ -107,7 +111,8 @@ class UserRestController {
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<MessageResponse> delete(@PathVariable("userId") int id) {
 		RestPreconditions.checkNotNull(userService.findUserById(id), "User", "ID", id);
-		userService.deleteUser(id);
+		gameService.deleteUserDependencies(id);
+		//userService.deleteUser(id);
 		return new ResponseEntity<>(new MessageResponse("User deleted!"), HttpStatus.OK);
 
 	}

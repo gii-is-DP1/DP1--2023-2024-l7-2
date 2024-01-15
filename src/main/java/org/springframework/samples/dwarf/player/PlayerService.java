@@ -31,7 +31,7 @@ public class PlayerService {
     }
 
     @Transactional(readOnly = true)
-    public Player getByName(String name) {
+    public List<Player> getByName(String name) {
         return repo.findByName(name);
     }
 
@@ -49,6 +49,11 @@ public class PlayerService {
     @Transactional(readOnly = true)
     public Player getPlayersByColor(String color) {
         return repo.findByColor(color);
+    }
+
+    @Transactional
+    public void deletePlayer(Player p) {
+        repo.delete(p);
     }
 
     /*

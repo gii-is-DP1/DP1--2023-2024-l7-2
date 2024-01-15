@@ -27,6 +27,8 @@ import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.CodeAlreadyTakenException;
 import org.springframework.samples.dwarf.exceptions.WrongTurnException;
+import org.springframework.samples.dwarf.invitation.Invitation;
+import org.springframework.samples.dwarf.invitation.InvitationService;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
@@ -53,7 +55,9 @@ public class GameService {
     LocationService ls;
     SpecialCardService scs;
     ChatService chatservice;
-
+    
+    @Autowired
+    InvitationService invitService;
 
     private final Integer OBJECTS_NEEDED_TO_END = 4;
     private final Integer MAX_ROUNDS = 6;
@@ -791,6 +795,41 @@ public class GameService {
         g = scs.resolveSpecialCard(g, p, mb, request, round, roundDwarves);
 
         saveGame(g);
+    }
+
+    @Transactional
+    public void deleteUserDependencies(Integer id) {
+        User u = us.findUserById(id);
+        List<Game> gams = gr.findAllWinnedGames(u);
+
+        
+        for (Game g: gams) {
+            delete(g.getId());
+        }
+
+        gams = gr.findGamesByUserName(u.getUsername());
+        for (Game g:gams) {
+            delete(g.getId());
+        }
+
+        List<Dwarf> dwarves = ds.getDwarvesUsername(u.getUsername());
+        for (Dwarf d: dwarves) {
+            ds.deleteDwarf(d);
+        }
+
+        List<Player> plys = ps.getByName(u.getUsername());
+        for (Player p: plys) {
+            ps.deletePlayer(p);
+        }
+
+        List<Invitation> invs = invitService.findByUser(u);
+        for (Invitation inv: invs) {
+            invitService.deleteInvitation(inv.getId());
+        }
+
+        
+
+        us.deleteUser(id);
     }
 
 }

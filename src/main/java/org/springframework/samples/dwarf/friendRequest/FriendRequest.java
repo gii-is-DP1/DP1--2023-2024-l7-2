@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.samples.dwarf.model.BaseEntity;
 import org.springframework.samples.dwarf.user.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
