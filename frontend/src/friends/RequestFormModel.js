@@ -10,8 +10,6 @@ export default function RequestFormModel(props) {
     const [visible, setVisible] = useState(false);
     const [request, setRequest] = useState(null);
     
-    console.log(request);
-
     function handleSubmit(event) {
         event.preventDefault();
 

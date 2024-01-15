@@ -195,8 +195,7 @@ export default function GameList() {
   const modal = getErrorModal(setVisible, visible, message);
 
   return (
-    <div>
-      <div className="admin-page-container" style={{marginTop: "70px"}}>
+    <div className="auth-page-container" style={{ height: "100vh", textAlign: "center" }}>
         <h1 className="text-center">Games</h1>        
         {modal}
         <div className="float-right">
@@ -204,8 +203,9 @@ export default function GameList() {
             <Link to={`/game/edit/new`} style={{ color: 'rgb(238, 191, 47)'}}> Add Create </Link>
         </Button>
         </div>
+        <br></br>
         <div>
-          <Table aria-label="games" className="mt-4">
+        <Table aria-label="games" className="transparent-table">
             <thead>
               <tr>
                 <th width="15%" className="text-center">Name</th>
@@ -214,13 +214,14 @@ export default function GameList() {
                 <th width="15%" className="text-center">Finished</th>
                 <th width="15%" className="text-center">Winner</th>
                 <th width="15%" className="text-center">Round</th>
+                <th width="15%" className="text-center">Nº players</th>
                 <th width="15%" className="text-center">Players</th>
+                <th width="15%" className="text-center"> </th>
               </tr>
             </thead>
             <tbody>{gamesList}</tbody>
           </Table>
         </div>
-      </div>
     </div>
   );
 
