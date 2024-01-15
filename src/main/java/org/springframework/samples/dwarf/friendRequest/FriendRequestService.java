@@ -52,7 +52,7 @@ public class FriendRequestService {
     }
 
     @Transactional
-    public void deleteAllFriendRequeswts(User u){
+    public void deleteAllFriendRequests(User u){
         List<FriendRequest> frs = friendRequestRepository.findByUser(u);
         for (FriendRequest fr: frs) {
             friendRequestRepository.delete(fr);
