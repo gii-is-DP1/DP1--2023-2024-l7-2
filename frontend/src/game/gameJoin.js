@@ -58,6 +58,9 @@ export default function GameJoin() {
             } else if(response.status == 400) {
                 setMessage("Game has already started")
                 setVisible(true)
+            } else if(response.status == 403) {
+                setMessage("Too many players in game")
+                setVisible(true)    
             } else {
                 setMessage("Failed to join the game")
                 setVisible(true)
@@ -86,6 +89,9 @@ export default function GameJoin() {
             setVisible(true)
         } else if(response.status == 400) {
             setMessage("Game has already started")
+            setVisible(true)
+        } else if(response.status == 403) {
+            setMessage("Too many players in game")
             setVisible(true)
           } else {
             setMessage("Failed to join the game")

@@ -118,6 +118,16 @@ public class ExceptionHandlerController {
 		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 	}
 
+	@ResponseStatus(value = HttpStatus.FORBIDDEN)
+	@ExceptionHandler(value = TooManyPlayersInGameException.class)
+	public final ResponseEntity<ErrorMessage> handleTooManyPlayersInGameException(CodeAlreadyTakenException ex,
+			WebRequest request) {
+		ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST.value(), new Date(), ex.getMessage(),
+				request.getDescription(false));
+
+		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+	}
+
 	
 	@ResponseStatus(HttpStatus.FORBIDDEN)
 	public ResponseEntity<ErrorMessage> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
