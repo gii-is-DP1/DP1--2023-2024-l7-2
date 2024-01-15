@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Form, Input, Label } from "reactstrap";
 import tokenService from "../../services/token.service";
@@ -20,7 +20,8 @@ export default function UserEditAdmin() {
   const id = getIdFromUrl(2);
   const [message, setMessage] = useState(null);
   const [visible, setVisible] = useState(false);
-  const [user, setUser] = useFetchState(
+  const [user,setUser] = useState({})
+  const [falseUser, setFalseUser] = useFetchState(
     emptyItem,
     `/api/v1/users/${id}`,
     jwt,
@@ -28,16 +29,18 @@ export default function UserEditAdmin() {
     setVisible,
     id
   );
-  const auths = useFetchData(`/api/v1/users/authorities`, jwt);
+
+  useEffect(() => {
+    falseUser.password = "";
+    setUser(falseUser);
+  },[falseUser])
+
 
   function handleChange(event) {
     const target = event.target;
     const value = target.value;
     const name = target.name;
-    if (name === "authority") {
-      const auth = auths.find((a) => a.id === Number(value));
-      setUser({ ...user, authority: auth });
-    } else setUser({ ...user, [name]: value });
+    setUser({ ...user, [name]: value });
   }
 
   function handleSubmit(event) {
@@ -63,11 +66,6 @@ export default function UserEditAdmin() {
   }
 
   const modal = getErrorModal(setVisible, visible, message);
-  const authOptions = auths.map((auth) => (
-    <option key={auth.id} value={auth.id}>
-      {auth.authority}
-    </option>
-  ));
 
   return (
     <div className="auth-page-container" style={{height: "100vh"}}>
@@ -103,37 +101,6 @@ export default function UserEditAdmin() {
               onChange={handleChange}
               className="custom-input"
             />
-          </div>
-          <Label for="authority" className="custom-form-input-label">
-            Authority
-          </Label>
-          <div className="custom-form-input">
-            {user.id ? (
-              <Input
-                type="select"
-                name="authority"
-                id="authority"
-                value={user.authority?.id || ""}
-                onChange={handleChange}
-                className="custom-input"
-              >
-                <option value="">None</option>
-                {authOptions}
-              </Input>
-            ) : (
-              <Input
-                type="select"
-                required
-                name="authority"
-                id="authority"
-                value={user.authority?.id || ""}
-                onChange={handleChange}
-                className="custom-input"
-              >
-                <option value="">None</option>
-                {authOptions}
-              </Input>
-            )}
           </div>
           <div className="custom-button-row">
             <button className="auth-button">Save</button>

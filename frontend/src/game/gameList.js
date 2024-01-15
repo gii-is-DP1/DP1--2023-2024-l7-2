@@ -91,37 +91,6 @@ export default function GameList() {
                 >
                     <Link to={`/game/edit/${game.id}`} className="btn sm" style={{ textDecoration: "none" }}>Edit</Link>
                 </Button>
-                <Button
-                  size="sm"
-                  color="danger"
-                  aria-label={"delete-" + game.name}
-                  onClick={() => {
-                    let confirmMessage = window.confirm("Are you sure you want to delete it?");
-
-                    if(!confirmMessage) return;
-
-                    fetch(`/api/v1/game/${game.id}`, {
-                      method: "DELETE",
-                      headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${jwt}`,
-                      },
-                    })
-                      .then((res) => {
-                        if (res.status === 204) {
-                          setMessage("Deleted successfully");
-                          setVisible(true);
-                          setGames(games.filter((g) => g.id!=game.id));
-                        }
-                      })
-                      .catch((err) => {
-                        setMessage(err.message);
-                        setVisible(true);
-                      });
-                  }}
-                >
-                  Delete
-                </Button>
               </ButtonGroup>
             : <tb></tb>}
             {role!="ADMIN" && game.finish==null && game.userWinner == null ?

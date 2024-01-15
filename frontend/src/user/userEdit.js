@@ -14,7 +14,7 @@ export default function UserEditPage() {
     const emptyItem = {
         id: user1.id,
         username: user1.username,
-        password: user1.password
+        password: ""
       };
 
     const [passw, setPassw] = useState("");
@@ -30,13 +30,12 @@ export default function UserEditPage() {
       
     function handleSubmit(event) {
         event.preventDefault();
-    
-        if (passw !== ""){
-          setUser({ ...user, password: passw })
-        }
-
-        fetch("/api/v1/auth/update/" + user.id, {
-          method: "POST",
+        
+        user.password = passw
+        console.log(user)
+        
+        fetch("/api/v1/users/" + user.id, {
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${jwt}`,
             Accept: "application/json",
@@ -57,7 +56,7 @@ export default function UserEditPage() {
             }).then((response)=> response.json()).then((data)=> {
               tokenService.setUser(data);
               tokenService.updateLocalAccessToken(data.token);
-              //window.location.href = "/user"
+              window.location.href = "/user"
             })
           })
           .catch((message) => alert(message));
