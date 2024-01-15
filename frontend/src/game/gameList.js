@@ -29,42 +29,24 @@ export default function GameList() {
     }, [jwt])
 
     function handleSubmit(game) {
-      
       fetch(
-          "/api/v1/game/check" + (game ? "/" + game : ""),
+        "/api/v1/game/join" + (game ? "/" + game : ""),
           {
-              method: "GET",
-              headers: {
-                  Authorization: `Bearer ${jwt}`,
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-              }
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${jwt}`,
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            }
           }
-      )
-      .then((response) => {
-          if (response.ok) {
-              fetch(
-                  "/api/v1/game/join" + (game ? "/" + game : ""),
-                  {
-                      method: "POST",
-                      headers: {
-                          Authorization: `Bearer ${jwt}`,
-                          Accept: "application/json",
-                          "Content-Type": "application/json",
-                      }
-                  }
-              ).then((response) => {
-                  console.log(response.text)
-                  if (response.ok) {
-                      window.location.href = `/game/${game}`
-                  } else {
-                      console.log("error", response)
-                  }
-              })
-          }
-      })
-      .catch((message) => alert(message));
-
+      ).then((response) => {
+        console.log(response.text)
+        if (response.ok) {
+          window.location.href = `/game/${game}`
+        } else {
+          console.log("error", response)
+        }
+      }).catch((message) => alert(message));
   }
 
   function gamePlayers(players) {
@@ -93,7 +75,7 @@ export default function GameList() {
           <td className="text-center">{game.isPublic?"Public":"Private"}</td>
           <td className="text-center">{game.playerCreator?game.playerCreator.name:"No player creator"}</td>
           <td className="text-center">{game.start==null?'Waiting':(game.finish==null?'Playing':'Finished')}</td>
-          <td className="text-center">{game.finish?game.finish:'not finished'}</td>
+          <td className="text-center">{game.userWinner?game.userWinner.username:'not finished'}</td>
           <td className="text-center">{game.finish!=null?(game.winner_id==null?'"Tie"':game.winner_id):'-'}</td>
           <td className="text-center">{game.finish?'-':game.round}</td>
           <td className="text-center">{players}</td>
@@ -142,38 +124,10 @@ export default function GameList() {
                 </Button>
               </ButtonGroup>
             : <tb></tb>}
-            {role!="ADMIN" && game.finish==null?
+            {role!="ADMIN" && game.finish==null && game.userWinner == null ?
               <div className="custom-button-row">
                 <Button className="btn btn-dark btn-lg" outline color="warning" size="lg"
-                  onClick={() => {
-                    fetch(`/api/v1/game/check/${game.id}`, {
-                      method: "GET",
-                      headers: {
-                          Authorization: `Bearer ${jwt}`,
-                          Accept: "application/json",
-                          "Content-Type": "application/json",
-                      }
-                    }).then((response) => {
-                    if (response.ok) {
-                      fetch(`/api/v1/game/join/${game.id}`, {
-                        method: "POST",
-                        headers: {
-                          Authorization: `Bearer ${jwt}`,
-                          Accept: "application/json",
-                          "Content-Type": "application/json",
-                        }
-                      }).then((response) => {
-                          console.log(response.text)
-                          if (response.ok) {
-                              window.location.href = `/game/${game.id}`
-                          } else {
-                              console.log("error", response)
-                          }
-                      })
-                    }
-                    }).catch((message) => alert(message));
-      
-                  }}>
+                  onClick={() => {handleSubmit(game.code)}}>
                   Join
                 </Button>
               </div>
@@ -187,7 +141,6 @@ export default function GameList() {
       if(role === "ADMIN")
         return showGame(game)
       else if (role === "USER")
-        console.log(game);
         if(game.playerCreator && game.playerCreator.user.username === username || game.isPublic)
           return showGame(game) 
     });
