@@ -42,7 +42,7 @@ public class PlayerRestController {
 	public ResponseEntity<Player> getPlayers(@PathVariable("id") int id) {
 		Player achievementToGet = playerService.getById(id);
 		if (achievementToGet == null)
-			throw new ResourceNotFoundException("Achievement with id " + id + " not found!");
+			throw new ResourceNotFoundException("Player with id " + id + " not found!");
 		return new ResponseEntity<Player>(achievementToGet, HttpStatus.OK);
 	}
 

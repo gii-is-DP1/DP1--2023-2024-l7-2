@@ -13,8 +13,14 @@ import org.springframework.samples.dwarf.user.UserRepository;
 import org.springframework.samples.dwarf.user.UserService;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,6 +103,7 @@ public class FriendRequestServiceTest {
     @Test
     public void testGetFriends() {
 
+        // Set up
         MockitoAnnotations.openMocks(this);
 
         User f1 = new User();
@@ -109,12 +116,21 @@ public class FriendRequestServiceTest {
         FriendRequest fr = new FriendRequest();
         fr.setReceiver(f1);
         fr.setSender(f2);
+        fr.setStatus(Status.ACCEPTED);
 
-        List<User> expectedFriends = List.of(f2);
-        List<User> actualFriends = friendRequestService.getFriends(f1);
+        // Mock the behavior of the friendRequestRepository
+        when(friendRequestRepository.findByUser(f1)).thenReturn(Arrays.asList(fr));
 
-        // Verify the results
-        assertEquals(expectedFriends, actualFriends);
+        // Call the function being tested
+        List<User> friends = friendRequestService.getFriends(f1);
+
+        // Verify the result
+        assertNotNull(friends);
+        assertEquals(1, friends.size());
+        assertTrue(friends.contains(f2));
+
+        // Verify interactions with the mock
+        verify(friendRequestRepository, times(1)).findByUser(f1);
     }
 
 }
