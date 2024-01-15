@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class SpecialCardService {
 
@@ -36,6 +38,11 @@ public class SpecialCardService {
     private final String SPECIAL_CARD_APPRENTICE = "Apprentice";
     private final String SPECIAL_CARD_TURN_BACK = "Turn back";
     private final String SPECIAL_CARD_PAST_GLORIES = "Past Glories";
+
+    private final String SPECIAL_CARD_USAGE_LOG_MSG = "Resolving action for card: ";
+    private final String BOTH_DWARVES_USED_LOG_MSG = "Both dwarves has been used";
+    private final String ONE_DWARVES_USED_LOG_MSG = "One dwarf has been used";
+
 
     private final SpecialCardRepository repo;
     private final DwarfService dwService;
@@ -84,6 +91,7 @@ public class SpecialCardService {
     @Transactional
     public Game handleIfBothDwarvesAreUsed(Game g, Player p, Integer round, Boolean usesBothDwarves) {
         if (usesBothDwarves) {
+            log.info(BOTH_DWARVES_USED_LOG_MSG);
             Dwarf dwarf1 = dwService.genAndSave(p, round, null);
             Dwarf dwarf2 = dwService.genAndSave(p, round, null);
 
@@ -92,6 +100,7 @@ public class SpecialCardService {
             gameDwarves.add(dwarf2);
             g.setDwarves(gameDwarves);
         } else {
+            log.info(ONE_DWARVES_USED_LOG_MSG);
             plService.removeMedalsUsedSpecialCard(p);
 
             Dwarf dwarf1 = dwService.genAndSave(p, round, null);
@@ -267,48 +276,63 @@ public class SpecialCardService {
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case SPECIAL_CARD_MUSTER_AN_ARMY:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_MUSTER_AN_ARMY);
                 List<Card> gameCards = mb.getCards();
                 g = musterAnArmyAction(g, round, gameCards);
                 break;
             case SPECIAL_CARD_SPECIAL_ORDER:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_SPECIAL_ORDER);
 
                 specialOrderAction(p, selectedGold, selectedIron, selectedSteal, selectedObject);
                 break;
 
             case SPECIAL_CARD_HOLD_A_COUNCIL:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_HOLD_A_COUNCIL);
+
                 mbService.holdACouncilAction(mb);
                 cards = mb.getLocationCards(mb.getLocations());
                 dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, cards);
                 break;
 
             case SPECIAL_CARD_COLLAPSE_THE_SHAFTS:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_COLLAPSE_THE_SHAFTS);
+
                 locations = mbService.collapseTheShaftsAction(mb);
                 cards = mb.getLocationCards(mb.getLocations());
                 dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, cards);
                 break;
 
             case SPECIAL_CARD_RUN_AMOK:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_RUN_AMOK);
+
                 locations = mbService.runAmokAction(mb);
                 cards = mb.getLocationCards(mb.getLocations());
                 dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, cards);
                 break;
 
             case SPECIAL_CARD_SELL_AN_ITEM:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_SELL_AN_ITEM);
+
                 sellAnItemAction(p, selectedGold, selectedIron, selectedSteal, selectedObject);
                 break;
 
             case SPECIAL_CARD_APPRENTICE:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_APPRENTICE);
 
                 g = apprenticeAction(g, p, round, selectedPosition, roundDwarvesApprentice);
                 break;
 
             case SPECIAL_CARD_TURN_BACK:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_TURN_BACK);
+
                 locations = mb.getLocations();
 
                 g = turnBackAction(g, p, round, selectedPosition, locations);
                 dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, g.getMainBoard().getCards());
                 break;
             case SPECIAL_CARD_PAST_GLORIES:
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_PAST_GLORIES);
+
                 locations = mb.getLocations();
                 pastGloriesAction(selectedPosition, cardToBeOnTop, locations);
 
