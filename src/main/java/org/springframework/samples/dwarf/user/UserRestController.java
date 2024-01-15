@@ -107,6 +107,13 @@ class UserRestController {
 		return new ResponseEntity<>(this.userService.userIsNotLoogedIn(username), HttpStatus.OK);
 	}
 
+	@PutMapping("{userId}")
+	public ResponseEntity updateUser(@PathVariable("userId") Integer id, @RequestBody @Valid User user) {
+		RestPreconditions.checkNotNull(userService.findUserById(id), "User", "ID", id);
+		userService.updateUser(user, id);
+		return ResponseEntity.ok(new MessageResponse("User updated successfully!"));
+	}
+
 	@DeleteMapping(value = "{userId}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<MessageResponse> delete(@PathVariable("userId") int id) {

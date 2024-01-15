@@ -87,12 +87,4 @@ public class AuthController {
 		authService.createUser(signUpRequest);
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
-
-	@PostMapping("/update/{userId}")
-	public ResponseEntity updateUser(@PathVariable("userId") Integer id, @RequestBody @Valid User user) {
-		RestPreconditions.checkNotNull(userService.findUserById(id), "User", "ID", id);
-		userService.updateUser(user, id);
-		return ResponseEntity.ok(new MessageResponse("User updated successfully!"));
-	}
-
 }

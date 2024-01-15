@@ -87,7 +87,7 @@ public class UserService {
 	public User updateUser(@Valid User user, Integer idToUpdate) {
 		User toUpdate = findUserById(idToUpdate);
 		toUpdate.setUsername(user.getUsername());
-		toUpdate.setPassword(encoder.encode(toUpdate.getPassword()));
+		toUpdate.setPassword(encoder.encode(user.getPassword()));
 		userRepository.save(toUpdate);
 
 		return toUpdate;
@@ -97,8 +97,6 @@ public class UserService {
 	public void deleteUser(Integer id) {
 		User toDelete = findUserById(id);
 		friendRequestService.deleteAllFriendRequests(toDelete);
-		// this.userRepository.deleteOwnerRelation(id);
-		// this.userRepository.deleteVetRelation(id);
 		this.userRepository.delete(toDelete);
 	}
 
