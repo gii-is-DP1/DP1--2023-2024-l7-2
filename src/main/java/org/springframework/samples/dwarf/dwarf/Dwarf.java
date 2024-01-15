@@ -1,5 +1,6 @@
 package org.springframework.samples.dwarf.dwarf;
 
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.model.BaseEntity;
 import org.springframework.samples.dwarf.player.Player;
@@ -8,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Builder.Default;
 
 @Entity
 @Getter
@@ -21,4 +23,7 @@ public class Dwarf extends BaseEntity {
 
     @ManyToOne(optional = true)
     Card card;
+
+    
+    Boolean needsToBeResolved = true;
 }

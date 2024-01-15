@@ -221,7 +221,8 @@ public class MainBoardService {
          * 4. Forjar
          */
         List<Dwarf> dwarves = g.getDwarves();
-        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getCard() != null).toList();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() 
+            && d.getCard() != null && d.getNeedsToBeResolved()).toList();
 
         //List<Player> plys = g.getPlayers();
 
@@ -328,6 +329,7 @@ public class MainBoardService {
 
             if (reverseCard.getPosition().equals(dwarfCard.getPosition())) {
                 applySingleCardWhenSpecialCardAction(p, dwarfCard);
+                d.setNeedsToBeResolved(false);
             }
         }
     }
@@ -381,9 +383,8 @@ public class MainBoardService {
 
     @Transactional
     public MainBoard handleSpecialCardTurn(MainBoard mb, Card reverseCard, SpecialCard specialCard, List<Dwarf> roundDwarves) {
+        
         applySingleCardWhenSpecialCard(roundDwarves, reverseCard);
-
-
         mb = removeUsedSpecialCard(mb, specialCard);
         mb = putReverseSpecialCard(mb, reverseCard);
         mb = saveMainBoard(mb);
