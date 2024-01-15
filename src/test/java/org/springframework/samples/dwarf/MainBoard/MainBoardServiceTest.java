@@ -1,15 +1,15 @@
 package org.springframework.samples.dwarf.MainBoard;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,18 +18,22 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
+import org.springframework.samples.dwarf.card.CardType;
+import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.card.SpecialCardRepository;
-import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeck;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
+import org.springframework.samples.dwarf.dwarf.Dwarf;
+import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardRepository;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
-import org.springframework.samples.dwarf.specialCardDeck.SpecialCardDeckService;
+import org.springframework.samples.dwarf.player.Player;
 
 public class MainBoardServiceTest {
 
@@ -40,13 +44,13 @@ public class MainBoardServiceTest {
     private CardDeckService cardDeckService;
 
     @Mock
-    private SpecialCardDeckService specialCardDeckService;
-
-    @Mock
-    private SpecialCardService specialCardService;
-
-    @Mock
     private CardService cardService;
+
+    @Mock
+    private LocationService locService;
+
+    @Mock
+    private SpecialCardRepository specCardRepo;
 
     @InjectMocks
     private MainBoardService mainBoardService;
@@ -60,6 +64,7 @@ public class MainBoardServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
     }
 
     @Test
@@ -96,74 +101,272 @@ public class MainBoardServiceTest {
     }
 
     @Test
-    public void testInitialize_Positive() {
-        // Mock behavior of dependencies
-        CardDeck mockedCardDeck = new CardDeck();
-        when(cardDeckService.initialiate()).thenReturn(mockedCardDeck);
+    public void testHoldACouncil() {
 
-        List<Location> mockedLocations = new ArrayList<>();
-        when(locationService.initialize()).thenReturn(mockedLocations);
+        CardDeck cd = new CardDeck();
+        cd.setCards(List.of());
 
-        MainBoard mockedMainBoard = new MainBoard();
-        when(mainBoardRepository.save(any(MainBoard.class))).thenReturn(mockedMainBoard);
+        Location l = new Location();
+        List<Location> locations = List.of(l, l);
 
-        // Call the method
-        MainBoard result = mainBoardService.initialize();
+        MainBoard mb = new MainBoard();
+        mb.setLocations(locations);
+        mb.setCardDeck(cd);
 
-        // Verify interactions
-        verify(cardDeckService, times(1)).initialiate();
-        verify(locationService, times(1)).initialize();
-        verify(mainBoardRepository, times(1)).save(any(MainBoard.class));
+        Card c = new Card();
+        when(locService.removeLastCard(any(Location.class))).thenReturn(c);
 
-        // Assert the result
-        assertNotNull(result);
+        SpecialCard sc = new SpecialCard();
+        when(specCardRepo.findAll()).thenReturn(List.of(sc));
+
+        mainBoardService.holdACouncilAction(mb);
+
+        verify(cardDeckService).shuffleAndSaveCards(cd, List.of(c, c));
     }
 
-    // @Test
-    // public void testHoldACouncilAction_Positive() {
+    @Test
+    public void testCollapseTheShaftsAction() {
+        Location l = new Location();
+        List<Location> locations = List.of(l, l);
 
-    // // Initialize mocks
-    // Card c1 = new Card();
-    // Card c2 = new Card();
-    // c1.setDescription("abc");
-    // c2.setDescription("abcd");
-    // c1.setPosition(0);
-    // c2.setPosition(1);
+        MainBoard mb = new MainBoard();
+        mb.setLocations(locations);
 
-    // Location l1 = new Location();
-    // Location l2 = new Location();
-    // l1.setPosition(0);
-    // l2.setPosition(1);
-    // l1.setCards(Arrays.asList(c1));
-    // l1.setCards(Arrays.asList(c2));
+        when(locService.putFirstCardAtEnd(any(Location.class))).thenReturn(l);
 
-    // List<Location> mockedLocations = Arrays.asList(l1, l2);
+        List<Location> lc = mainBoardService.collapseTheShaftsAction(mb);
 
-    // CardDeck mockedCardDeck = new CardDeck();
-    // mockedCardDeck.setCards(Arrays.asList(c1, c2));
+        assertEquals(2, lc.size());
+        assertEquals(l, lc.get(0));
+    }
 
-    // MainBoard mockedMainBoard = mainBoardService.initialize();
+    @Test
+    public void testRunAmokAction() {
+        Location l = new Location();
+        List<Location> locations = List.of(l, l);
 
-    // List<Card> mockedRemovedCards = Arrays.asList(new Card(), new Card());
+        MainBoard mb = new MainBoard();
+        mb.setLocations(locations);
 
-    // when(cardDeckService.shuffleAndSaveCards(any(CardDeck.class),
-    // anyList())).thenReturn(mockedCardDeck);
-    // when(locationService.removeLastCard(any(Location.class))).thenReturn(mockedRemovedCards.get(0),
-    // mockedRemovedCards.get(1));
+        when(locService.shuffleLocation(any(Location.class))).thenReturn(l);
 
-    // // Call the method
-    // mainBoardService.holdACouncilAction(mockedMainBoard);
+        List<Location> lc = mainBoardService.runAmokAction(mb);
 
-    // // Verify interactions
-    // verify(mainBoardRepository, times(1)).findById(any());
-    // verify(cardDeckService, times(1)).shuffleAndSaveCards(any(CardDeck.class),
-    // anyList());
-    // verify(locationService, times(2)).removeLastCard(any(Location.class));
+        assertEquals(2, lc.size());
+        assertEquals(l, lc.get(0));
+    }
 
-    // // Assert that the state of MainBoard is modified as expected
-    // assertEquals(mockedCardDeck, mockedMainBoard.getCardDeck());
-    // assertEquals(0, mockedMainBoard.getLocations().get(0).getCards().size());
-    // assertEquals(0, mockedMainBoard.getLocations().get(1).getCards().size());
-    // }
+    @Test
+    void testGetChoosedCards() {
+        Dwarf d1 = new Dwarf();
+        Card c1 = new Card();
+        Player p1 = new Player();
+        c1.setName("Test1");
+        p1.setName("Test1");
+        d1.setCard(c1);
+        d1.setPlayer(p1);
+
+        Dwarf d2 = new Dwarf();
+        Card c2 = new Card();
+        Player p2 = new Player();
+        c2.setName("Test2");
+        p2.setName("Test2");
+        d2.setCard(c2);
+        d2.setPlayer(p2);
+
+        ArrayList<Pair<Player, Card>> res = mainBoardService.getChoosedCards(List.of(d1, d2));
+
+        assertEquals(2, res.size());
+        assertEquals(p1, res.get(0).getFirst());
+        assertEquals(p2, res.get(1).getFirst());
+        assertEquals(c1, res.get(0).getSecond());
+        assertEquals(c2, res.get(1).getSecond());
+    }
+
+    @Test
+    void testSplitCardsByType() {
+        CardType ct1 = new CardType();
+        ct1.setName("Test1");
+        CardType ct2 = new CardType();
+        ct2.setName("Test2");
+
+        Player p1 = new Player();
+        p1.setName("Test1");
+        Player p2 = new Player();
+        p2.setName("Test2");
+
+        Card c1 = new Card();
+        c1.setName("Test1");
+        c1.setCardType(ct1);
+
+        Card c3 = new Card();
+        c3.setName("Test3");
+        c3.setCardType(ct1);
+
+        Card c2 = new Card();
+        c2.setName("Test2");
+        c2.setCardType(ct2);
+
+        Card c4 = new Card();
+        c4.setName("Test4");
+        c4.setCardType(ct2);
+
+        ArrayList<Pair<Player, Card>> cards = new ArrayList<>();
+        cards.add(Pair.of(p1, c1));
+        cards.add(Pair.of(p2, c2));
+        cards.add(Pair.of(p1, c3));
+        cards.add(Pair.of(p2, c4));
+
+        HashMap<String, ArrayList<Pair<Player, Card>>> res = mainBoardService.splitCardsByType(cards);
+
+        assertEquals(true, res.containsKey(ct1.getName()));
+        assertEquals(true, res.containsKey(ct2.getName()));
+
+        ArrayList<Pair<Player, Card>> t1 = res.get(ct1.getName());
+        ArrayList<Pair<Player, Card>> t2 = res.get(ct2.getName());
+
+        assertEquals(2, t1.size());
+        assertEquals(2, t2.size());
+        assertEquals(Pair.of(p1, c1), t1.get(0));
+        assertEquals(Pair.of(p1, c3), t1.get(1));
+        assertEquals(Pair.of(p2, c2), t2.get(0));
+        assertEquals(Pair.of(p2, c4), t2.get(1));
+
+    }
+
+    @Test
+    void testFaseOrcosNoOrcCardsCurrently() {
+        Game g = new Game();
+        MainBoard mb = new MainBoard();
+
+        CardType ct1 = new CardType();
+        ct1.setName("Test1");
+        Card c1 = new Card();
+        c1.setName("Test1");
+        c1.setCardType(ct1);
+        Card c2 = new Card();
+        c2.setName("Test2");
+        c2.setCardType(ct1);
+
+        Location l1 = new Location();
+        l1.setCards(List.of(c1));
+        Location l2 = new Location();
+        l2.setCards(List.of(c2));
+        mb.setLocations(List.of(l1, l2));
+
+        g.setMainBoard(mb);
+
+        Boolean res = mainBoardService.faseOrcos(g, null);
+        assertTrue(res);
+    }
+
+    @Test
+    void testFaseOrcosDefended() {
+        Game g = new Game();
+        MainBoard mb = new MainBoard();
+        Player p = new Player();
+        p.setName("test");
+
+        CardType ct1 = new CardType();
+        ct1.setName("Test1");
+        CardType ct2 = new CardType();
+        ct2.setName("OrcCard");
+
+        Card c1 = new Card();
+        c1.setName("Test1");
+        c1.setCardType(ct1);
+        Card c2 = new Card();
+        c2.setName("Test2");
+        c2.setCardType(ct1);
+
+        Card c3 = new Card();
+        c3.setName("Orc Raiders");
+        c3.setCardType(ct2);
+
+        Location l1 = new Location();
+        l1.setCards(List.of(c1));
+        Location l2 = new Location();
+        l2.setCards(List.of(c2));
+        Location l3 = new Location();
+        l3.setCards(List.of(c3));
+        mb.setLocations(List.of(l1, l2, l3));
+
+        g.setMainBoard(mb);
+
+        ArrayList<Pair<Player, Card>> orcCards = new ArrayList<>();
+        orcCards.add(Pair.of(p, c3));
+
+        Boolean res = mainBoardService.faseOrcos(g, orcCards);
+        assertTrue(res);
+    }
+
+    @Test
+    void testFaseOrcosNotDefended() {
+        Game g = new Game();
+        MainBoard mb = new MainBoard();
+        Player p = new Player();
+        p.setName("test");
+
+        CardType ct1 = new CardType();
+        ct1.setName("Test1");
+        CardType ct2 = new CardType();
+        ct2.setName("OrcCard");
+
+        Card c1 = new Card();
+        c1.setName("Test1");
+        c1.setCardType(ct1);
+        Card c2 = new Card();
+        c2.setName("Test2");
+        c2.setCardType(ct1);
+
+        Card c3 = new Card();
+        c3.setName("Orc Raiders");
+        c3.setCardType(ct2);
+
+        Location l1 = new Location();
+        l1.setCards(List.of(c1));
+        Location l2 = new Location();
+        l2.setCards(List.of(c2));
+        Location l3 = new Location();
+        l3.setCards(List.of(c3));
+        mb.setLocations(List.of(l1, l2, l3));
+
+        g.setMainBoard(mb);
+
+        ArrayList<Pair<Player, Card>> orcCards = new ArrayList<>();
+
+        Boolean res = mainBoardService.faseOrcos(g, orcCards);
+        assertTrue(!res);
+    }
+
+    @Test
+    void testApplySingleCardWhenSpecialCardChangeDwarf() {
+        Dwarf d1 = new Dwarf();
+        Card c1 = new Card();
+        Card c2 = new Card();
+        Player p1 = new Player();
+
+        CardType ct2 = new CardType();
+        ct2.setName("OrcCard");
+
+        Integer position = 1;
+        c1.setName("Test1");
+        c1.setPosition(position);
+        c1.setCardType(ct2);
+
+        c2.setName("Test2");
+        c2.setPosition(position);
+
+        p1.setName("Test1");
+        d1.setCard(c1);
+        d1.setPlayer(p1);
+
+        List<Dwarf> roundDwarves = List.of(d1);
+        mainBoardService.applySingleCardWhenSpecialCard(roundDwarves, c2);
+
+        assertTrue(!d1.getNeedsToBeResolved());
+
+        verify(cardService).adwardMedalSingleAction(p1, c1);
+    }
 
 }

@@ -1,15 +1,12 @@
 package org.springframework.samples.dwarf.card;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
+import org.springframework.samples.dwarf.exceptions.CannotUseCardException;
 import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.game.SpecialCardRequestHandler;
 import org.springframework.samples.dwarf.location.Location;
@@ -27,7 +24,6 @@ import jakarta.validation.Valid;
 @Service
 public class SpecialCardService {
 
-    private final Integer MEDALS_USED_FOR_SPECIAL_CARD_USAGE = 4;
     private final Integer POSITION_MAX = 9;
     private final Integer POSITION_MIN = 1;
 
@@ -125,6 +121,7 @@ public class SpecialCardService {
     public Game apprenticeAction(Game g, Player p, Integer round,
             Integer selectedPosition, List<Dwarf> roundDwarvesApprentice) {
 
+        Boolean changed = false;
         for (Dwarf d : roundDwarvesApprentice) {
 
             if (!d.getPlayer().equals(p) && d.getCard().getPosition().equals(selectedPosition)) {
@@ -134,8 +131,12 @@ public class SpecialCardService {
                 List<Dwarf> gameDwarvesApprentice = g.getDwarves();
                 gameDwarvesApprentice.add(newDwarf);
                 g.setDwarves(gameDwarvesApprentice);
+                changed = true;
                 break;
             }
+        }
+        if (!changed) {
+            throw new CannotUseCardException("No user uses this position");
         }
         return g;
     }
@@ -153,7 +154,7 @@ public class SpecialCardService {
             // Update player's state
             if (selectedGold > p.getGold() || selectedIron > p.getIron()
                     || selectedSteal > p.getSteal() || playerObjects.contains(selectedObject)) {
-                // TODO: Create error
+                throw new CannotUseCardException("Not enough resources");
             }
             p.setGold(p.getGold() - selectedGold);
             p.setIron(p.getIron() - selectedIron);
@@ -165,6 +166,8 @@ public class SpecialCardService {
 
             // Save the updated player
             plService.savePlayer(p);
+        } else {
+            throw new CannotUseCardException("Not enough resources");
         }
     }
 
@@ -183,8 +186,16 @@ public class SpecialCardService {
             p.setSteal(p.getSteal() + selectedSteal);
 
             // Remove the selected object
-            if (!playerObjects.contains(selectedObject)) {
-                // TODO: Create error
+            Boolean containsObject = false;
+            for (Object o : playerObjects) {
+                if (o.getName().equals(selectedObject.getName())) {
+                    containsObject = true;
+                    selectedObject = o;
+                    break;
+                }
+            }
+            if (!containsObject) {
+                throw new CannotUseCardException("Not enough resources");
             }
             playerObjects.remove(selectedObject);
             p.setObjects(playerObjects);
@@ -200,6 +211,15 @@ public class SpecialCardService {
         if (selectedPosition >= POSITION_MIN && selectedPosition <= POSITION_MAX) {
             Location selectedLocation = newLocationsTurnBack.get(selectedPosition - 1);
 
+            List<Dwarf> thisRoundDwarves = g.getDwarves().stream().filter(d -> d.getRound() == round
+                    && d.getPlayer() != null).toList();
+
+            for (Dwarf d : thisRoundDwarves) {
+                if (d.getCard() != null && d.getCard().getPosition() == selectedPosition) {
+                    throw new CannotUseCardException("A user already uses this positions");
+                }
+            }
+
             Card removedCard = locService.removeLastCard(selectedLocation);
             if (removedCard != null) {
                 List<Card> newCards = selectedLocation.getCards();
@@ -212,7 +232,7 @@ public class SpecialCardService {
                 g.setDwarves(gameDwarvesTurnBack);
             }
         } else {
-            // TODO: create error
+            throw new CannotUseCardException("Position does not exist");
         }
         return g;
     }
@@ -227,7 +247,7 @@ public class SpecialCardService {
             locService.pastGloriesAction(selectedLocation, cardToBeOnTop);
 
         } else {
-            // TODO: create error
+            throw new CannotUseCardException("Not enough information to use this card");
         }
     }
 
@@ -269,10 +289,8 @@ public class SpecialCardService {
 
             case SPECIAL_CARD_RUN_AMOK:
                 locations = mbService.runAmokAction(mb);
-                // mb = mbService.saveMainBoard(mb);
                 cards = mb.getLocationCards(mb.getLocations());
                 dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, cards);
-                // g.setMainBoard(mb);
                 break;
 
             case SPECIAL_CARD_SELL_AN_ITEM:

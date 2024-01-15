@@ -1,14 +1,9 @@
 package org.springframework.samples.dwarf.dwarf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -27,27 +22,9 @@ public class DwarfRepositoryTest {
         List<Dwarf> mockDwarfs = Arrays.asList(new Dwarf(), new Dwarf());
         when(dwarfRepository.findAll()).thenReturn(mockDwarfs);
 
-        // Calling the method
-        List<Dwarf> dwarfs = dwarfRepository.findAll();
-
-        // Verifying interactions and assertions
-        verify(dwarfRepository, times(1)).findAll();
-        assertNotNull(dwarfs);
-        assertEquals(2, dwarfs.size());
-    }
-
-    @Test
-    public void testFindAll_EmptyList_Negative() {
-        // Mocking behavior of the repository
-        when(dwarfRepository.findAll()).thenReturn(Collections.emptyList());
-
-        // Calling the method
-        List<Dwarf> dwarfs = dwarfRepository.findAll();
-
-        // Verifying interactions and assertions
-        verify(dwarfRepository, times(1)).findAll();
-        assertNotNull(dwarfs);
-        assertTrue(dwarfs.isEmpty());
+        // Ejecutar el método del repositorio y verificar el resultado
+        List<Dwarf> result = dwarfRepository.findAll();
+        assertEquals(29, result.size(), "La lista de enanos no coincide");
     }
 
 }

@@ -37,8 +37,27 @@ public class CardServiceTest {
     @Autowired
     private PlayerService playerService;
 
-    @Mock
-    private CardRepository cardRepository;
+    @Autowired
+    private GameService gameService;
+
+    @Test
+    public void testSaveCard() {
+        Card newCard = new Card();
+
+        CardType newCardType = cardService.getById(1).getCardType();
+
+        newCard.setName("sample name");
+        newCard.setDescription("sample description");
+        newCard.setPosition(2);
+        newCard.setCardType(newCardType);
+
+        Card savedCard = cardService.saveCard(newCard);
+
+        assertNotNull(savedCard.getId());
+
+        assertEquals(101, savedCard.getId());
+
+    }
 
     @Test
     public void testGetCards() {
@@ -59,25 +78,6 @@ public class CardServiceTest {
         assertEquals(id, retrievedCard.getId());
         assertEquals(name, retrievedCard.getName());
         assertEquals(position, retrievedCard.getPosition());
-
-    }
-
-    @Test
-    public void testSaveCard() {
-        Card newCard = new Card();
-
-        CardType newCardType = cardService.getById(1).getCardType();
-
-        newCard.setName("sample name");
-        newCard.setDescription("sample description");
-        newCard.setPosition(2);
-        newCard.setCardType(newCardType);
-
-        Card savedCard = cardService.saveCard(newCard);
-
-        assertNotNull(savedCard.getId());
-
-        assertEquals(savedCard.getId(), 100);
 
     }
 
@@ -267,8 +267,14 @@ public class CardServiceTest {
     }
 
     @Test
+<<<<<<< HEAD
     public void testForjarn_CannotApplyCard() {
 
+=======
+
+    public void testForjar_CannotApplyCard() {
+        
+>>>>>>> main
         Player player = new Player();
         player.setGold(5);
         player.setSteal(2);

@@ -97,6 +97,69 @@ class CardRestControllerTest {
         verify(cardService, never()).saveCard(invalidCard);
     }
 
+    @Test
+    void modifyValidCard() {
+        
+        int cardId = 1;
+        Card existingCard = new Card();
+        existingCard.setId(cardId);
+        when(cardService.getById(cardId)).thenReturn(existingCard);
+
+        Card newCard = new Card();
+        newCard.setId(cardId);
+        BindingResult bindingResult = new BeanPropertyBindingResult(newCard, "newCard");
+
+        
+        ResponseEntity<Void> responseEntity = cardRestController.modifyCard(newCard, bindingResult, cardId);
+
+       
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+        verify(cardService, times(1)).saveCard(existingCard);
+    }
+
+    @Test
+    void modifyInvalidCard() {
+        
+        int cardId = 1;
+        Card existingCard = new Card();
+        existingCard.setId(cardId);
+        when(cardService.getById(cardId)).thenReturn(existingCard);
+
+        Card newCard = new Card();
+        newCard.setId(cardId);
+        BindingResult bindingResult = new BeanPropertyBindingResult(newCard, "newCard");
+        bindingResult.reject("fieldErrorCode", "Error message");
+
+
+        assertThrows(BadRequestException.class, () -> cardRestController.modifyCard(newCard, bindingResult, cardId));
+        verify(cardService, never()).saveCard(existingCard);
+    }
+
+    @Test
+    void deleteExistingCard() {
+       
+        int cardId = 1;
+        when(cardService.getById(cardId)).thenReturn(new Card());
+
+        
+        ResponseEntity<Void> responseEntity = cardRestController.deleteCard(cardId);
+
+        
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+        verify(cardService, times(1)).deleteCardById(cardId);
+    }
+
+    @Test
+    void deleteNonExistingCard() {
+        
+        int nonExistingCardId = 999;
+        when(cardService.getById(nonExistingCardId)).thenReturn(null);
+
+        
+        assertThrows(ResourceNotFoundException.class, () -> cardRestController.deleteCard(nonExistingCardId));
+        verify(cardService, never()).deleteCardById(nonExistingCardId);
+    }
+
     
 
 }

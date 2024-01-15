@@ -29,7 +29,7 @@ const Card = (props) => {
 
     const rectanguloStyle = {
       width: '200px',
-      height: '250px',
+      height: '350px',
       backgroundColor: 'white',
       border: '7px solid black',
       display: 'flex', 

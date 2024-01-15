@@ -36,12 +36,40 @@ export default function LeaderboardList() {
             },
           });
 
+          const mediaResponse = await fetch(`/api/v1/achievements/mediaPlayers/${user.username}`, {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${jwt}`,
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+          });
+
+          const gamesPlayedResponse = await fetch(`/api/v1/achievements/allPlayedGames/${user.username}`, {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${jwt}`,
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+          });
+
           if (!victoriesResponse.ok) {
             throw new Error(`HTTP error! Status: ${victoriesResponse.status}`);
           }
 
+          if (!mediaResponse.ok) {
+            throw new Error(`HTTP error! Status: ${victoriesResponse.status}`);
+          }
+
+          if (!gamesPlayedResponse.ok) {
+            throw new Error(`HTTP error! Status: ${victoriesResponse.status}`);
+          }
+
           const victoriesData = await victoriesResponse.json();
-          return { user, victoriesData }; // Combina datos de usuario y estadísticas de victorias
+          const mediaData = await mediaResponse.json();
+          const gamesPlayedData = await gamesPlayedResponse.json();
+          return { user, victoriesData, mediaData, gamesPlayedData }; // Combina datos de usuario y estadísticas de victorias
         });
 
         const statsDataArray = await Promise.all(promises);
@@ -66,6 +94,8 @@ export default function LeaderboardList() {
     <tr key={index}>
       <td>{data.user.username}</td>
       <td>{data.victoriesData}</td>
+      <td>{data.mediaData}</td>
+      <td>{data.gamesPlayedData}</td>
     </tr>
   ));
 
@@ -81,6 +111,12 @@ export default function LeaderboardList() {
               </th>
               <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
                 Total Victories
+              </th>
+              <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
+                Media Players Per Game
+              </th>
+              <th width="15%" className="text-center" style={{ borderBottom: "2px solid black" }}>
+                Games Played
               </th>
             </tr>
           </thead>

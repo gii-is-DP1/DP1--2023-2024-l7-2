@@ -60,7 +60,11 @@ public class AchievementService {
 
     @Transactional(readOnly = true)
     public List<Game> getAllWinnedGames(Integer id) {
-        return gameRepo.findAllWinnedGames(id);
+        Optional<User> u = userRepo.findById(id);
+        if (u.isPresent())
+            return gameRepo.findAllWinnedGames(u.get());
+        else 
+            return null;
     }
 
     @Transactional(readOnly = true)

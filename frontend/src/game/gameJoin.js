@@ -37,41 +37,36 @@ export default function GameJoin() {
 
         event.preventDefault();
         
+
         fetch(
-            "/api/v1/game/check" + (game ? "/" + game : ""),
+            "/api/v1/game/join" + (game ? "/" + game : ""),
             {
-                method: "GET",
+                method: "POST",
                 headers: {
                     Authorization: `Bearer ${jwt}`,
                     Accept: "application/json",
                     "Content-Type": "application/json",
                 }
             }
-        )
-        .then((response) => {
+        ).then((response) => {
+            console.log(response.text)
             if (response.ok) {
-                fetch(
-                    "/api/v1/game/join" + (game ? "/" + game : ""),
-                    {
-                        method: "POST",
-                        headers: {
-                            Authorization: `Bearer ${jwt}`,
-                            Accept: "application/json",
-                            "Content-Type": "application/json",
-                        }
-                    }
-                ).then((response) => {
-                    console.log(response.text)
-                    if (response.ok) {
-                        window.location.href = `/game/${game}`
-                    } else {
-                        console.log("error", response)
-                    }
-                })
+                window.location.href = `/game/${game}`
+            } else if(response.status == 404) {
+                setMessage("Game not found")
+                setVisible(true)
+            } else if(response.status == 400) {
+                setMessage("Game has already started")
+                setVisible(true)
+            } else if(response.status == 403) {
+                setMessage("Too many players in game")
+                setVisible(true)    
+            } else {
+                setMessage("Failed to join the game")
+                setVisible(true)
+                console.log("error", response)
             }
-        })
-        .catch((message) => alert(message));
-
+        }).catch((message) => alert(message));
     }
 
     const handleJoinClick = (game) => {
@@ -89,7 +84,18 @@ export default function GameJoin() {
         ).then((response) => {
           if (response.ok) {
             return response.json()
+          } else if (response.status == 404) {
+            setMessage("Game not found")
+            setVisible(true)
+        } else if(response.status == 400) {
+            setMessage("Game has already started")
+            setVisible(true)
+        } else if(response.status == 403) {
+            setMessage("Too many players in game")
+            setVisible(true)
           } else {
+            setMessage("Failed to join the game")
+            setVisible(true)
             throw new Error("Failed to join the game");
           }
         })
@@ -98,10 +104,14 @@ export default function GameJoin() {
           if (response.code) {
             window.location.href = `/game/${response.code}`;
           } else {
+            setMessage("Failed to join the game")
+            setVisible(true)
             throw new Error("Failed to join the game");
           }
         })
         .catch((error) => {
+            setMessage("Failed to join the game")
+            setVisible(true)
           setMessage(error.message);
         });
       };
@@ -133,12 +143,14 @@ export default function GameJoin() {
     }
 
     const gameList = publicGames.content.map((publicGame) => {
-        return (
-            <div key={publicGame.id} style={{ border: '2px solid white', borderRadius: '8px', marginBottom: '15px', padding: '5px', margin: '5px', color: 'white'}}>
-                {publicGame.name} - Players: {publicGame.players.length}
-                <Button className="btn btn-dark btn-sm" style={{marginLeft: '5px'}} onClick={() =>  handleJoinClick(publicGame.code)}>Join</Button>
-            </div>
-        );
+        if (!publicGame.start) {
+            return (
+                <div key={publicGame.id} style={{ border: '2px solid white', borderRadius: '8px', marginBottom: '15px', padding: '5px', margin: '5px', color: 'white'}}>
+                    {publicGame.name} - Players: {publicGame.players.length}
+                    <Button className="btn btn-dark btn-sm" style={{marginLeft: '5px'}} onClick={() =>  handleJoinClick(publicGame.code)}>Join</Button>
+                </div>
+            );
+        }
     });
 
     const invitationList = invitedGames.map((game) => {
@@ -163,6 +175,7 @@ export default function GameJoin() {
 
     return (
         <div>
+            {getErrorModal(setVisible,visible,message)}
             <div className="row" style={{height: "100vh", width: "100vw"}}>
                 <div className="col game-join-container" style={{height: "100vh", width: "100vw"}}>
                             <div className="custom-button-column">

@@ -3,11 +3,14 @@ package org.springframework.samples.dwarf.game;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Map.Entry;
 
+import org.springframework.samples.dwarf.object.Object;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,14 +18,22 @@ import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.card.CardType;
+import org.springframework.samples.dwarf.card.SpecialCard;
+import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.cardDeck.CardDeckService;
+import org.springframework.samples.dwarf.chat.Chat;
+import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
+import org.springframework.samples.dwarf.dwarf.DwarfService;
+import org.springframework.samples.dwarf.exceptions.CodeAlreadyTakenException;
+import org.springframework.samples.dwarf.exceptions.WrongTurnException;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.mainboard.MainBoardService;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerRepository;
+import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.samples.dwarf.spectator.Spectator;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
@@ -34,13 +45,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class GameService {
 
     GameRepository gr;
-    PlayerRepository pr;
+    PlayerService ps;
+    DwarfService ds;
     UserService us;
     MainBoardService mbs;
     CardDeckService cds;
     LocationService ls;
-    CardService cs;
+    SpecialCardService scs;
+    ChatService chatservice;
 
+
+    private final Integer OBJECTS_NEEDED_TO_END = 4;
+    private final Integer MAX_ROUNDS = 6;
     private final Integer MAX_DWARVES_PER_PLAYER = 4;
     final String helpCard = "HelpCard";
     final String orcCard = "OrcCard";
@@ -48,15 +64,19 @@ public class GameService {
     final String otherCard = "Other";
 
     @Autowired
-    public GameService(GameRepository gr, PlayerRepository pr, UserService us,
-            MainBoardService mbs, CardDeckService cds, LocationService ls, CardService cs) {
+    public GameService(GameRepository gr, PlayerService ps, UserService us,
+            MainBoardService mbs, CardDeckService cds, LocationService ls,SpecialCardService scs, 
+            DwarfService ds,
+            ChatService chatService) {
         this.gr = gr;
-        this.pr = pr;
+        this.ps = ps;
         this.us = us;
         this.mbs = mbs;
         this.cds = cds;
         this.ls = ls;
-        this.cs = cs;
+        this.scs=scs;
+        this.ds=ds;
+        this.chatservice = chatService;
     }
 
     @Transactional(readOnly = true)
@@ -125,6 +145,84 @@ public class GameService {
     }
 
     @Transactional
+    public Game initalize(Game g, User u) {
+
+        Game sameCode = getGameByCode(g.getCode());
+
+        if (sameCode != null) {
+            throw new CodeAlreadyTakenException("Another game already has this code");
+        }
+
+        MainBoard mb = mbs.initialize();
+        g.setMainBoard(mb);
+
+        Player p = ps.initialize(u.getUsername());
+        p.setColor(ps.getRandomColor(List.of()));
+        // p.setGame(g);
+        p.setUser(u);
+        p.setObjects(new ArrayList<Object>());
+        p = ps.savePlayer(p);
+
+        // Si no se hace asi da error porque
+        // al guardarse el game en player, el game todavia no existe
+        // y si se asigna a game el player, el player todavia no existe
+
+        g.setPlayerCreator(p);
+        g.setPlayerStart(p);
+        g.setPlayers(List.of(p));
+
+        Chat chat = chatservice.initialize();
+        g.setChat(chat);
+
+        g = saveGame(g);
+        return g;
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean needsToEnd(Game g){
+        List<Player> plys = g.getPlayers();
+        Boolean finished = false;
+        List<Card> cardDeckRemainingCards = g.getMainBoard().getCardDeck().getCards();
+        if (cardDeckRemainingCards.size() == 0) {
+            finished = true;
+        }
+
+        // tiene que terminar si un jugador consigue 4 objetos
+        if (!finished) {
+            for (Player p : plys) {
+                if (p.getObjects() != null && p.getObjects().size() >= OBJECTS_NEEDED_TO_END) {
+                    finished = true;
+                    break;
+                }
+            }
+        }
+
+        // tiene que terminar en 6 rondas
+        // if (finished || g.getRound() >= MAX_ROUNDS)
+        //     finished = true;
+
+        if (finished || g.getFinish() != null)
+            finished = true;
+        return finished;
+    }
+
+    @Transactional
+    public void joinPlayer(Game g, User u) {
+        Player p = ps.initialize(u.getUsername());
+        p.setColor(ps.getRandomColor(g.getPlayers()));
+        p.setUser(u);
+        p.setObjects(new ArrayList<Object>());
+
+        ps.savePlayer(p);
+
+        if (g.getPlayerStart() == null) {
+            g.setPlayerStart(p);
+        }
+
+        addPlayer(g, p);
+    }
+
+    @Transactional
     public Game addPlayer(Game g, Player p) {
         List<Player> players = g.getPlayers();
         players.add(p);
@@ -138,6 +236,25 @@ public class GameService {
         spectators.add(s);
         g.setSpectators(spectators);
         return saveGame(g);
+    }
+
+    @Transactional
+    public Game addDwarf(Game g, Player p , Card card) {
+        Dwarf dwarf = new Dwarf();
+        
+
+        dwarf.setPlayer(p);
+        dwarf.setRound(g.getRound());
+        dwarf.setCard(card);
+
+        ds.saveDwarf(dwarf);
+
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves.add(dwarf);
+        g.setDwarves(dwarves);
+
+        g = saveGame(g);
+        return g;
     }
 
     @Transactional(readOnly = true)
@@ -300,6 +417,24 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
+    public Boolean checkAllPositionsOccupied(List<Dwarf> dwarves) {
+        Boolean res = false;
+        Set<Integer> positions = Set.of(1,2,3,4,5,6,7,8,9);
+        Set<Integer> dwarfPositions = new HashSet<>();
+        for(Dwarf d:dwarves) {
+            Card c = d.getCard();
+            if(c!=null) {
+                dwarfPositions.add(c.getPosition());
+            }
+        }
+
+        if (dwarfPositions.equals(positions)) {
+            res = true;
+        }
+        return res;
+    }
+
+    @Transactional(readOnly = true)
     public Boolean checkRoundNeedsChange(Game g, List<Dwarf> dwarves) {
         List<Player> plys = g.getPlayers();
 
@@ -310,20 +445,42 @@ public class GameService {
         List<Player> remainingTurns = getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
 
         return thisRoundDwarves.size() >= remainingTurns.size() 
-            || thisRoundDwarves.size() >= MAX_DWARVES_PER_PLAYER*plys.size() ;
+            || thisRoundDwarves.size() >= MAX_DWARVES_PER_PLAYER*plys.size() 
+            || checkAllPositionsOccupied(thisRoundDwarves) ;
     }
 
     @Transactional
-    public Game handleRoundChange(Game g) {
-        ArrayList<Pair<Player, Card>> helpCards = null;
-        try {
+    public Player getCurrentTurnPlayer(List<Player> plys, List<Dwarf> dwarves, Player playerStarter) {
+        Player res = null;
 
-            helpCards = mbs.faseResolucionAcciones(g);
-        } catch (Exception e) {
-            System.out.println(e);
-            System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+        List<Player> dwarves_players = dwarves.stream().map(d -> d.getPlayer()).toList();
+
+        ArrayList<Player> remaining_turns = new ArrayList<Player>();
+        remaining_turns.addAll(getRemainingTurns(plys, dwarves, playerStarter));
+
+        // Partimos de la premisa de que cada ronda se componen de 2 turnos por cada
+        // jugador
+        for (Player p_dwarf : dwarves_players) {
+            // ArrayList<Player> tmp_remaining_turns = new ArrayList<>(remaining_turns);
+            for (int i = 0; i < remaining_turns.size(); i++) {
+                if (remaining_turns.get(i).equals(p_dwarf)) {
+                    remaining_turns.remove(i);
+                    break;
+                }
+            }
         }
+
+        if (remaining_turns.size() > 0) {
+            res = remaining_turns.get(0);
+        }
+
+        return res;
+    }
+
+
+    @Transactional
+    public Game handleRoundChange(Game g) {
+        ArrayList<Pair<Player, Card>> helpCards = mbs.faseResolucionAcciones(g);
 
         if (helpCards != null) {
             g = changePlayerStart(g, helpCards);
@@ -335,15 +492,8 @@ public class GameService {
 
         ArrayList<Card> cd = new ArrayList<Card>();
 
-        try {
-
-            List<Card> twoCards = cds.getNewCards(g.getMainBoard().getCardDeck().getId());
-            cd.addAll(twoCards);
-        } catch (Exception e) {
-            System.out.println(e);
-            System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
-        }
+        List<Card> twoCards = cds.getNewCards(g.getMainBoard().getCardDeck().getId());
+        cd.addAll(twoCards);
 
         List<Location> locations = mb.getLocations();
         for (Card ca : cd) {
@@ -451,7 +601,7 @@ public class GameService {
 
                     for (Player p : pWithMoreIron) {
                         // maxObjects was calculated at the begining of this process
-                        if (p.getIron() == maxObjects) {
+                        if (p.getObjects().size() == maxObjects) {
                             winner = p;
                             break;
                         }
@@ -501,8 +651,6 @@ public class GameService {
 
     @Transactional
     public Game changePlayerStart(Game g, ArrayList<Pair<Player, Card>> helpCards) {
-        // ArrayList<Player> players = new ArrayList<>();
-        // players.addAll(g.getPlayers());
         List<Player> players = g.getPlayers();
 
         Integer playerStarterId = g.getPlayerStart().getId();
@@ -521,18 +669,53 @@ public class GameService {
         return g;
     }
 
-    /* 
-    public void handleSpecialCardSelectionDwarvesUsage(SpecialCardRequestHandler request, Player p) {
-
-    }*/
-
     @Transactional
     public void resign(Game g, Player p) {
         p.setGold(0);
         p.setIron(0);
-        p.setMedal(null);
-        p.setObjects(null);
+        p.setMedal(0);
+        p.setObjects(List.of());
         p.setSteal(0);
+    }
+
+    @Transactional
+    public Boolean checkIfIsPlayerTurn(Game g, Player p) {
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
+
+        Player p2 = getCurrentTurnPlayer(g.getPlayers(), dwarves, g.getPlayerStart());
+
+        return p.getName().equals(p2.getName());
+    }
+
+    @Transactional
+    public void handleSpecialCard(Game g, SpecialCard specialCard, Boolean usesBothDwarves, Player p ,
+            SpecialCardRequestHandler request) {
+
+        if (!checkIfIsPlayerTurn(g, p)) {
+            throw new WrongTurnException("Not player's turn");
+        }
+        
+        Integer round = g.getRound();
+        scs.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
+
+        // Ahora vamos a darle la vuelta a la carta. Si hay
+        // un jugador en esa posicion, es decir, si se hay un
+        // dwarf en la base de datos con esa carta, se resuelve automaticamente.
+        // Despues, se coloca el dwarf del jugador que ha tirado la carta especial
+        // en esa posicion.
+        Card reverseCard = specialCard.getTurnedSide();
+        List<Dwarf> roundDwarves = getRoundDwarfs(g, round);
+        MainBoard mb = g.getMainBoard();
+
+        mbs.handleSpecialCardTurn(mb, reverseCard, specialCard, roundDwarves);
+
+        g.setMainBoard(mb);
+        saveGame(g);
+
+        g = scs.resolveSpecialCard(g, p, mb, request, round, roundDwarves);
+
+        saveGame(g);
     }
 
 }

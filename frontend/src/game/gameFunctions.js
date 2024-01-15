@@ -67,133 +67,35 @@ function resign(code, jwt) {
       Accept: 'application/json',
     }
   })
-  .then(() => {
-    window.location.href = `/game/${code}/finish`;
+  .then((response) => {
+    console.log(response)
+    //window.location.href = `/game/${code}/finish`;
   })
 }
 
+function checkResourcesSelectCard(cards, player) {
+  let totalGold = 0;
+  let totalIron = 0;
+  let totalSteal = 0;
+  for (const card in cards) {
+    if (cards[card].totalGold < 1)
+      totalGold += cards[card].totalGold
 
+    if (cards[card].totalGold < 1)
+      totalIron += cards[card].totalGold
 
-/*
-function specialOrder(code, jwt, setSelectedCards) {
-  const gold = prompt("Enter the number of gold:");
-  const steal = prompt("Enter the number of steal:");
-  const iron = prompt("Enter the number of iron:");
-
-  const order = {
-    gold: parseInt(gold),
-    steal: parseInt(steal),
-    iron: parseInt(iron),
-  };
-
-  const wantsObject = window.confirm("Do you want to select an object in exchange for the materials?");
-  
-  if (wantsObject) {
-    // Fetch the list of available objects from the server
-    fetch(`/api/v1/game/play/${code}/availableObjects`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-        Accept: "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((objects) => {
-        // Let the player choose an object
-        const selectedObject = prompt("Select an object:\n" + objects.join("\n"));
-
-        // Attach the selected object to the order
-        order.selectedObject = selectedObject;
-
-        // Continue with the API call
-        sendOrderToServer(code, jwt, order, setSelectedCards);
-      })
-      .catch((error) => {
-        console.error("Error fetching available objects:", error);
-        alert("An error occurred while fetching available objects. Please try again.");
-      });
-  } else {
-    // Continue with the API call without selecting an object
-    sendOrderToServer(code, jwt, order, setSelectedCards);
+    if (cards[card].totalSteal < 1)
+      totalSteal += cards[card].totalSteal
   }
-}
-/*
-function sendOrderToServer(code, jwt, order, setSelectedCards) {
-  // You can replace the following fetch with your actual API call
-  fetch(`/api/v1/game/play/${code}/specialOrder`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwt}`,
-      Accept: "application/json",
-    },
-    body: JSON.stringify(order),
-  })
-    .then((response) => response.json())
-    .then((response) => {
-      if (response.success) {
-        // Assuming the server responds with success
-        // Update the selected cards or perform any other necessary actions
-        getAlreadySelectedCardByPlayers(response.dwarves, setSelectedCards);
-      } else {
-        // Handle the case where the special order is not successful
-        alert("Special order failed. Please try again.");
-      }
-    })
-    .catch((error) => {
-      console.error("Error during special order:", error);
-      alert("An error occurred during the special order. Please try again.");
-    });
-}
-
-
-function sellAnItem(code, jwt, setSelectedCards) {
-  const gold = prompt("Enter the number of gold:");
-  const steal = prompt("Enter the number of steal:");
-  const iron = prompt("Enter the number of iron:");
-
-  const order = {
-    gold: parseInt(gold),
-    steal: parseInt(steal),
-    iron: parseInt(iron),
-  };
-
-  const wantsObject = window.confirm("Do you want to select an object in exchange for the materials?");
-  
-  if (wantsObject) {
-    
-    fetch(`/api/v1/game/play/${code}/availableObjects`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-        Accept: "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((objects) => {
-        // Let the player choose an object
-        const selectedObject = prompt("Select an object:\n" + objects.join("\n"));
-
-        // Attach the selected object to the order
-        order.selectedObject = selectedObject;
-
-        // Continue with the API call
-        sendSellAnItem(code, jwt, order, setSelectedCards);
-      })
-      .catch((error) => {
-        console.error("Error fetching available objects:", error);
-        alert("An error occurred while fetching available objects. Please try again.");
-      });
-  } else {
-    // Continue with the API call without selecting an object
-    sendSellAnItem(code, jwt, order, setSelectedCards);
+  if (totalGold * -1 > player.gold || totalIron * -1 > player.iron 
+    || totalSteal * -1 > player.steal) {
+    return false;
   }
+
+  return true;
 }
-*/
 
 
 export { 
-    isFinished, sendCard,isStart, resign
+    isFinished, sendCard,isStart, resign, checkResourcesSelectCard
 };

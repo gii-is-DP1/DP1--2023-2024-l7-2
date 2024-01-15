@@ -13,6 +13,7 @@ import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
 import org.springframework.samples.dwarf.player.Player;
+import org.springframework.samples.dwarf.user.User;
 
 public class GameTest {
 
@@ -53,9 +54,9 @@ public class GameTest {
 
     @Test
     public void testSetWinnerId() {
-        Integer winnerId = 1;
-        game.setWinner_id(winnerId);
-        assertEquals(winnerId, game.getWinner_id(), "El ID del ganador del juego no coincide");
+        User winner = new User();
+        game.setUserWinner(winner);
+        assertEquals(winner, game.getUserWinner(), "El ganador del juego no coincide");
     }
 
     @Test

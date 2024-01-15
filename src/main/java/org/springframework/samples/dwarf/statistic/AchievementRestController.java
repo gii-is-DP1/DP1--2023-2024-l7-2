@@ -92,17 +92,11 @@ public class AchievementRestController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<Void> modifyAchievement(@RequestBody @Valid Achievement newAchievement, BindingResult br,
-			@PathVariable("id") int id) {
-		Achievement achievementToUpdate = this.findAchievement(id).getBody();
-		if (br.hasErrors())
-			throw new BadRequestException(br.getAllErrors());
-		else if (newAchievement.getId() == null || !newAchievement.getId().equals(id))
-			throw new BadRequestException("Achievement id is not consistent with resource URL:" + id);
-		else {
+			@PathVariable("id") Integer id) {
+		Achievement achievementToUpdate = achievementService.getById(id);
 			BeanUtils.copyProperties(newAchievement, achievementToUpdate, "id");
 			achievementService.saveAchievement(achievementToUpdate);
-		}
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/{id}")
@@ -115,9 +109,9 @@ public class AchievementRestController {
 	@GetMapping("/allWinnedGames/{id}")
 	public ResponseEntity<Integer> findAllWinnedGames(@PathVariable("id") Integer id) {
 		List<Game> gamesToGet = achievementService.getAllWinnedGames(id);
+		if (gamesToGet == null)
+			throw new ResourceNotFoundException("Games with name " + id + " not found!");
 	 	Integer res = gamesToGet.size();
-	 	if (gamesToGet == null)
-	 		throw new ResourceNotFoundException("Games with name " + id + " not found!");
 	 	return new ResponseEntity<Integer>(res, HttpStatus.OK);
 	}
 

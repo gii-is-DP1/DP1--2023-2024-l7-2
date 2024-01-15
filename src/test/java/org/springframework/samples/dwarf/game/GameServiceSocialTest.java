@@ -2,15 +2,22 @@ package org.springframework.samples.dwarf.game;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.runner.RunWith;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.dwarf.card.Card;
+import org.springframework.samples.dwarf.card.CardService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
+import org.springframework.samples.dwarf.exceptions.CodeAlreadyTakenException;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.util.Pair;
 import org.springframework.samples.dwarf.player.Player;
+import org.springframework.samples.dwarf.user.User;
+import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import jakarta.transaction.Transactional;
@@ -23,6 +30,11 @@ public class GameServiceSocialTest {
     @Autowired
     private GameService gameService;
 
+    @Autowired
+    private CardService cardService;
+
+    @Autowired
+    private UserService userService;
 
     @Test
     @Transactional
@@ -252,4 +264,89 @@ public class GameServiceSocialTest {
 
         assertEquals(res, expected);
     }
+
+    @Test
+    @Transactional
+    void changePlayerStartTestChangesPlayer() {
+        Card c = cardService.getById(32);
+
+        Game g = gameService.getGameByCode("test-code");
+
+        ArrayList<Pair<Player, Card>> helpCards = new ArrayList<>();   
+        helpCards.add(Pair.of(g.getPlayerStart(),c));
+
+        g = gameService.changePlayerStart(g, helpCards);
+
+        assertEquals(g.getPlayers().get(2), g.getPlayerStart());
+    }
+
+    @Test
+    @Transactional
+    void changePlayerStartTestDoesNOTChangesPlayer() {
+        Card c = cardService.getById(32);
+
+        Game g = gameService.getGameByCode("test-code");
+
+        Player p = g.getPlayers().get(0);
+
+        assertNotEquals(p, g.getPlayerStart());
+
+        ArrayList<Pair<Player, Card>> helpCards = new ArrayList<>();   
+        helpCards.add(Pair.of(p,c));
+
+        g = gameService.changePlayerStart(g, helpCards);
+
+        assertEquals(g.getPlayers().get(1), g.getPlayerStart());
+    }
+
+    @Transactional
+    @Test
+    void checkIfIsPlayerTurnTestShouldReturnFalse() {
+        Game g = gameService.getGameByCode("test-code");
+        g.setRound(6);
+        Player p = g.getPlayers().get(1);
+
+        Boolean res = gameService.checkIfIsPlayerTurn(g, p);
+        assertTrue(!res);
+    }
+
+    @Test
+    @Transactional
+    void checkIfIsPlayerTurnTestShouldReturnTrue() {
+        Game g = gameService.getGameByCode("test-code");
+        g.setRound(6);
+        Player p = g.getPlayers().get(0);
+
+        Boolean res = gameService.checkIfIsPlayerTurn(g, p);
+        assertTrue(res);
+    }
+
+    @Test
+    @Transactional
+    void initalizeTest() {
+        Game g = new Game();
+        g.setCode("sample Code");
+
+        User u = userService.findUserById(4);
+
+        g = gameService.initalize(g, u);
+
+        assertNotNull(g.getMainBoard());
+        assertNotNull(g.getPlayerStart());
+        assertNotNull(g.getPlayers());
+        assertNotNull(g.getChat());
+        assertEquals(1, g.getPlayers().size());
+        assertEquals(g.getPlayers().get(0), g.getPlayerCreator());
+        assertEquals(g.getPlayers().get(0), g.getPlayerStart());
+    }
+
+    @Test
+    @Transactional
+    void initalizeTestThrowErrorBecauseAlreadyUsedCode() {
+        Game g = new Game();
+        g.setCode("test-code");
+
+        assertThrows(CodeAlreadyTakenException.class, () -> gameService.initalize(g, null));
+    }
+    
 }
