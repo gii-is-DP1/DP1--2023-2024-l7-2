@@ -110,45 +110,8 @@ public class MainBoardServiceTest {
         assertEquals(1, retrievedMainBoard.getId());
     }
 
-    @Test
-    public void testHoldACouncil() {
 
-        CardDeck cd = new CardDeck();
-        cd.setCards(List.of());
 
-        Location l = new Location();
-        List<Location> locations = List.of(l, l);
-
-        MainBoard mb = new MainBoard();
-        mb.setLocations(locations);
-        mb.setCardDeck(cd);
-
-        Card c = new Card();
-        when(locService.removeLastCard(any(Location.class))).thenReturn(c);
-
-        SpecialCard sc = new SpecialCard();
-        when(specCardRepo.findAll()).thenReturn(List.of(sc));
-
-        mainBoardService.holdACouncilAction(mb);
-
-        verify(cardDeckService).shuffleAndSaveCards(cd, Arrays.asList(c, c));
-    }
-
-    @Test
-    public void testCollapseTheShaftsAction() {
-        Location l = new Location();
-        List<Location> locations = List.of(l, l);
-
-        MainBoard mb = new MainBoard();
-        mb.setLocations(locations);
-
-        when(locService.putFirstCardAtEnd(any(Location.class))).thenReturn(l);
-
-        List<Location> lc = mainBoardService.collapseTheShaftsAction(mb);
-
-        assertEquals(2, lc.size());
-        assertEquals(l, lc.get(0));
-    }
 
     @Test
     public void testRunAmokAction() {

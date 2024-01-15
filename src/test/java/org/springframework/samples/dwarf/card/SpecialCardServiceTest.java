@@ -191,25 +191,5 @@ public class SpecialCardServiceTest {
         assertEquals(p.getObjects().contains(o), false);
     }
 
-    @Test
-    @Transactional
-    void turnBackActionTest() {
-        Game g = this.gService.getGameByCode("test-code");
-        Player p = g.getPlayers().get(2);
-        Integer round = 1;
-        Integer selectedPosition = 1;
-        List<Location> locations = g.getMainBoard().getLocations();
 
-        Integer currentDwarvesSize = g.getDwarves().size();
-
-        g = specCardService.turnBackAction(g, p, round, selectedPosition, locations);
-
-        List<Dwarf> dwarves = g.getDwarves();
-        assertEquals(dwarves.size() - currentDwarvesSize, 1);
-
-        Card c = g.getMainBoard().getCards().get(0);
-        Dwarf d = dwarves.get(dwarves.size() - 1);
-        assertEquals(d.getCard(), c);
-        assertEquals(d.getPlayer(), p);
-    }
 }

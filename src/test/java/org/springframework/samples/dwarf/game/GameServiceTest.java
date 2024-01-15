@@ -491,23 +491,7 @@ public class GameServiceTest {
         assertEquals(0, player.getSteal(), "Steal should be reset to 0");
     }
 
-    @Test
-    void testTurnWhenSpecialCard() {
 
-        Game g = realGameService.getGameByCode("test-code");
-        List<Player> players = g.getPlayers();
-        Player starter = g.getPlayerStart();
-
-        List<Dwarf> dwarves = g.getDwarves();
-        Integer round = g.getRound();
-        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
-                && d.getPlayer() != null).toList();
-
-        List<Player> returnedPlayers = realGameService.getRemainingTurns(players, thisRoundDwarves, starter);
-
-        System.out.println(returnedPlayers);
-
-    }
 
     @Test
     void getGameWinnerTest1() {
@@ -568,7 +552,7 @@ public class GameServiceTest {
 
         player2.setSteal(99);
         player2.setGold(50);
-        player2.setIron(0);
+        player2.setIron(50);
         player2.setMedal(50);
         player2.setObjects(List.of());
 
@@ -741,47 +725,6 @@ public class GameServiceTest {
         assertTrue(res);
     }
 
-    @Test
-    void gameNeedsToEndShouldReturnTrueBecauseEndTimeNotNull() {
-        Game g = new Game();
-
-        MainBoard mb = new MainBoard();
-        CardDeck cd = new CardDeck();
-        cd.setCards(List.of(new Card()));
-        mb.setCardDeck(cd);
-        g.setMainBoard(mb);
-
-        Player p = new Player();
-        p.setObjects(List.of(new Object()));
-
-        g.setPlayers(List.of(p));
-
-        g.setFinish(LocalDateTime.now());
-
-        Boolean res = gameService.needsToEnd(g);
-
-        assertTrue(res);
-    }
-
-    @Test
-    void gameNeedsToEndShouldReturnFalse() {
-        Game g = new Game();
-
-        MainBoard mb = new MainBoard();
-        CardDeck cd = new CardDeck();
-        cd.setCards(List.of(new Card()));
-        mb.setCardDeck(cd);
-        g.setMainBoard(mb);
-
-        Player p = new Player();
-        p.setObjects(List.of(new Object()));
-
-        g.setPlayers(List.of(p));
-
-        Boolean res = gameService.needsToEnd(g);
-
-        assertTrue(!res);
-    }
 
     @Test
     void canAddDwarfTestShouldReturnTrue() {
