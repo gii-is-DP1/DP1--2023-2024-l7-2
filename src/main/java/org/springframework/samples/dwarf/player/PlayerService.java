@@ -84,7 +84,7 @@ public class PlayerService {
 
     @Transactional
     public void removeMedalsUsedSpecialCard(Player p) {
-        if (p.getMedal() > MEDALS_USED_FOR_SPECIAL_CARD_USAGE) {
+        if (p.getMedal() >= MEDALS_USED_FOR_SPECIAL_CARD_USAGE) {
             p.setMedal(p.getMedal() - MEDALS_USED_FOR_SPECIAL_CARD_USAGE);
             savePlayer(p);
         } else {

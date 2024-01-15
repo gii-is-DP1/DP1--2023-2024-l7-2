@@ -3,9 +3,11 @@ package org.springframework.samples.dwarf.game;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.springframework.samples.dwarf.object.Object;
@@ -408,6 +410,24 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
+    public Boolean checkAllPositionsOccupied(List<Dwarf> dwarves) {
+        Boolean res = false;
+        Set<Integer> positions = Set.of(1,2,3,4,5,6,7,8,9);
+        Set<Integer> dwarfPositions = new HashSet<>();
+        for(Dwarf d:dwarves) {
+            Card c = d.getCard();
+            if(c!=null) {
+                dwarfPositions.add(c.getPosition());
+            }
+        }
+
+        if (dwarfPositions.equals(positions)) {
+            res = true;
+        }
+        return res;
+    }
+
+    @Transactional(readOnly = true)
     public Boolean checkRoundNeedsChange(Game g, List<Dwarf> dwarves) {
         List<Player> plys = g.getPlayers();
 
@@ -415,10 +435,16 @@ public class GameService {
         List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
                 && d.getPlayer() != null).toList();
 
+        // if (checkAllPositionsOccupied(thisRoundDwarves)) {
+        //     return true;
+        // }
+
+
         List<Player> remainingTurns = getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
 
         return thisRoundDwarves.size() >= remainingTurns.size() 
-            || thisRoundDwarves.size() >= MAX_DWARVES_PER_PLAYER*plys.size() ;
+            || thisRoundDwarves.size() >= MAX_DWARVES_PER_PLAYER*plys.size() 
+            || checkAllPositionsOccupied(thisRoundDwarves) ;
     }
 
     @Transactional

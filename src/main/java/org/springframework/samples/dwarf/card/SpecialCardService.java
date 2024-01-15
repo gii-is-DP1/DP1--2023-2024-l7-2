@@ -171,6 +171,8 @@ public class SpecialCardService {
 
             // Save the updated player
             plService.savePlayer(p);
+        } else {
+            throw new CannotUseCardException("Not enough resources"); 
         }
     }
 
@@ -189,7 +191,15 @@ public class SpecialCardService {
             p.setSteal(p.getSteal() + selectedSteal);
 
             // Remove the selected object
-            if (!playerObjects.contains(selectedObject)) {
+            Boolean containsObject = false;
+            for(Object o: playerObjects) {
+                if (o.getName().equals(selectedObject.getName())){
+                    containsObject = true;
+                    selectedObject = o;
+                    break;
+                }
+            }
+            if (!containsObject) {
                 throw new CannotUseCardException("Not enough resources");
             }
             playerObjects.remove(selectedObject);
@@ -206,7 +216,10 @@ public class SpecialCardService {
         if (selectedPosition >= POSITION_MIN && selectedPosition <= POSITION_MAX) {
             Location selectedLocation = newLocationsTurnBack.get(selectedPosition - 1);
 
-            for(Dwarf d:g.getDwarves()) {
+            List<Dwarf> thisRoundDwarves = g.getDwarves().stream().filter(d -> d.getRound() == round
+            && d.getPlayer() != null).toList();
+
+            for(Dwarf d:thisRoundDwarves) {
                 if (d.getCard() != null && d.getCard().getPosition() == selectedPosition) {
                     throw new CannotUseCardException("A user already uses this positions");
                 }
