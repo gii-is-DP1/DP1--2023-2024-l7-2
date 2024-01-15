@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.game.Game;
 import org.springframework.samples.dwarf.invitation.Invitation;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
@@ -81,7 +82,19 @@ public class FriendsController {
 		}
 
 		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
 
+	@GetMapping("/friendGames")
+	public ResponseEntity<List<Game>> findAllFriendGames() {
+		User u = us.findCurrentUser();
+
+		if (u == null) {
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}
+
+		List<Game> res = friendRequestService.getAllFriendGames(u);
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
 	@GetMapping("/pending")

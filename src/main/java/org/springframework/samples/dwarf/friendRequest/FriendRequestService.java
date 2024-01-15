@@ -1,9 +1,14 @@
 package org.springframework.samples.dwarf.friendRequest;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.dwarf.game.Game;
+import org.springframework.samples.dwarf.game.GameRepository;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,10 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class FriendRequestService {
 
     private FriendRequestRepository friendRequestRepository;
+    private GameRepository gr;
 
     @Autowired
-    public FriendRequestService(FriendRequestRepository friendRequestRepository) {
+    public FriendRequestService(FriendRequestRepository friendRequestRepository, GameRepository gr) {
         this.friendRequestRepository = friendRequestRepository;
+        this.gr = gr;
     }
 
     @Transactional(readOnly = true)
@@ -59,6 +66,19 @@ public class FriendRequestService {
             }
         }
 
+        return res;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Game> getAllFriendGames(User u) {
+        ArrayList<Game> res = new ArrayList<Game>();
+        List<User> friends = getFriends(u);
+        
+        Set<Game> tempGames = new HashSet<>();
+        for (User user:friends) {
+            tempGames.addAll(gr.findGamesByUserName(user.getUsername()));
+        }
+        res.addAll(tempGames);
         return res;
     }
 

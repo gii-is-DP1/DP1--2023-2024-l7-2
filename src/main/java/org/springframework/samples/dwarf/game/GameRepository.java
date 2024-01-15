@@ -36,5 +36,6 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     @Query("SELECT DISTINCT g FROM Game g JOIN g.players p WHERE p.user.username = :username")
     List<Game> findGamesByUserName(String username);
+    
 
 }

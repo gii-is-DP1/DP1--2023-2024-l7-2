@@ -198,8 +198,8 @@ public class GameService {
         }
 
         // tiene que terminar en 6 rondas
-        // if (finished || g.getRound() >= MAX_ROUNDS)
-        //     finished = true;
+        if (finished || g.getRound() >= MAX_ROUNDS)
+            finished = true;
 
         if (finished || g.getFinish() != null)
             finished = true;
@@ -331,6 +331,15 @@ public class GameService {
             if (p.getUser().equals(u)) {
                 res = true;
                 break;
+            }
+        }
+
+        if (!res) {
+            for (Spectator s : g.getSpectators()) {
+                if (s.getUser().equals(u)) {
+                    res = true;
+                    break;
+                }
             }
         }
         return res;
