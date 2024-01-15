@@ -39,8 +39,8 @@ public class MainBoardService {
     private final LocationService ls;
 
     @Autowired
-    public MainBoardService(MainBoardRepository repo, SpecialCardRepository specCardRepo, CardDeckService cds, 
-        CardService cs, LocationService ls) {
+    public MainBoardService(MainBoardRepository repo, SpecialCardRepository specCardRepo, CardDeckService cds,
+            CardService cs, LocationService ls) {
         this.repo = repo;
         this.cds = cds;
         this.cs = cs;
@@ -77,18 +77,18 @@ public class MainBoardService {
     public MainBoard initialize() {
 
         CardDeck cardDecks = cds.initialiate();
-        //SpecialCardDeck specCardDeck = scds.initialize();
+        // SpecialCardDeck specCardDeck = scds.initialize();
 
         MainBoard mb = new MainBoard();
         mb.setCardDeck(cardDecks);
-        //mb.setSpecialCardDeck(specCardDeck);
+        // mb.setSpecialCardDeck(specCardDeck);
 
         List<Location> locations = ls.initialize();
         mb.setLocations(locations);
 
         List<SpecialCard> specCards = initializeSpecialCards();
         mb.setSCards(specCards);
-        
+
         mb = saveMainBoard(mb);
 
         return mb;
@@ -106,7 +106,7 @@ public class MainBoardService {
         CardDeck cd = mb.getCardDeck();
         List<Card> cardsRemovedFromLocations = new ArrayList<>();
 
-        for (Location lc:mb.getLocations()) {
+        for (Location lc : mb.getLocations()) {
             Card removedCard = ls.removeLastCard(lc);
             cardsRemovedFromLocations.add(removedCard);
         }
@@ -115,35 +115,32 @@ public class MainBoardService {
 
         cd = cds.shuffleAndSaveCards(cd, cardsRemovedFromLocations);
 
-        // mb = saveMainBoard(mb);
-        //return mb;
     }
 
     @Transactional
     public List<Location> collapseTheShaftsAction(MainBoard mb) {
 
         List<Location> locations = new ArrayList<>();
-        for (Location lc:mb.getLocations()) {
+        for (Location lc : mb.getLocations()) {
             Location l = ls.putFirstCardAtEnd(lc);
             locations.add(l);
         }
-        //mb.setLocations(locations);
-        //mb = saveMainBoard(mb);
+        // mb.setLocations(locations);
+        // mb = saveMainBoard(mb);
         return locations;
     }
 
     @Transactional
     public List<Location> runAmokAction(MainBoard mb) {
         List<Location> newLocations = new ArrayList<>();
-        for (Location lc:mb.getLocations()) {
+        for (Location lc : mb.getLocations()) {
             Location newLocation = ls.shuffleLocation(lc);
             newLocations.add(newLocation);
         }
-        //mb.setLocations(newLocations);
-        //mb = saveMainBoard(mb);
+        // mb.setLocations(newLocations);
+        // mb = saveMainBoard(mb);
         return newLocations;
     }
-    
 
     @Transactional
     public void updateMaterials(ArrayList<Pair<Player, Card>> cards) {
@@ -172,10 +169,10 @@ public class MainBoardService {
             if (d.getCard() == null) {
                 continue;
             }
-            
+
             Pair<Player, Card> playerPair;
             if (d.getPlayer() == null) {
-                 playerPair = Pair.of(new Player(), d.getCard());
+                playerPair = Pair.of(new Player(), d.getCard());
             } else {
                 playerPair = Pair.of(d.getPlayer(), d.getCard());
             }
@@ -209,10 +206,10 @@ public class MainBoardService {
          * 4. Forjar
          */
         List<Dwarf> dwarves = g.getDwarves();
-        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() 
-            && d.getCard() != null && d.getNeedsToBeResolved()).toList();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound()
+                && d.getCard() != null && d.getNeedsToBeResolved()).toList();
 
-        //List<Player> plys = g.getPlayers();
+        // List<Player> plys = g.getPlayers();
 
         // Obtenemos todas las cartas y las guardamos
         // con su player para despues aplicarselo al player
@@ -241,7 +238,7 @@ public class MainBoardService {
         // Fase de recoleccion
         if (canContinue && normalCards != null) {
             updateMaterials(normalCards);
-        } 
+        }
 
         if (canContinue && objectCards != null) {
             faseForjar(objectCards);
@@ -275,7 +272,7 @@ public class MainBoardService {
                     Player p = pc.getFirst();
                     Card c = pc.getSecond();
                     if (p.getUser() != null) {
-                        cs.adwardMedalSingleAction(p,c);
+                        cs.adwardMedalSingleAction(p, c);
                     }
                 }
             }
@@ -329,10 +326,10 @@ public class MainBoardService {
                 cs.updateMaterialsSingleAction(p, c);
                 break;
             case objectCard:
-                cs.forjarSingleAction(p,c);
+                cs.forjarSingleAction(p, c);
                 break;
             case orcCard:
-                cs.adwardMedalSingleAction(p,c);
+                cs.adwardMedalSingleAction(p, c);
                 break;
             default:
                 break;
@@ -342,36 +339,37 @@ public class MainBoardService {
     @Transactional
     public MainBoard removeUsedSpecialCard(MainBoard mb, SpecialCard sc) {
         List<SpecialCard> newSpecCards = mb.getSCards();
-        
-        for( int i = 0 ; i < newSpecCards.size() ; i++) {
+
+        for (int i = 0; i < newSpecCards.size(); i++) {
             SpecialCard tmp = newSpecCards.get(i);
             if (tmp.getName().equals(sc.getName())) {
                 newSpecCards.remove(i);
                 break;
             }
         }
-        
+
         mb.setSCards(newSpecCards);
-        //mb = saveMainBoard(mb);
+        // mb = saveMainBoard(mb);
         return mb;
     }
 
     @Transactional
     public MainBoard putReverseSpecialCard(MainBoard mb, Card reverseCard) {
-        //MainBoard mb = g.getMainBoard();
+        // MainBoard mb = g.getMainBoard();
         List<Location> newLocations = mb.getLocations();
         Location locationToUpdate = newLocations.get(reverseCard.getPosition() - 1);
         locationToUpdate = ls.pushCard(locationToUpdate, reverseCard);
         newLocations.set(reverseCard.getPosition() - 1, locationToUpdate);
         mb.setLocations(newLocations);
-        //mb = saveMainBoard(mb);
+        // mb = saveMainBoard(mb);
 
         return mb;
     }
 
     @Transactional
-    public MainBoard handleSpecialCardTurn(MainBoard mb, Card reverseCard, SpecialCard specialCard, List<Dwarf> roundDwarves) {
-        
+    public MainBoard handleSpecialCardTurn(MainBoard mb, Card reverseCard, SpecialCard specialCard,
+            List<Dwarf> roundDwarves) {
+
         applySingleCardWhenSpecialCard(roundDwarves, reverseCard);
         mb = removeUsedSpecialCard(mb, specialCard);
         mb = putReverseSpecialCard(mb, reverseCard);

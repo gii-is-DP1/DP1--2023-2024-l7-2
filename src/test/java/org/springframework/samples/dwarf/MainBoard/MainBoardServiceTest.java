@@ -1,17 +1,16 @@
 package org.springframework.samples.dwarf.MainBoard;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -132,7 +131,7 @@ public class MainBoardServiceTest {
 
         mainBoardService.holdACouncilAction(mb);
 
-        verify(cardDeckService).shuffleAndSaveCards(cd, List.of(c, c));
+        verify(cardDeckService).shuffleAndSaveCards(cd, Arrays.asList(c, c));
     }
 
     @Test
@@ -442,6 +441,51 @@ public class MainBoardServiceTest {
 
         // Verificar resultados y comportamientos
         assertNotNull(result);
+    }
+
+    @Test
+    void testFaseResolucionAcciones_NoHelpCards() {
+        // Configurar el estado del juego para el test
+        CardType ct1 = new CardType();
+        ct1.setName("Other");
+
+        Card c1 = new Card();
+        c1.setName("Test1");
+        c1.setPosition(1);
+        c1.setCardType(ct1);
+
+        Player p1 = new Player();
+        p1.setName("Player1");
+
+        Dwarf d1 = new Dwarf();
+        d1.setCard(c1);
+        d1.setPlayer(p1);
+        d1.setRound(1);
+
+        List<Dwarf> dwarves = new ArrayList<>();
+        dwarves.add(d1);
+
+        Location l1 = new Location();
+        l1.setCards(List.of(c1));
+
+        MainBoard mb = new MainBoard();
+        mb.setLocations(List.of(l1));
+        mb.setCardDeck(null);
+
+        Game game = new Game();
+        game.setMainBoard(mb);
+        game.setPlayerCreator(p1);
+        game.setPlayers(Collections.singletonList(p1));
+        game.setDwarves(dwarves);
+        game.setRound(1);
+
+        when(dwarfRepository.findAll()).thenReturn(dwarves);
+
+        // Llamada al método que estamos probando
+        ArrayList<Pair<Player, Card>> result = mainBoardService.faseResolucionAcciones(game);
+
+        // Verificar resultados y comportamientos
+        assertNull(result);
     }
 
 }
