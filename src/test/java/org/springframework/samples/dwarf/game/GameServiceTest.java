@@ -371,11 +371,17 @@ public class GameServiceTest {
     public void testGameDoesNotContainPlayer() {
         // Arrange
         User userToCheck = new User();
+        User userSpectator = new User();
+
         Player player = new Player();
         player.setUser(new User()); // Different user
 
+        Spectator spectator = new Spectator();
+        spectator.setUser(userSpectator);
+
         Game game = new Game();
-        game.setPlayers(List.of(player));
+        game.setPlayers(Arrays.asList(player));
+        game.setSpectators(Arrays.asList(spectator));
 
         // Act
         boolean result = gameService.gameContainsPlayer(game, userToCheck);
@@ -480,8 +486,8 @@ public class GameServiceTest {
 
         assertEquals(0, player.getGold(), "Gold should be reset to 0");
         assertEquals(0, player.getIron(), "Iron should be reset to 0");
-        assertNull(player.getMedal(), "Medal should be reset to null");
-        assertNull(player.getObjects(), "Objects should be reset to null");
+        assertEquals(0, player.getMedal(), "Medal should be reset to null");
+        assertTrue(player.getObjects().isEmpty(), "Objects should be reset to null");
         assertEquals(0, player.getSteal(), "Steal should be reset to 0");
     }
 

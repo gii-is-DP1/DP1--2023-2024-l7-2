@@ -11,14 +11,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.SpecialCard;
 import org.springframework.samples.dwarf.card.SpecialCardRepository;
 import org.springframework.samples.dwarf.card.SpecialCardService;
+import org.springframework.samples.dwarf.object.ObjectService;
 
 @SpringBootTest
 public class SpecialCardServiceTest {
+
+    @Autowired
+    private SpecialCardService scs;
 
     @Mock
     private SpecialCardService specialCardService;
@@ -44,14 +50,13 @@ public class SpecialCardServiceTest {
 
     @Test
     public void testGetById() {
-        // Configurar el comportamiento del repositorio mock
-        SpecialCard mockCard = new SpecialCard();
-        mockCard.setId(1);
-        when(specialCardRepository.findById(1)).thenReturn(Optional.of(mockCard));
 
-        // Ejecutar el método del servicio y verificar el resultado
-        SpecialCard result = specialCardService.getById(1);
-        assertEquals(mockCard, result, "La tarjeta recuperada no coincide");
+        SpecialCard existingObject = scs.getSpecialCards().get(0);
+
+        SpecialCard retrievedObject = scs.getById(existingObject.getId());
+        assertNotNull(retrievedObject);
+        assertEquals(existingObject.getId(), retrievedObject.getId());
+
     }
 
     @Test
@@ -59,6 +64,9 @@ public class SpecialCardServiceTest {
         // Configurar el comportamiento del repositorio mock
         SpecialCard newCard = new SpecialCard();
         newCard.setId(1);
+        newCard.setDescription("Do something heavy");
+        newCard.setName("The worst");
+
         when(specialCardRepository.save(newCard)).thenReturn(newCard);
 
         // Ejecutar el método del servicio y verificar el resultado
