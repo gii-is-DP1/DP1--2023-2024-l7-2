@@ -46,8 +46,8 @@ public class SpecialCardService {
     private final String ORC_CARD = "OrcCard";
 
     @Autowired
-    public SpecialCardService(SpecialCardRepository repo, DwarfService dwService, PlayerService plService
-        , LocationService locService, MainBoardService mbService) {
+    public SpecialCardService(SpecialCardRepository repo, DwarfService dwService, PlayerService plService,
+            LocationService locService, MainBoardService mbService) {
         this.repo = repo;
         this.dwService = dwService;
         this.plService = plService;
@@ -118,8 +118,8 @@ public class SpecialCardService {
     }
 
     @Transactional
-    public Game apprenticeAction(Game g,Player p, Integer round, 
-        Integer selectedPosition, List<Dwarf> roundDwarvesApprentice) {
+    public Game apprenticeAction(Game g, Player p, Integer round,
+            Integer selectedPosition, List<Dwarf> roundDwarvesApprentice) {
 
         Boolean changed = false;
         for (Dwarf d : roundDwarvesApprentice) {
@@ -142,8 +142,8 @@ public class SpecialCardService {
     }
 
     @Transactional
-    public void specialOrderAction(Player p, Integer selectedGold, Integer selectedIron, 
-        Integer selectedSteal, Object selectedObject) {
+    public void specialOrderAction(Player p, Integer selectedGold, Integer selectedIron,
+            Integer selectedSteal, Object selectedObject) {
 
         if (selectedGold != null && selectedIron != null
                 && selectedSteal != null && selectedObject != null
@@ -167,17 +167,17 @@ public class SpecialCardService {
             // Save the updated player
             plService.savePlayer(p);
         } else {
-            throw new CannotUseCardException("Not enough resources"); 
+            throw new CannotUseCardException("Not enough resources");
         }
     }
 
     @Transactional
-    public void sellAnItemAction(Player p, Integer selectedGold, Integer selectedIron, 
-        Integer selectedSteal, Object selectedObject) {
+    public void sellAnItemAction(Player p, Integer selectedGold, Integer selectedIron,
+            Integer selectedSteal, Object selectedObject) {
         if (selectedGold != null && selectedIron != null
-            && selectedSteal != null && selectedObject != null 
-            && selectedGold + selectedIron + selectedSteal == 5 
-            && selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
+                && selectedSteal != null && selectedObject != null
+                && selectedGold + selectedIron + selectedSteal == 5
+                && selectedGold > 0 && selectedIron > 0 && selectedSteal > 0) {
 
             List<Object> playerObjects = p.getObjects();
             // Update player's state
@@ -187,8 +187,8 @@ public class SpecialCardService {
 
             // Remove the selected object
             Boolean containsObject = false;
-            for(Object o: playerObjects) {
-                if (o.getName().equals(selectedObject.getName())){
+            for (Object o : playerObjects) {
+                if (o.getName().equals(selectedObject.getName())) {
                     containsObject = true;
                     selectedObject = o;
                     break;
@@ -205,16 +205,16 @@ public class SpecialCardService {
     }
 
     @Transactional
-    public Game turnBackAction(Game g, Player p, Integer round, Integer selectedPosition, 
-        List<Location> newLocationsTurnBack) {
-    
+    public Game turnBackAction(Game g, Player p, Integer round, Integer selectedPosition,
+            List<Location> newLocationsTurnBack) {
+
         if (selectedPosition >= POSITION_MIN && selectedPosition <= POSITION_MAX) {
             Location selectedLocation = newLocationsTurnBack.get(selectedPosition - 1);
 
             List<Dwarf> thisRoundDwarves = g.getDwarves().stream().filter(d -> d.getRound() == round
-            && d.getPlayer() != null).toList();
+                    && d.getPlayer() != null).toList();
 
-            for(Dwarf d:thisRoundDwarves) {
+            for (Dwarf d : thisRoundDwarves) {
                 if (d.getCard() != null && d.getCard().getPosition() == selectedPosition) {
                     throw new CannotUseCardException("A user already uses this positions");
                 }
@@ -240,21 +240,21 @@ public class SpecialCardService {
     @Transactional
     public void pastGloriesAction(Integer selectedPosition, Card cardToBeOnTop, List<Location> locations) {
         if (selectedPosition != null && cardToBeOnTop != null && selectedPosition >= POSITION_MIN
-            && selectedPosition <= POSITION_MAX) {
+                && selectedPosition <= POSITION_MAX) {
 
             Location selectedLocation = locations.get(selectedPosition - 1);
 
             locService.pastGloriesAction(selectedLocation, cardToBeOnTop);
 
-            } else {
-                throw new CannotUseCardException("Not enough information to use this card");
-            }
+        } else {
+            throw new CannotUseCardException("Not enough information to use this card");
+        }
     }
 
     @Transactional
-    public Game resolveSpecialCard(Game g, Player p, MainBoard mb, SpecialCardRequestHandler request, 
-        Integer round, List<Dwarf> roundDwarvesApprentice) {
-        
+    public Game resolveSpecialCard(Game g, Player p, MainBoard mb, SpecialCardRequestHandler request,
+            Integer round, List<Dwarf> roundDwarvesApprentice) {
+
         SpecialCard specialCard = request.getSpecialCard();
         Integer selectedGold = request.getSelectedGold();
         Integer selectedIron = request.getSelectedIron();
@@ -318,6 +318,11 @@ public class SpecialCardService {
                 break;
         }
         return g;
+    }
+
+    public void initializeSpecialCards() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'initializeSpecialCards'");
     }
 
 }
