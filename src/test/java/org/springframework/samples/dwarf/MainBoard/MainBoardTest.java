@@ -1,9 +1,7 @@
 package org.springframework.samples.dwarf.MainBoard;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,16 +29,6 @@ public class MainBoardTest {
 
         assertEquals(cardDeck, mainBoard.getCardDeck());
     }
-
-    /* 
-    @Test
-    public void testGetAndSetSpecialCardDeck() {
-        SpecialCardDeck specialCardDeck = mock(SpecialCardDeck.class);
-
-        mainBoard.setSpecialCardDeck(specialCardDeck);
-
-        assertEquals(specialCardDeck, mainBoard.getSpecialCardDeck());
-    }*/
 
     @Test
     public void testGetAndSetCards() {

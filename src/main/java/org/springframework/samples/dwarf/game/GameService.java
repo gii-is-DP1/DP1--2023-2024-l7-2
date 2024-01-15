@@ -601,7 +601,7 @@ public class GameService {
 
                     for (Player p : pWithMoreIron) {
                         // maxObjects was calculated at the begining of this process
-                        if (p.getIron() == maxObjects) {
+                        if (p.getObjects().size() == maxObjects) {
                             winner = p;
                             break;
                         }
@@ -651,8 +651,6 @@ public class GameService {
 
     @Transactional
     public Game changePlayerStart(Game g, ArrayList<Pair<Player, Card>> helpCards) {
-        // ArrayList<Player> players = new ArrayList<>();
-        // players.addAll(g.getPlayers());
         List<Player> players = g.getPlayers();
 
         Integer playerStarterId = g.getPlayerStart().getId();
