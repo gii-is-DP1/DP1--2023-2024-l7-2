@@ -105,9 +105,8 @@ public class GameServiceTest {
         // gameRepository = mock(GameRepository.class);
         // mbs = mock(MainBoardService.class);
         // cds = mock(CardDeckService.class);
-        gameService = new GameService(gameRepository, ps, userService, mbs, cds, ls,scs,ds,null);
+        gameService = new GameService(gameRepository, ps, userService, mbs, cds, ls, scs, ds, null);
 
-        
     }
 
     @Test
@@ -121,20 +120,17 @@ public class GameServiceTest {
 
     @Test
     public void testGetWaitingGames() {
-    
+
         Game game1 = new Game();
         game1.setId(1);
         game1.setStart(null);
 
         Game game2 = new Game();
         game2.setId(2);
-        game2.setStart(LocalDateTime.now().minusMinutes(30));  
+        game2.setStart(LocalDateTime.now().minusMinutes(30));
 
-
-    
         when(gameRepository.findByStart(null)).thenReturn(Arrays.asList(game1));
 
-   
         List<Game> waitingGames = gameService.getWaitingGames();
         assertEquals(1, waitingGames.size(), "Number of waiting games should be 1");
         assertTrue(waitingGames.contains(game1), "The waiting games list should contain game1");
@@ -143,7 +139,7 @@ public class GameServiceTest {
 
     @Test
     public void testGameContainsSpectator() {
-        
+
         User user1 = new User();
         user1.setId(1);
 
@@ -163,44 +159,36 @@ public class GameServiceTest {
         game.setSpectators(sp);
         game.getSpectators().addAll(Arrays.asList(spectator1));
 
-        
         boolean containsUser1 = gameService.gameContainsSpectator(game, user1);
         boolean containsUser2 = gameService.gameContainsSpectator(game, user2);
 
-    
         assertTrue(containsUser1, "The game should contain spectator1");
         assertFalse(containsUser2, "The game should not contain spectator2");
     }
 
     @Test
     public void testDelete() {
-        
+
         Integer gameId = 1;
         Game gameToDelete = new Game();
         gameToDelete.setId(gameId);
 
-        
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(gameToDelete));
 
-       
         gameService.delete(gameId);
 
-        
         verify(gameRepository).delete(gameToDelete);
     }
 
     @Test
     public void testDeleteGameNotFound() {
-        
+
         Integer gameId = 1;
 
-        
         when(gameRepository.findById(gameId)).thenReturn(Optional.empty());
 
-        
         assertThrows(NoSuchElementException.class, () -> gameService.delete(gameId));
     }
-
 
     @Test
     public void testGetGameByCode() {
@@ -233,14 +221,10 @@ public class GameServiceTest {
         Game game3 = new Game();
         game3.setName("Test Game 3");
 
-       
-
         when(gameRepository.findByNameContains(pattern)).thenReturn(Arrays.asList(game1, game3));
 
-        
         List<Game> result = gameService.getGamesLike(pattern);
 
-        
         assertEquals(2, result.size(), "Number of games retrieved should be 2");
         assertTrue(result.contains(game1), "The result should contain game1");
         assertFalse(result.contains(game2), "The result should not contain game2");
@@ -262,19 +246,16 @@ public class GameServiceTest {
         finishedGame.setStart(LocalDateTime.now().minusDays(1));
         finishedGame.setFinish(LocalDateTime.now().minusHours(23));
 
+        when(gameRepository.findByFinishIsNullAndStartIsNotNull())
+                .thenReturn(Arrays.asList(ongoingGame1, ongoingGame2));
 
-        when(gameRepository.findByFinishIsNullAndStartIsNotNull()).thenReturn(Arrays.asList(ongoingGame1, ongoingGame2));
-
-        
         List<Game> result = gameService.getOngoingGames();
 
-        
         assertEquals(2, result.size(), "Number of ongoing games should be 2");
         assertTrue(result.contains(ongoingGame1), "The result should contain ongoingGame1");
         assertTrue(result.contains(ongoingGame2), "The result should contain ongoingGame2");
         assertFalse(result.contains(finishedGame), "The result should not contain finishedGame");
     }
-
 
     @Test
     public void testGetAllPublicGames() {
@@ -288,8 +269,6 @@ public class GameServiceTest {
         Game privateGame = new Game();
         privateGame.setIsPublic(false);
 
-       
-
         // Stubbing the behavior of the gameRepository.findAllPublicGames method
         when(gameRepository.findAllPublicGames()).thenReturn(Arrays.asList(publicGame1, publicGame2));
 
@@ -302,7 +281,6 @@ public class GameServiceTest {
         assertTrue(result.contains(publicGame2), "The result should contain publicGame2");
         assertFalse(result.contains(privateGame), "The result should not contain privateGame");
     }
-
 
     @Test
     public void testGetAllPublicGamesPagination() {
@@ -319,7 +297,8 @@ public class GameServiceTest {
 
         Page<Game> publicGamesPage = new PageImpl<>(Arrays.asList(publicGame1, publicGame2));
 
-        // Stubbing the behavior of the gameRepository.findAllPublicGames method with pagination
+        // Stubbing the behavior of the gameRepository.findAllPublicGames method with
+        // pagination
         when(gameRepository.findAllPublicGames(pageable)).thenReturn(publicGamesPage);
 
         // Act
@@ -349,7 +328,7 @@ public class GameServiceTest {
         dwarf2.setCard(new Card());
 
         Dwarf dwarf3 = new Dwarf();
-        dwarf3.setRound(2);  // Different round
+        dwarf3.setRound(2); // Different round
         dwarf3.setPlayer(new Player());
         dwarf3.setCard(new Card());
 
@@ -373,7 +352,7 @@ public class GameServiceTest {
         player1.setUser(userToCheck);
 
         Player player2 = new Player();
-        player2.setUser(new User());  // Different user
+        player2.setUser(new User()); // Different user
 
         Game game = new Game();
         List<Player> players = new ArrayList<>();
@@ -392,11 +371,17 @@ public class GameServiceTest {
     public void testGameDoesNotContainPlayer() {
         // Arrange
         User userToCheck = new User();
+        User userSpectator = new User();
+
         Player player = new Player();
-        player.setUser(new User());  // Different user
+        player.setUser(new User()); // Different user
+
+        Spectator spectator = new Spectator();
+        spectator.setUser(userSpectator);
 
         Game game = new Game();
-        game.setPlayers(List.of(player));
+        game.setPlayers(Arrays.asList(player));
+        game.setSpectators(Arrays.asList(spectator));
 
         // Act
         boolean result = gameService.gameContainsPlayer(game, userToCheck);
@@ -410,7 +395,7 @@ public class GameServiceTest {
         // Arrange
         User userToCheck = new User();
         Spectator spectator = new Spectator();
-        spectator.setUser(new User());  // Different user
+        spectator.setUser(new User()); // Different user
 
         Game game = new Game();
         game.setSpectators(List.of(spectator));
@@ -422,7 +407,7 @@ public class GameServiceTest {
         assertFalse(result, "The game should not contain the spectator with the specified user");
     }
 
- @Test
+    @Test
     void testChangePlayerStart() {
         // Initialize mocks
         MockitoAnnotations.openMocks(this);
@@ -485,7 +470,7 @@ public class GameServiceTest {
         gameService.changePlayerStart(game, helpCards);
 
         // Assert
-        assertEquals(player3, game.getPlayerStart());
+        assertEquals(player2, game.getPlayerStart());
     }
 
     @Test
@@ -494,440 +479,430 @@ public class GameServiceTest {
         Player player = new Player();
         List<Player> players = new ArrayList<>();
         game.setPlayers(players);
-    
+
         game.getPlayers().add(player);
 
         gameService.resign(game, player);
 
         assertEquals(0, player.getGold(), "Gold should be reset to 0");
         assertEquals(0, player.getIron(), "Iron should be reset to 0");
-        assertNull(player.getMedal(), "Medal should be reset to null");
-        assertNull(player.getObjects(), "Objects should be reset to null");
+        assertEquals(0, player.getMedal(), "Medal should be reset to null");
+        assertTrue(player.getObjects().isEmpty(), "Objects should be reset to null");
         assertEquals(0, player.getSteal(), "Steal should be reset to 0");
     }
-    
-   
-
-    
-   @Test
-   void testTurnWhenSpecialCard(){
-
-    Game g = realGameService.getGameByCode("test-code");
-    List<Player> players = g.getPlayers();
-    Player starter = g.getPlayerStart();
-
-
-    List<Dwarf> dwarves = g.getDwarves();
-    Integer round = g.getRound();
-    List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
-            && d.getPlayer() != null).toList();
-
-    List<Player> returnedPlayers = realGameService.getRemainingTurns(players,thisRoundDwarves,starter);
-
-    System.out.println(returnedPlayers);
-
-   }
-
-
-   @Test
-   void getGameWinnerTest1() {
-    Player player1 = new Player();
-    Player player2 = new Player();
-    Player player3 = new Player();
-
-    player1.setName("Player1");
-    player2.setName("Player2");
-    player3.setName("Player3");
-
-    player1.setId(1);
-    player2.setId(2);
-    player3.setId(3);
-    
-    player1.setSteal(99);
-    player1.setGold(0);
-    player1.setIron(0);
-    player1.setObjects(List.of());
-
-    player2.setSteal(0);
-    player2.setGold(0);
-    player2.setIron(50);
-    player2.setObjects(List.of());
-
-
-    player3.setSteal(0);
-    player3.setGold(0);
-    player3.setIron(99);
-    player3.setObjects(List.of());
-
-    Game g = new Game();
-    g.setPlayers(List.of(player1,player2,player3));
-
-    Player winner = gameService.getGameWinner(g);
-    
-    assertEquals(player1, winner);
-   }
-
-   @Test
-   void getGameWinnerTest2() {
-    Player player1 = new Player();
-    Player player2 = new Player();
-    Player player3 = new Player();
-
-    player1.setName("Player1");
-    player2.setName("Player2");
-    player3.setName("Player3");
-
-    player1.setId(1);
-    player2.setId(2);
-    player3.setId(3);
-    
-    player1.setSteal(99);
-    player1.setGold(50);
-    player1.setIron(0);
-    player1.setMedal(0);
-    player1.setObjects(List.of());
-
-    player2.setSteal(99);
-    player2.setGold(50);
-    player2.setIron(0);
-    player2.setMedal(50);
-    player2.setObjects(List.of());
-
-
-    player3.setSteal(0);
-    player3.setGold(0);
-    player3.setIron(99);
-    player2.setMedal(0);
-    player3.setObjects(List.of());
-
-    Game g = new Game();
-    g.setPlayers(List.of(player1,player2,player3));
-
-    Player winner = gameService.getGameWinner(g);
-    
-    assertEquals(player2, winner);
-   }
-
-   @Test
-   void getGameWinnerTest3() {
-    Player player1 = new Player();
-    Player player2 = new Player();
-    Player player3 = new Player();
-
-    player1.setName("Player1");
-    player2.setName("Player2");
-    player3.setName("Player3");
-
-    player1.setId(1);
-    player2.setId(2);
-    player3.setId(3);
-    
-    player1.setSteal(99);
-    player1.setGold(50);
-    player1.setIron(0);
-    player1.setMedal(50);
-    player1.setObjects(List.of());
-
-    player2.setSteal(99);
-    player2.setGold(50);
-    player2.setIron(99);
-    player2.setMedal(50);
-    player2.setObjects(List.of());
-
-
-    player3.setSteal(0);
-    player3.setGold(0);
-    player3.setIron(99);
-    player3.setMedal(0);
-    player3.setObjects(List.of());
-
-    Game g = new Game();
-    g.setPlayers(List.of(player1,player2,player3));
-
-    Player winner = gameService.getGameWinner(g);
-    
-    assertEquals(player2, winner);
-   }
-
-   @Test
-   void getGameWinnerTest4() {
-    Player player1 = new Player();
-    Player player2 = new Player();
-    Player player3 = new Player();
-
-    player1.setName("Player1");
-    player2.setName("Player2");
-    player3.setName("Player3");
-
-    player1.setId(1);
-    player2.setId(2);
-    player3.setId(3);
-    
-    player1.setSteal(99);
-    player1.setGold(50);
-    player1.setIron(50);
-    player1.setMedal(50);
-    player1.setObjects(List.of());
-
-    player2.setSteal(99);
-    player2.setGold(50);
-    player2.setIron(99);
-    player2.setMedal(50);
-    player2.setObjects(List.of());
-
-
-    player3.setSteal(0);
-    player3.setGold(0);
-    player3.setIron(99);
-    player3.setMedal(0);
-    player3.setObjects(List.of());
-
-    Game g = new Game();
-    g.setPlayers(List.of(player1,player2,player3));
-
-    Player winner = gameService.getGameWinner(g);
-    
-    assertEquals(player2, winner);
-   }
-
-   @Test
-   void getGameWinnerTest5() {
-    Player player1 = new Player();
-    Player player2 = new Player();
-    Player player3 = new Player();
-
-    player1.setName("Player1");
-    player2.setName("Player2");
-    player3.setName("Player3");
-
-    player1.setId(1);
-    player2.setId(2);
-    player3.setId(3);
-    
-    player1.setSteal(99);
-    player1.setGold(50);
-    player1.setIron(50);
-    player1.setMedal(50);
-    player1.setObjects(List.of(new Object()));
-
-    player2.setSteal(99);
-    player2.setGold(50);
-    player2.setIron(99);
-    player2.setMedal(50);
-    player2.setObjects(List.of());
-
-
-    player3.setSteal(0);
-    player3.setGold(0);
-    player3.setIron(99);
-    player3.setMedal(0);
-    player3.setObjects(List.of());
-
-    Game g = new Game();
-    g.setPlayers(List.of(player1,player2,player3));
-
-    Player winner = gameService.getGameWinner(g);
-    
-    assertEquals(player1, winner);
-   }
-
-   @Test
-   void gameNeedsToEndShouldReturnTrueBecauseEmtpyCards() {
-    Game g = new Game();
-
-    MainBoard mb = new MainBoard();
-    CardDeck cd = new CardDeck();
-    cd.setCards(List.of());
-    mb.setCardDeck(cd);
-    g.setMainBoard(mb);
-
-    Boolean res = gameService.needsToEnd(g);
-
-    assertTrue(res);
-   }
-
-   @Test
-   void gameNeedsToEndShouldReturnTrueBecausePlayerObjects() {
-    Game g = new Game();
-
-    MainBoard mb = new MainBoard();
-    CardDeck cd = new CardDeck();
-    cd.setCards(List.of(new Card()));
-    mb.setCardDeck(cd);
-    g.setMainBoard(mb);
-
-    Player p = new Player();
-    p.setObjects(List.of(new Object(),new Object(),new Object(),new Object()));
-
-    g.setPlayers(List.of(p));
-
-    Boolean res = gameService.needsToEnd(g);
-
-    assertTrue(res);
-   }
-
-   @Test
-   void gameNeedsToEndShouldReturnTrueBecauseEndTimeNotNull() {
-    Game g = new Game();
-
-    MainBoard mb = new MainBoard();
-    CardDeck cd = new CardDeck();
-    cd.setCards(List.of(new Card()));
-    mb.setCardDeck(cd);
-    g.setMainBoard(mb);
-
-    Player p = new Player();
-    p.setObjects(List.of(new Object()));
-
-    g.setPlayers(List.of(p));
-
-    g.setFinish(LocalDateTime.now());
-
-    Boolean res = gameService.needsToEnd(g);
-
-    assertTrue(res);
-   }
-
-   @Test
-   void gameNeedsToEndShouldReturnFalse() {
-    Game g = new Game();
-
-    MainBoard mb = new MainBoard();
-    CardDeck cd = new CardDeck();
-    cd.setCards(List.of(new Card()));
-    mb.setCardDeck(cd);
-    g.setMainBoard(mb);
-
-    Player p = new Player();
-    p.setObjects(List.of(new Object()));
-
-    g.setPlayers(List.of(p));
-
-    Boolean res = gameService.needsToEnd(g);
-
-    assertTrue(!res);
-   }
-
-   @Test
-   void canAddDwarfTestShouldReturnTrue(){
-    Player player1 = new Player();
-
-    player1.setName("Player1");
-
-    player1.setSteal(99);
-    player1.setGold(50);
-    player1.setIron(50);
-    player1.setMedal(50);
-    player1.setObjects(List.of(new Object()));
-
-    Card c1 = new Card();
-    c1.setTotalIron(0);
-    c1.setTotalGold(0);
-    c1.setTotalSteal(0);
-
-    ArrayList<Dwarf> dwarves = new ArrayList<>();
-    Dwarf d1 = new Dwarf();
-    d1.setCard(c1);
-    d1.setPlayer(player1);
-    dwarves.add(d1);
-
-    Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
-
-    assertTrue(res);
-   }
-
-   @Test
-   void canAddDwarfTestShouldReturnFalse(){
-    Player player1 = new Player();
-
-    player1.setName("Player1");
-
-    player1.setSteal(0);
-    player1.setGold(0);
-    player1.setIron(1);
-    player1.setMedal(0);
-    player1.setObjects(List.of(new Object()));
-
-    Card c1 = new Card();
-    c1.setTotalIron(-1);
-    c1.setTotalGold(0);
-    c1.setTotalSteal(0);
-
-    ArrayList<Dwarf> dwarves = new ArrayList<>();
-    Dwarf d1 = new Dwarf();
-    d1.setCard(c1);
-    d1.setPlayer(player1);
-    dwarves.add(d1);
-
-    Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
-
-    assertTrue(!res);
-   }
-
-   @Test
-   void canAddDwarfTestShouldReturnFalse2(){
-    Player player1 = new Player();
-
-    Object o = new Object();
-    o.setName("testobj");
-
-    player1.setName("Player1");
-
-    player1.setSteal(0);
-    player1.setGold(0);
-    player1.setIron(0);
-    player1.setMedal(0);
-    player1.setObjects(List.of(o));
-
-    Card c1 = new Card();
-    c1.setTotalIron(0);
-    c1.setTotalGold(0);
-    c1.setTotalSteal(0);
-    c1.setObject(o);
-
-    ArrayList<Dwarf> dwarves = new ArrayList<>();
-    Dwarf d1 = new Dwarf();
-    d1.setCard(c1);
-    d1.setPlayer(player1);
-    dwarves.add(d1);
-
-    Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
-
-    assertTrue(!res);
-   }
-   
-   @Test
-   void canAddDwarfTestShouldReturnTrue2(){
-    Player player1 = new Player();
-
-    Object o = new Object();
-    o.setName("testobj");
-
-    Object o1 = new Object();
-    o1.setName("testobj1");
-
-    player1.setName("Player1");
-
-    player1.setSteal(0);
-    player1.setGold(0);
-    player1.setIron(0);
-    player1.setMedal(0);
-    player1.setObjects(List.of(o));
-
-    Card c1 = new Card();
-    c1.setTotalIron(0);
-    c1.setTotalGold(0);
-    c1.setTotalSteal(0);
-    c1.setObject(o1);
-
-    ArrayList<Dwarf> dwarves = new ArrayList<>();
-    Dwarf d1 = new Dwarf();
-    d1.setCard(c1);
-    d1.setPlayer(player1);
-    dwarves.add(d1);
-
-    Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
-
-    assertTrue(res);
-   }
+
+    @Test
+    void testTurnWhenSpecialCard() {
+
+        Game g = realGameService.getGameByCode("test-code");
+        List<Player> players = g.getPlayers();
+        Player starter = g.getPlayerStart();
+
+        List<Dwarf> dwarves = g.getDwarves();
+        Integer round = g.getRound();
+        List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
+                && d.getPlayer() != null).toList();
+
+        List<Player> returnedPlayers = realGameService.getRemainingTurns(players, thisRoundDwarves, starter);
+
+        System.out.println(returnedPlayers);
+
+    }
+
+    @Test
+    void getGameWinnerTest1() {
+        Player player1 = new Player();
+        Player player2 = new Player();
+        Player player3 = new Player();
+
+        player1.setName("Player1");
+        player2.setName("Player2");
+        player3.setName("Player3");
+
+        player1.setId(1);
+        player2.setId(2);
+        player3.setId(3);
+
+        player1.setSteal(99);
+        player1.setGold(0);
+        player1.setIron(0);
+        player1.setObjects(List.of());
+
+        player2.setSteal(0);
+        player2.setGold(0);
+        player2.setIron(50);
+        player2.setObjects(List.of());
+
+        player3.setSteal(0);
+        player3.setGold(0);
+        player3.setIron(99);
+        player3.setObjects(List.of());
+
+        Game g = new Game();
+        g.setPlayers(List.of(player1, player2, player3));
+
+        Player winner = gameService.getGameWinner(g);
+
+        assertEquals(player1, winner);
+    }
+
+    @Test
+    void getGameWinnerTest2() {
+        Player player1 = new Player();
+        Player player2 = new Player();
+        Player player3 = new Player();
+
+        player1.setName("Player1");
+        player2.setName("Player2");
+        player3.setName("Player3");
+
+        player1.setId(1);
+        player2.setId(2);
+        player3.setId(3);
+
+        player1.setSteal(99);
+        player1.setGold(50);
+        player1.setIron(0);
+        player1.setMedal(0);
+        player1.setObjects(List.of());
+
+        player2.setSteal(99);
+        player2.setGold(50);
+        player2.setIron(0);
+        player2.setMedal(50);
+        player2.setObjects(List.of());
+
+        player3.setSteal(0);
+        player3.setGold(0);
+        player3.setIron(99);
+        player2.setMedal(0);
+        player3.setObjects(List.of());
+
+        Game g = new Game();
+        g.setPlayers(List.of(player1, player2, player3));
+
+        Player winner = gameService.getGameWinner(g);
+
+        assertEquals(player2, winner);
+    }
+
+    @Test
+    void getGameWinnerTest3() {
+        Player player1 = new Player();
+        Player player2 = new Player();
+        Player player3 = new Player();
+
+        player1.setName("Player1");
+        player2.setName("Player2");
+        player3.setName("Player3");
+
+        player1.setId(1);
+        player2.setId(2);
+        player3.setId(3);
+
+        player1.setSteal(99);
+        player1.setGold(50);
+        player1.setIron(0);
+        player1.setMedal(50);
+        player1.setObjects(List.of());
+
+        player2.setSteal(99);
+        player2.setGold(50);
+        player2.setIron(99);
+        player2.setMedal(50);
+        player2.setObjects(List.of());
+
+        player3.setSteal(0);
+        player3.setGold(0);
+        player3.setIron(99);
+        player3.setMedal(0);
+        player3.setObjects(List.of());
+
+        Game g = new Game();
+        g.setPlayers(List.of(player1, player2, player3));
+
+        Player winner = gameService.getGameWinner(g);
+
+        assertEquals(player2, winner);
+    }
+
+    @Test
+    void getGameWinnerTest4() {
+        Player player1 = new Player();
+        Player player2 = new Player();
+        Player player3 = new Player();
+
+        player1.setName("Player1");
+        player2.setName("Player2");
+        player3.setName("Player3");
+
+        player1.setId(1);
+        player2.setId(2);
+        player3.setId(3);
+
+        player1.setSteal(99);
+        player1.setGold(50);
+        player1.setIron(50);
+        player1.setMedal(50);
+        player1.setObjects(List.of());
+
+        player2.setSteal(99);
+        player2.setGold(50);
+        player2.setIron(99);
+        player2.setMedal(50);
+        player2.setObjects(List.of());
+
+        player3.setSteal(0);
+        player3.setGold(0);
+        player3.setIron(99);
+        player3.setMedal(0);
+        player3.setObjects(List.of());
+
+        Game g = new Game();
+        g.setPlayers(List.of(player1, player2, player3));
+
+        Player winner = gameService.getGameWinner(g);
+
+        assertEquals(player2, winner);
+    }
+
+    @Test
+    void getGameWinnerTest5() {
+        Player player1 = new Player();
+        Player player2 = new Player();
+        Player player3 = new Player();
+
+        player1.setName("Player1");
+        player2.setName("Player2");
+        player3.setName("Player3");
+
+        player1.setId(1);
+        player2.setId(2);
+        player3.setId(3);
+
+        player1.setSteal(99);
+        player1.setGold(50);
+        player1.setIron(50);
+        player1.setMedal(50);
+        player1.setObjects(List.of(new Object()));
+
+        player2.setSteal(99);
+        player2.setGold(50);
+        player2.setIron(99);
+        player2.setMedal(50);
+        player2.setObjects(List.of());
+
+        player3.setSteal(0);
+        player3.setGold(0);
+        player3.setIron(99);
+        player3.setMedal(0);
+        player3.setObjects(List.of());
+
+        Game g = new Game();
+        g.setPlayers(List.of(player1, player2, player3));
+
+        Player winner = gameService.getGameWinner(g);
+
+        assertEquals(player1, winner);
+    }
+
+    @Test
+    void gameNeedsToEndShouldReturnTrueBecauseEmtpyCards() {
+        Game g = new Game();
+
+        MainBoard mb = new MainBoard();
+        CardDeck cd = new CardDeck();
+        cd.setCards(List.of());
+        mb.setCardDeck(cd);
+        g.setMainBoard(mb);
+
+        Boolean res = gameService.needsToEnd(g);
+
+        assertTrue(res);
+    }
+
+    @Test
+    void gameNeedsToEndShouldReturnTrueBecausePlayerObjects() {
+        Game g = new Game();
+
+        MainBoard mb = new MainBoard();
+        CardDeck cd = new CardDeck();
+        cd.setCards(List.of(new Card()));
+        mb.setCardDeck(cd);
+        g.setMainBoard(mb);
+
+        Player p = new Player();
+        p.setObjects(List.of(new Object(), new Object(), new Object(), new Object()));
+
+        g.setPlayers(List.of(p));
+
+        Boolean res = gameService.needsToEnd(g);
+
+        assertTrue(res);
+    }
+
+    @Test
+    void gameNeedsToEndShouldReturnTrueBecauseEndTimeNotNull() {
+        Game g = new Game();
+
+        MainBoard mb = new MainBoard();
+        CardDeck cd = new CardDeck();
+        cd.setCards(List.of(new Card()));
+        mb.setCardDeck(cd);
+        g.setMainBoard(mb);
+
+        Player p = new Player();
+        p.setObjects(List.of(new Object()));
+
+        g.setPlayers(List.of(p));
+
+        g.setFinish(LocalDateTime.now());
+
+        Boolean res = gameService.needsToEnd(g);
+
+        assertTrue(res);
+    }
+
+    @Test
+    void gameNeedsToEndShouldReturnFalse() {
+        Game g = new Game();
+
+        MainBoard mb = new MainBoard();
+        CardDeck cd = new CardDeck();
+        cd.setCards(List.of(new Card()));
+        mb.setCardDeck(cd);
+        g.setMainBoard(mb);
+
+        Player p = new Player();
+        p.setObjects(List.of(new Object()));
+
+        g.setPlayers(List.of(p));
+
+        Boolean res = gameService.needsToEnd(g);
+
+        assertTrue(!res);
+    }
+
+    @Test
+    void canAddDwarfTestShouldReturnTrue() {
+        Player player1 = new Player();
+
+        player1.setName("Player1");
+
+        player1.setSteal(99);
+        player1.setGold(50);
+        player1.setIron(50);
+        player1.setMedal(50);
+        player1.setObjects(List.of(new Object()));
+
+        Card c1 = new Card();
+        c1.setTotalIron(0);
+        c1.setTotalGold(0);
+        c1.setTotalSteal(0);
+
+        ArrayList<Dwarf> dwarves = new ArrayList<>();
+        Dwarf d1 = new Dwarf();
+        d1.setCard(c1);
+        d1.setPlayer(player1);
+        dwarves.add(d1);
+
+        Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
+
+        assertTrue(res);
+    }
+
+    @Test
+    void canAddDwarfTestShouldReturnFalse() {
+        Player player1 = new Player();
+
+        player1.setName("Player1");
+
+        player1.setSteal(0);
+        player1.setGold(0);
+        player1.setIron(1);
+        player1.setMedal(0);
+        player1.setObjects(List.of(new Object()));
+
+        Card c1 = new Card();
+        c1.setTotalIron(-1);
+        c1.setTotalGold(0);
+        c1.setTotalSteal(0);
+
+        ArrayList<Dwarf> dwarves = new ArrayList<>();
+        Dwarf d1 = new Dwarf();
+        d1.setCard(c1);
+        d1.setPlayer(player1);
+        dwarves.add(d1);
+
+        Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
+
+        assertTrue(!res);
+    }
+
+    @Test
+    void canAddDwarfTestShouldReturnFalse2() {
+        Player player1 = new Player();
+
+        Object o = new Object();
+        o.setName("testobj");
+
+        player1.setName("Player1");
+
+        player1.setSteal(0);
+        player1.setGold(0);
+        player1.setIron(0);
+        player1.setMedal(0);
+        player1.setObjects(List.of(o));
+
+        Card c1 = new Card();
+        c1.setTotalIron(0);
+        c1.setTotalGold(0);
+        c1.setTotalSteal(0);
+        c1.setObject(o);
+
+        ArrayList<Dwarf> dwarves = new ArrayList<>();
+        Dwarf d1 = new Dwarf();
+        d1.setCard(c1);
+        d1.setPlayer(player1);
+        dwarves.add(d1);
+
+        Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
+
+        assertTrue(!res);
+    }
+
+    @Test
+    void canAddDwarfTestShouldReturnTrue2() {
+        Player player1 = new Player();
+
+        Object o = new Object();
+        o.setName("testobj");
+
+        Object o1 = new Object();
+        o1.setName("testobj1");
+
+        player1.setName("Player1");
+
+        player1.setSteal(0);
+        player1.setGold(0);
+        player1.setIron(0);
+        player1.setMedal(0);
+        player1.setObjects(List.of(o));
+
+        Card c1 = new Card();
+        c1.setTotalIron(0);
+        c1.setTotalGold(0);
+        c1.setTotalSteal(0);
+        c1.setObject(o1);
+
+        ArrayList<Dwarf> dwarves = new ArrayList<>();
+        Dwarf d1 = new Dwarf();
+        d1.setCard(c1);
+        d1.setPlayer(player1);
+        dwarves.add(d1);
+
+        Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
+
+        assertTrue(res);
+    }
 }

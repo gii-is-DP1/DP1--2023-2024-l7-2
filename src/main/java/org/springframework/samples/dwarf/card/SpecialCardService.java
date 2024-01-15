@@ -43,7 +43,6 @@ public class SpecialCardService {
     private final String BOTH_DWARVES_USED_LOG_MSG = "Both dwarves has been used";
     private final String ONE_DWARVES_USED_LOG_MSG = "One dwarf has been used";
 
-
     private final SpecialCardRepository repo;
     private final DwarfService dwService;
     private final PlayerService plService;
@@ -276,18 +275,18 @@ public class SpecialCardService {
         // Ahora aplicamos la carta
         switch (specialCard.getName()) {
             case SPECIAL_CARD_MUSTER_AN_ARMY:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_MUSTER_AN_ARMY);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_MUSTER_AN_ARMY);
                 List<Card> gameCards = mb.getCards();
                 g = musterAnArmyAction(g, round, gameCards);
                 break;
             case SPECIAL_CARD_SPECIAL_ORDER:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_SPECIAL_ORDER);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_SPECIAL_ORDER);
 
                 specialOrderAction(p, selectedGold, selectedIron, selectedSteal, selectedObject);
                 break;
 
             case SPECIAL_CARD_HOLD_A_COUNCIL:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_HOLD_A_COUNCIL);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_HOLD_A_COUNCIL);
 
                 mbService.holdACouncilAction(mb);
                 cards = mb.getLocationCards(mb.getLocations());
@@ -295,7 +294,7 @@ public class SpecialCardService {
                 break;
 
             case SPECIAL_CARD_COLLAPSE_THE_SHAFTS:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_COLLAPSE_THE_SHAFTS);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_COLLAPSE_THE_SHAFTS);
 
                 locations = mbService.collapseTheShaftsAction(mb);
                 cards = mb.getLocationCards(mb.getLocations());
@@ -303,7 +302,7 @@ public class SpecialCardService {
                 break;
 
             case SPECIAL_CARD_RUN_AMOK:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_RUN_AMOK);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_RUN_AMOK);
 
                 locations = mbService.runAmokAction(mb);
                 cards = mb.getLocationCards(mb.getLocations());
@@ -311,19 +310,19 @@ public class SpecialCardService {
                 break;
 
             case SPECIAL_CARD_SELL_AN_ITEM:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_SELL_AN_ITEM);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_SELL_AN_ITEM);
 
                 sellAnItemAction(p, selectedGold, selectedIron, selectedSteal, selectedObject);
                 break;
 
             case SPECIAL_CARD_APPRENTICE:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_APPRENTICE);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_APPRENTICE);
 
                 g = apprenticeAction(g, p, round, selectedPosition, roundDwarvesApprentice);
                 break;
 
             case SPECIAL_CARD_TURN_BACK:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_TURN_BACK);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_TURN_BACK);
 
                 locations = mb.getLocations();
 
@@ -331,7 +330,7 @@ public class SpecialCardService {
                 dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, g.getMainBoard().getCards());
                 break;
             case SPECIAL_CARD_PAST_GLORIES:
-                log.info(SPECIAL_CARD_USAGE_LOG_MSG+SPECIAL_CARD_PAST_GLORIES);
+                log.info(SPECIAL_CARD_USAGE_LOG_MSG + SPECIAL_CARD_PAST_GLORIES);
 
                 locations = mb.getLocations();
                 pastGloriesAction(selectedPosition, cardToBeOnTop, locations);

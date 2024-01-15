@@ -52,7 +52,7 @@ class UserRestController {
 	private final GameService gameService;
 
 	@Autowired
-	public UserRestController(UserService userService, AuthoritiesService authService, 
+	public UserRestController(UserService userService, AuthoritiesService authService,
 			UserRepository userRepository, GameService gameService) {
 		this.userService = userService;
 		this.authService = authService;
@@ -119,7 +119,7 @@ class UserRestController {
 	public ResponseEntity<MessageResponse> delete(@PathVariable("userId") int id) {
 		RestPreconditions.checkNotNull(userService.findUserById(id), "User", "ID", id);
 		gameService.deleteUserDependencies(id);
-		//userService.deleteUser(id);
+		// userService.deleteUser(id);
 		return new ResponseEntity<>(new MessageResponse("User deleted!"), HttpStatus.OK);
 
 	}

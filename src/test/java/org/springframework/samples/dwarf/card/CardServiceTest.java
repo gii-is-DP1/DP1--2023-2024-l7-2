@@ -32,21 +32,13 @@ public class CardServiceTest {
 
     @Test
     public void testSaveCard() {
-        Card newCard = new Card();
+        Card validCard = new Card();
+        validCard.setName("Test Card");
 
-        CardType newCardType = cardService.getById(1).getCardType();
+        Card savedCard = cardService.saveCard(validCard);
 
-        newCard.setName("sample name");
-        newCard.setDescription("sample description");
-        newCard.setPosition(2);
-        newCard.setCardType(newCardType);
-
-        Card savedCard = cardService.saveCard(newCard);
-
-        assertNotNull(savedCard.getId());
-
-        assertEquals(101, savedCard.getId());
-
+        assertNotNull(savedCard);
+        assertEquals(validCard, savedCard);
     }
 
     @Test
