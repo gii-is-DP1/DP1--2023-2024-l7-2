@@ -29,7 +29,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import jakarta.transaction.Transactional;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureTestDatabase
 public class SpecialCardServiceTest {

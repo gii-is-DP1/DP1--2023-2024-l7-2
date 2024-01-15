@@ -73,7 +73,7 @@ export default function FriendList() {
   const espectateList = games.map((game) => {
     if (game.finish === null) {
         return (
-            <div key={game.id} style={{ border: '2px solid white', borderRadius: '8px', marginBottom: '15px', padding: '5px', margin: '5px', color: 'white'}}>
+            <div key={game.id} style={{ border: '2px solid black', borderRadius: '8px', marginBottom: '15px', padding: '5px', margin: '5px', color: 'black'}}>
                 {game.name} - Players: {game.players.length}
                 <Button className="btn btn-dark btn-sm" style={{marginLeft: '5px'}} onClick={() =>  handleJoinClick(game.code)}>Join</Button>
             </div>
@@ -85,7 +85,7 @@ export default function FriendList() {
 
   function showFriend(req) {
     return (
-      <tr key={req.id}>
+      <div key={req.id} style={{ border: '2px solid black', borderRadius: '8px', marginBottom: '15px', padding: '5px', margin: '5px', color: 'black'}}>
         <td className="text-center">{req.receiver.username!==tokenService.getUsername? req.sender.username : req.receiver.username}</td>
         <td className="text-center">
           {req.sender.username!==tokenService.getUsername ?
@@ -154,13 +154,13 @@ export default function FriendList() {
               </ButtonGroup>
           : <tb></tb>}
         </td>
-      </tr>
+      </div>
     );
   }
   
   function showRequest(req) {
     return (
-      <tr key={req.id}>
+      <div key={req.id} style={{ border: '2px solid black', borderRadius: '8px', marginBottom: '15px', padding: '5px', margin: '5px', color: 'black'}}>
         <td className="text-center">{req.sender.username}</td>
         <td className="text-center">
           {req.sender.username!=tokenService.getUserName ?
@@ -260,7 +260,7 @@ export default function FriendList() {
               </ButtonGroup>
           : <tb></tb>}
         </td>
-      </tr>
+      </div>
     );
   }
 
@@ -322,8 +322,14 @@ export default function FriendList() {
                 <tbody>{sentRequests}</tbody>
               </Table>
             </div>
+
+            <div className="col d-flex flex-column align-items-center justify-content-center" style={{marginRight:"50px", marginLeft:"100px"}}>
+              <h2 className="text-center">Games to spectate</h2>
+              <Table aria-label="spectators" className="mt-4">
+                <tbody>{espectateList}</tbody>
+              </Table>
+            </div>
           </div>
-          {espectateList}
       </div>
     </div>
     </>

@@ -39,6 +39,7 @@ public class CardServiceTest {
         newCard.setName("sample name");
         newCard.setDescription("sample description");
         newCard.setPosition(2);
+        newCard.setId(101);
         newCard.setCardType(newCardType);
 
         Card savedCard = cardService.saveCard(newCard);

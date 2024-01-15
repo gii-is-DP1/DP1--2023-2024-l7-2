@@ -83,6 +83,7 @@ public class SpecialCardServiceTest {
         // Configurar el comportamiento del repositorio mock
         SpecialCard mockCard = new SpecialCard();
         mockCard.setId(1);
+        mockCard.setName("TestCard");
         when(specialCardRepository.findByName("TestCard")).thenReturn(mockCard);
 
         // Ejecutar el método del servicio y verificar el resultado
