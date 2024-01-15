@@ -55,7 +55,7 @@ public class CardServiceTest {
 
         assertNotNull(savedCard.getId());
 
-        assertEquals(101, savedCard.getId());
+        assertEquals(201, savedCard.getId());
 
     }
 

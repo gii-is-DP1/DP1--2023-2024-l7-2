@@ -1,6 +1,5 @@
 package org.springframework.samples.dwarf.game;
 
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.card.Card;
 import org.springframework.samples.dwarf.card.SpecialCard;
-import org.springframework.samples.dwarf.card.SpecialCardService;
 import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.chat.Message;
@@ -65,11 +63,10 @@ public class GameRestController {
     private final SpectatorService specservice;
     private final ChatService chatservice;
     private final InvitationService is;
-    
 
     @Autowired
     public GameRestController(GameService gs, UserService us, PlayerService ps,
-        SpectatorService specservice, ChatService chatservice, InvitationService is) {
+            SpectatorService specservice, ChatService chatservice, InvitationService is) {
         this.gs = gs;
         this.us = us;
         this.ps = ps;
@@ -77,7 +74,6 @@ public class GameRestController {
         this.chatservice = chatservice;
         this.is = is;
     }
-
 
     @GetMapping
     public List<Game> getAllGames(@ParameterObject() @RequestParam(value = "name", required = false) String name,
@@ -96,7 +92,7 @@ public class GameRestController {
         } else
             return gs.getAllGames();
     }
-    
+
     @GetMapping("/{id}")
     public Game getGameById(@PathVariable("id") Integer id) {
         Optional<Game> g = gs.getGameById(id);
@@ -124,7 +120,7 @@ public class GameRestController {
         Game g = gs.getGameByCode(code);
 
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-           throw new ExistingUserException("Player not in the game");
+            throw new ExistingUserException("Player not in the game");
         }
 
         List<Card> cards = g.getMainBoard().getCardDeck().getCards();
@@ -170,7 +166,7 @@ public class GameRestController {
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
             throw new ExistingUserException("Player not in the game");
-           
+
         }
         List<SpecialCard> cd = g.getMainBoard().getSCards();
 
@@ -191,15 +187,14 @@ public class GameRestController {
             throw new ResourceNotFoundException("Game not found");
         }
 
-        
         if (!gs.gameContainsPlayer(g, u)) {
             if (g.getStart() != null) {
                 throw new GameAlreadyStartedException("Game has already started");
             } else if (g.getPlayers().size() >= MAX_PLAYERS_IN_GAME) {
                 throw new TooManyPlayersInGameException("Too many players in game");
             }
-            gs.joinPlayer(g,u);
-        } 
+            gs.joinPlayer(g, u);
+        }
 
         return ResponseEntity.ok(g);
     }
@@ -214,8 +209,6 @@ public class GameRestController {
         }
         Game g = g_tmp.get();
 
-
-
         User u = us.findCurrentUser();
         // if a player already exists in a game he cant just join the game :)
 
@@ -226,10 +219,10 @@ public class GameRestController {
 
                 // El juego ya ha comenzado
                 throw new GameAlreadyStartedException("Game has already started");
-            }else if (g.getPlayers().size() >= MAX_PLAYERS_IN_GAME) {
+            } else if (g.getPlayers().size() >= MAX_PLAYERS_IN_GAME) {
                 throw new TooManyPlayersInGameException("Too many players in game");
             }
-            gs.joinPlayer(g,u);
+            gs.joinPlayer(g, u);
 
         }
 
@@ -247,7 +240,7 @@ public class GameRestController {
 
         if (g == null || u == null) {
             throw new ExistingUserException("Player not in the game");
-          
+
         }
         if (g.getStart() != null) {
 
@@ -263,7 +256,7 @@ public class GameRestController {
 
             specservice.saveSpectator(s);
             gs.addSpectator(g, s);
-        } 
+        }
 
         return ResponseEntity.ok(g);
 
@@ -332,7 +325,7 @@ public class GameRestController {
         // Gets the lists of players and dwarfs. Turn is the next player
         Game g = gs.getGameByCode(code);
         if (!gs.checkPlayerInGameAndGameExists(g)) {
-           throw new ExistingUserException("Player not in the game");
+            throw new ExistingUserException("Player not in the game");
         }
 
         List<Player> plys = g.getPlayers();
@@ -344,9 +337,8 @@ public class GameRestController {
         dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
         if (gs.checkRoundNeedsChange(g, dwarves)) {
             gs.handleRoundChange(g);
-            return new ResponseEntity<>(p,HttpStatus.OK);
+            return new ResponseEntity<>(p, HttpStatus.OK);
         }
-
 
         p = gs.getCurrentTurnPlayer(plys, dwarves, g.getPlayerStart());
 
@@ -362,8 +354,6 @@ public class GameRestController {
         }
         Boolean finished = gs.needsToEnd(g);
 
-
-
         return new ResponseEntity<>(finished, HttpStatus.OK);
     }
 
@@ -376,11 +366,11 @@ public class GameRestController {
         }
 
         Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
-        if(!gs.checkIfIsPlayerTurn(g, p)) {
+        if (!gs.checkIfIsPlayerTurn(g, p)) {
             throw new WrongTurnException("Not player's turn");
         }
-        List<Dwarf> roundDwarves = gs.getRoundDwarfs(g,g.getRound());
-        if (!gs.canAddDwarf(p,card,roundDwarves)) {
+        List<Dwarf> roundDwarves = gs.getRoundDwarfs(g, g.getRound());
+        if (!gs.canAddDwarf(p, card, roundDwarves)) {
             throw new CannotUseCardException("Cannot use that card");
         }
         g = gs.addDwarf(g, p, card);

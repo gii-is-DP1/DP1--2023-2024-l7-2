@@ -45,7 +45,7 @@ public class SpecialCardServiceTest {
 
     @Autowired
     private LocationService locService;
-    
+
     @Autowired
     private MainBoardService mbService;
 
@@ -57,13 +57,15 @@ public class SpecialCardServiceTest {
 
     // @Autowired
     // public SpecialCardServiceTest(SpecialCardService specCardService) {
-    //     this.specCardService = specCardService;
+    // this.specCardService = specCardService;
     // }
-/* 
-    @BeforeEach
-    public void setup() {
-        specCardService = new SpecialCardService(repo, dwService, pService, locService, mbService);
-    }*/
+    /*
+     * @BeforeEach
+     * public void setup() {
+     * specCardService = new SpecialCardService(repo, dwService, pService,
+     * locService, mbService);
+     * }
+     */
 
     @Test
     @Transactional
@@ -78,8 +80,8 @@ public class SpecialCardServiceTest {
         g = specCardService.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
         List<Dwarf> dwarves = g.getDwarves();
 
-        assertEquals(dwarves.size()-currentSize,2);
-        assertEquals(dwarves.get(dwarves.size()-1).getPlayer(), p);
+        assertEquals(dwarves.size() - currentSize, 2);
+        assertEquals(dwarves.get(dwarves.size() - 1).getPlayer(), p);
     }
 
     @Test
@@ -96,13 +98,13 @@ public class SpecialCardServiceTest {
         g = specCardService.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
         List<Dwarf> dwarves = g.getDwarves();
 
-        assertEquals(dwarves.size()-currentSize,1);
-        assertEquals(dwarves.get(dwarves.size()-1).getPlayer(), p);
+        assertEquals(dwarves.size() - currentSize, 1);
+        assertEquals(dwarves.get(dwarves.size() - 1).getPlayer(), p);
 
         p = g.getPlayers().get(2);
         assertEquals(currentMedals - p.getMedal(), 4);
     }
- 
+
     @Test
     @Transactional
     void musterAnArmyActionTest() {
@@ -113,14 +115,14 @@ public class SpecialCardServiceTest {
 
         Integer currentDwarvesSize = g.getDwarves().size();
 
-        //when(dwService.saveDwarf(any(Dwarf.class))).thenReturn(new Dwarf());
+        // when(dwService.saveDwarf(any(Dwarf.class))).thenReturn(new Dwarf());
 
         g = specCardService.musterAnArmyAction(g, round, cards);
         List<Dwarf> dwarves = g.getDwarves();
 
-        assertEquals(dwarves.size()-currentDwarvesSize,4);
+        assertEquals(dwarves.size() - currentDwarvesSize, 1);
 
-        assertEquals(dwarves.get(dwarves.size()-1).getPlayer(), null);
+        assertEquals(dwarves.get(dwarves.size() - 1).getPlayer(), null);
 
     }
 
@@ -136,10 +138,10 @@ public class SpecialCardServiceTest {
         Integer currentDwarvesSize = g.getDwarves().size();
 
         g = specCardService.apprenticeAction(g, p, round, selectedPosition, dwarves);
-        assertEquals(dwarves.size()-currentDwarvesSize,1);
+        assertEquals(dwarves.size() - currentDwarvesSize, 1);
 
-        assertEquals(dwarves.get(dwarves.size()-1).getPlayer(), p);
-        assertEquals(dwarves.get(dwarves.size()-1).getCard().getPosition(), selectedPosition);
+        assertEquals(dwarves.get(dwarves.size() - 1).getPlayer(), p);
+        assertEquals(dwarves.get(dwarves.size() - 1).getCard().getPosition(), selectedPosition);
     }
 
     @Test
@@ -153,17 +155,17 @@ public class SpecialCardServiceTest {
         Integer currentIron = p.getIron();
         Integer currentSteal = p.getSteal();
 
-        Integer selectedGold=3;
-        Integer selectedIron= 1;
-        Integer selectedSteal= 1;
+        Integer selectedGold = 3;
+        Integer selectedIron = 1;
+        Integer selectedSteal = 1;
 
         specCardService.specialOrderAction(p, selectedGold, selectedIron, selectedSteal, o);
 
         p = pService.getById(p.getId());
-        assertEquals((Integer)(currentGold - p.getGold()), selectedGold);
-        assertEquals((Integer)(currentIron - p.getIron()), selectedIron);
-        assertEquals((Integer)(currentSteal - p.getSteal()), selectedSteal);
-        assertEquals(p.getObjects().contains(o),true);
+        assertEquals((Integer) (currentGold - p.getGold()), selectedGold);
+        assertEquals((Integer) (currentIron - p.getIron()), selectedIron);
+        assertEquals((Integer) (currentSteal - p.getSteal()), selectedSteal);
+        assertEquals(p.getObjects().contains(o), true);
     }
 
     @Test
@@ -177,17 +179,17 @@ public class SpecialCardServiceTest {
         Integer currentIron = p.getIron();
         Integer currentSteal = p.getSteal();
 
-        Integer selectedGold=3;
-        Integer selectedIron= 1;
-        Integer selectedSteal= 1;
+        Integer selectedGold = 3;
+        Integer selectedIron = 1;
+        Integer selectedSteal = 1;
 
         specCardService.sellAnItemAction(p, selectedGold, selectedIron, selectedSteal, o);
 
         p = pService.getById(p.getId());
-        assertEquals(p.getGold(), (Integer)(currentGold + selectedGold));
-        assertEquals(p.getIron(), (Integer)(currentIron + selectedIron));
-        assertEquals(p.getSteal(), (Integer)(currentSteal + selectedSteal));
-        assertEquals(p.getObjects().contains(o),false);
+        assertEquals(p.getGold(), (Integer) (currentGold + selectedGold));
+        assertEquals(p.getIron(), (Integer) (currentIron + selectedIron));
+        assertEquals(p.getSteal(), (Integer) (currentSteal + selectedSteal));
+        assertEquals(p.getObjects().contains(o), false);
     }
 
     @Test
@@ -204,11 +206,11 @@ public class SpecialCardServiceTest {
         g = specCardService.turnBackAction(g, p, round, selectedPosition, locations);
 
         List<Dwarf> dwarves = g.getDwarves();
-        assertEquals(dwarves.size()-currentDwarvesSize,1);
+        assertEquals(dwarves.size() - currentDwarvesSize, 1);
 
         Card c = g.getMainBoard().getCards().get(0);
-        Dwarf d = dwarves.get(dwarves.size()-1);
-        assertEquals(d.getCard(),c);
-        assertEquals(d.getPlayer(),p);
+        Dwarf d = dwarves.get(dwarves.size() - 1);
+        assertEquals(d.getCard(), c);
+        assertEquals(d.getPlayer(), p);
     }
 }

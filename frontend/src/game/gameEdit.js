@@ -73,7 +73,7 @@ export default function GameEdit() {
         )
         .then((response) => {
             if (response.status == 400) {
-                setMessage("Game code already taken");
+                setMessage("Invalid game code");
                 setVisible(true);
                 return "";
                 
@@ -123,9 +123,10 @@ export default function GameEdit() {
                             name="name"
                             id="name"
                             value={game.name || ""}
-                            onChange={(e) => setGame({ ...game, name: e.target.value })}
+                            onChange={handleChange}
                             className="custom-input"
                         />
+
                     </div>
                     {
                         !game.isPublic &&

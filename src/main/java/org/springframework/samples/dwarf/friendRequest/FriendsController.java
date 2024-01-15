@@ -63,6 +63,50 @@ public class FriendsController {
 
 	}
 
+	@GetMapping("/accepted")
+	public ResponseEntity<List<FriendRequest>> findAllAccepted() {
+		User u = us.findCurrentUser();
+
+		if (u == null) {
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}
+
+		List<FriendRequest> res = null;
+
+		if (u.getAuthority().getAuthority().equals("ADMIN")) {
+			res = friendRequestService.findAll();
+		} else {
+			res = friendRequestService.findByUser(u).stream().filter(fr -> fr.getStatus().equals(Status.ACCEPTED))
+					.toList();
+		}
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+
+	}
+
+	@GetMapping("/pending")
+	public ResponseEntity<List<FriendRequest>> findAllPending() {
+		User u = us.findCurrentUser();
+
+		if (u == null) {
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}
+
+		List<FriendRequest> res = null;
+
+		if (u.getAuthority().getAuthority().equals("ADMIN")) {
+			res = friendRequestService.findAll();
+		} else {
+			res = friendRequestService.findByUser(u).stream().filter(fr -> fr.getStatus().equals(Status.SENT)
+					&& fr.getReceiver().equals(u))
+					.toList();
+			;
+		}
+
+		return new ResponseEntity<>(res, HttpStatus.OK);
+
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<FriendRequest> findFriendRequest(@PathVariable("id") int id) {
 		FriendRequest friendRequestToGet = friendRequestService.findById(id);
@@ -83,6 +127,7 @@ public class FriendsController {
 		savedRequest.setSendTime(LocalDateTime.now());
 		savedRequest.setSender(sender);
 		savedRequest.setStatus(Status.SENT);
+		friendRequestService.saveFriendRequest(savedRequest);
 
 		return new ResponseEntity<>(savedRequest, HttpStatus.CREATED);
 	}

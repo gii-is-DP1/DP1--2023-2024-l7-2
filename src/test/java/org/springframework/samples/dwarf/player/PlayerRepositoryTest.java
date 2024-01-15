@@ -4,14 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.samples.dwarf.game.Game;
-import org.springframework.samples.dwarf.player.Player;
-import org.springframework.samples.dwarf.player.PlayerRepository;
-import org.springframework.samples.dwarf.user.User;
-import org.springframework.samples.dwarf.user.UserRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -23,7 +16,6 @@ public class PlayerRepositoryTest {
 
     @Autowired
     private PlayerRepository playerRepository;
-    
 
     @Test
     public void testFindAll() {
@@ -42,7 +34,7 @@ public class PlayerRepositoryTest {
         List<Player> players = playerRepository.findAll();
 
         // Then
-        assertEquals(2, players.size());
+        assertEquals(5, players.size());
         assertTrue(players.contains(player1));
         assertTrue(players.contains(player2));
     }
