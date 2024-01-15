@@ -19,12 +19,11 @@ function resolveDefault(code, jwt, payload) {
       },
       body: JSON.stringify(payload),
     })
-    .then((response) => response.json())
     .then((response) => {
-      if (!response.success) {
+      if (response.status != 200) {
   
         // Handle the case where the special sell item order is not successful
-        alert(payload.specialCard.name + "failed. Please try again.");
+        alert("Error using special card. Please try again.");
       }
     })
     .catch((error) => {
@@ -126,8 +125,8 @@ export default function ConfirmSpecialCardModel(props) {
 
                 for (const i in props.playerObjects) {
                     if (props.playerObjects[i].name === objectSelected){
-                        objectToSend = gameObjects[i]
-                        break;
+                        objectToSend = props.playerObjects[i]
+                        
                     }
                 }
 
@@ -164,7 +163,7 @@ export default function ConfirmSpecialCardModel(props) {
             case "Turn back":
                 if (!position || position == -1) {
                     
-                    alert("Past Glories failed. Please try again.")
+                    alert("Turn back failed. Please try again.")
                     break
                      
                 }
@@ -187,7 +186,7 @@ export default function ConfirmSpecialCardModel(props) {
             default:
                 resolveDefault(props.code,jwt, {
                     specialCard: props.card,
-                    usesBothDwarves: numberOfDwarves === 2,
+                    usesBothDwarves: numberOfDwarves === 2
                 })
         }
     }
@@ -224,7 +223,7 @@ export default function ConfirmSpecialCardModel(props) {
                         steal={steal} setSteal={setSteal} 
                         iron={iron} setIron={setIron}
                         objectSelected={objectSelected} setObjectSelected={setObjectSelected}
-                        gameObject={gameObjects} setGameObject={setGameObjects}
+                        gameObject={props.playerObjects} 
                         />
                     }
                     {title == "Past Glories" && 
