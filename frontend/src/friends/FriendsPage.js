@@ -28,6 +28,61 @@ export default function FriendList() {
     setVisible
   );
 
+  const [games, setGames] = useFetchState(
+    [],
+    `/api/v1/friends/friendGames`,
+    jwt,
+    setMessage,
+    setVisible
+  );
+
+  const handleJoinClick = (game) => {
+  
+    fetch(
+      "/api/v1/game/spectate" + (game ? "/" + game : ""),
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        }
+      }
+    ).then((response) => {
+      if (response.ok) {
+        return response.json()
+      } 
+    })
+    .then((response) => {
+      console.log(response)
+      if (response.code) {
+        window.location.href = `/espectate/${response.code}`;
+      } else {
+        setMessage("Failed to join the game")
+        setVisible(true)
+        throw new Error("Failed to join the game");
+      }
+    })
+    .catch((error) => {
+        setMessage("Failed to join the game")
+        setVisible(true)
+      setMessage(error.message);
+    });
+  };
+
+  const espectateList = games.map((game) => {
+    if (game.finish === null) {
+        return (
+            <div key={game.id} style={{ border: '2px solid white', borderRadius: '8px', marginBottom: '15px', padding: '5px', margin: '5px', color: 'white'}}>
+                {game.name} - Players: {game.players.length}
+                <Button className="btn btn-dark btn-sm" style={{marginLeft: '5px'}} onClick={() =>  handleJoinClick(game.code)}>Join</Button>
+            </div>
+        );
+    } else {
+        return null;
+    }
+});
+
   function showFriend(req) {
     return (
       <tr key={req.id}>
@@ -268,6 +323,7 @@ export default function FriendList() {
               </Table>
             </div>
           </div>
+          {espectateList}
       </div>
     </div>
     </>
