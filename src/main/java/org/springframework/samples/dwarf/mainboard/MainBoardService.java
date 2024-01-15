@@ -32,11 +32,6 @@ public class MainBoardService {
     final String objectCard = "ObjectCard";
     final String otherCard = "Other";
 
-    private final Integer MAX_POSITION = 9;
-    private final Integer MIN_POSITION = 1;
-    private final Integer MAX_NUMBER_SPECIAL_CARD_DECK = 9;
-
-
     private final MainBoardRepository repo;
     private final SpecialCardRepository specCardRepo;
     private final CardDeckService cds;
@@ -159,18 +154,6 @@ public class MainBoardService {
         }
     }
 
-    /*
-    @Transactional
-    public void adwardMedal(ArrayList<Pair<Player, Card>> orcCards) {
-
-        for (Pair<Player, Card> pc : orcCards) {
-            Player p = pc.getFirst();
-            Card c = pc.getSecond();
-
-            cs.adwardMedalSingleAction(p, c);
-        }
-    }*/
-
     @Transactional
     public void faseForjar(ArrayList<Pair<Player, Card>> playerCards) {
 
@@ -183,7 +166,7 @@ public class MainBoardService {
     }
 
     @Transactional
-    private ArrayList<Pair<Player, Card>> getChoosedCards(List<Dwarf> dwarves) {
+    public ArrayList<Pair<Player, Card>> getChoosedCards(List<Dwarf> dwarves) {
         ArrayList<Pair<Player, Card>> cards = new ArrayList<Pair<Player, Card>>();
         for (Dwarf d : dwarves) {
             if (d.getCard() == null) {
@@ -202,7 +185,7 @@ public class MainBoardService {
     }
 
     @Transactional
-    private HashMap<String, ArrayList<Pair<Player, Card>>> splitCardsByType(ArrayList<Pair<Player, Card>> cards) {
+    public HashMap<String, ArrayList<Pair<Player, Card>>> splitCardsByType(ArrayList<Pair<Player, Card>> cards) {
         HashMap<String, ArrayList<Pair<Player, Card>>> cardsByType = new HashMap<String, ArrayList<Pair<Player, Card>>>();
         for (Pair<Player, Card> c : cards) {
             String type = c.getSecond().getCardType().getName();
@@ -226,7 +209,8 @@ public class MainBoardService {
          * 4. Forjar
          */
         List<Dwarf> dwarves = g.getDwarves();
-        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getCard() != null).toList();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() 
+            && d.getCard() != null && d.getNeedsToBeResolved()).toList();
 
         //List<Player> plys = g.getPlayers();
 
@@ -333,6 +317,7 @@ public class MainBoardService {
 
             if (reverseCard.getPosition().equals(dwarfCard.getPosition())) {
                 applySingleCardWhenSpecialCardAction(p, dwarfCard);
+                d.setNeedsToBeResolved(false);
             }
         }
     }
@@ -386,9 +371,8 @@ public class MainBoardService {
 
     @Transactional
     public MainBoard handleSpecialCardTurn(MainBoard mb, Card reverseCard, SpecialCard specialCard, List<Dwarf> roundDwarves) {
+        
         applySingleCardWhenSpecialCard(roundDwarves, reverseCard);
-
-
         mb = removeUsedSpecialCard(mb, specialCard);
         mb = putReverseSpecialCard(mb, reverseCard);
         mb = saveMainBoard(mb);

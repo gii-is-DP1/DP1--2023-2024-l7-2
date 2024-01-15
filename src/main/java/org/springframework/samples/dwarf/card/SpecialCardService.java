@@ -1,13 +1,9 @@
 package org.springframework.samples.dwarf.card;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.CannotUseCardException;
@@ -28,7 +24,6 @@ import jakarta.validation.Valid;
 @Service
 public class SpecialCardService {
 
-    private final Integer MEDALS_USED_FOR_SPECIAL_CARD_USAGE = 4;
     private final Integer POSITION_MAX = 9;
     private final Integer POSITION_MIN = 1;
 
@@ -294,10 +289,8 @@ public class SpecialCardService {
 
             case SPECIAL_CARD_RUN_AMOK:
                 locations = mbService.runAmokAction(mb);
-//                mb = mbService.saveMainBoard(mb);
                 cards = mb.getLocationCards(mb.getLocations());
                 dwService.updateDwarvesWhenUpdatedCards(roundDwarvesApprentice, cards);
-                //g.setMainBoard(mb);
                 break;
 
             case SPECIAL_CARD_SELL_AN_ITEM:

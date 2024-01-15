@@ -6,13 +6,9 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.samples.dwarf.game.Game;
-import org.springframework.samples.dwarf.game.GameRepository;
-import org.springframework.samples.dwarf.player.Player;
 
 public class GameRepositoryTest {
 

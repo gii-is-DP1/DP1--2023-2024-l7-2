@@ -1,15 +1,10 @@
 package org.springframework.samples.dwarf.chat;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.samples.dwarf.game.Game;
-import org.springframework.samples.dwarf.mainboard.MainBoard;
-import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.user.User;
 import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.web.bind.annotation.DeleteMapping;

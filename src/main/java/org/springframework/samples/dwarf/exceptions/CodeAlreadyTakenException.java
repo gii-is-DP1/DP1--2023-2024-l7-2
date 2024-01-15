@@ -7,11 +7,11 @@ import lombok.Getter;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 @Getter
-public class CannotUseCardException extends RuntimeException {
+public class CodeAlreadyTakenException extends RuntimeException {
 
 	private static final long serialVersionUID = -3906338266891937036L;
 
-	public CannotUseCardException(final String message) {
+	public CodeAlreadyTakenException(final String message) {
 		super(message);
 	}
 }

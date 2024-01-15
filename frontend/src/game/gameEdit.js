@@ -71,10 +71,20 @@ export default function GameEdit() {
                 body: JSON.stringify(game),
             }
         )
-        .then((response) => response.text())
+        .then((response) => {
+            if (response.status == 400) {
+                setMessage("Game code already taken");
+                setVisible(true);
+                return "";
+                
+            } else {
+                return response.text()
+            }
+        })
         .then((data) => {
             if(data==="")
-            window.location.href = role=="USER" ? `/game` : `/games`;
+            //window.location.href = role=="USER" ? `/game` : `/games`;
+                return;
             else{
                 let json = JSON.parse(data);
                 if(json.message){

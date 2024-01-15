@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.maven.model.Resource;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +21,15 @@ import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.chat.Message;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
-import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.ExistingUserException;
 import org.springframework.samples.dwarf.exceptions.GameAlreadyStartedException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.exceptions.TooManyPlayersInGameException;
+import org.springframework.samples.dwarf.exceptions.WrongTurnException;
 import org.springframework.samples.dwarf.exceptions.AccessDeniedException;
-import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.invitation.Invitation;
 import org.springframework.samples.dwarf.invitation.InvitationService;
 import org.springframework.samples.dwarf.location.Location;
-import org.springframework.samples.dwarf.location.LocationService;
-import org.springframework.samples.dwarf.mainboard.MainBoard;
-import org.springframework.samples.dwarf.mainboard.MainBoardService;
-import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.samples.dwarf.spectator.Spectator;
@@ -60,6 +55,8 @@ import jakarta.validation.Valid;
 @Tag(name = "Games", description = "The games management API")
 @SecurityRequirement(name = "bearerAuth")
 public class GameRestController {
+
+    private final Integer MAX_PLAYERS_IN_GAME = 3;
 
     private final GameService gs;
     private final UserService us;
@@ -197,6 +194,8 @@ public class GameRestController {
         if (!gs.gameContainsPlayer(g, u)) {
             if (g.getStart() != null) {
                 throw new GameAlreadyStartedException("Game has already started");
+            } else if (g.getPlayers().size() >= MAX_PLAYERS_IN_GAME) {
+                throw new TooManyPlayersInGameException("Too many players in game");
             }
             gs.joinPlayer(g,u);
         } 
@@ -222,12 +221,12 @@ public class GameRestController {
         if (!gs.gameContainsPlayer(g, u)) {
             if (g.getIsPublic() == false) {
                 throw new AccessDeniedException("User unauthorized");
-            }
-            
-            if (g.getStart() != null) {
+            } else if (g.getStart() != null) {
 
                 // El juego ya ha comenzado
                 throw new GameAlreadyStartedException("Game has already started");
+            }else if (g.getPlayers().size() >= MAX_PLAYERS_IN_GAME) {
+                throw new TooManyPlayersInGameException("Too many players in game");
             }
             gs.joinPlayer(g,u);
 
@@ -376,6 +375,9 @@ public class GameRestController {
         }
 
         Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
+        if(!gs.checkIfIsPlayerTurn(g, p)) {
+            throw new WrongTurnException("Not player's turn");
+        }
         g = gs.addDwarf(g, p, card);
 
         return new ResponseEntity<>(HttpStatus.OK);
