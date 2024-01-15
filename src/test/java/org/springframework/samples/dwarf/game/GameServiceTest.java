@@ -54,6 +54,8 @@ import org.springframework.samples.dwarf.user.UserRepository;
 import org.springframework.samples.dwarf.user.UserService;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import jakarta.transaction.Transactional;
+
 @SpringBootTest
 public class GameServiceTest {
 
@@ -802,5 +804,128 @@ public class GameServiceTest {
     Boolean res = gameService.needsToEnd(g);
 
     assertTrue(!res);
+   }
+
+   @Test
+   void canAddDwarfTestShouldReturnTrue(){
+    Player player1 = new Player();
+
+    player1.setName("Player1");
+
+    player1.setSteal(99);
+    player1.setGold(50);
+    player1.setIron(50);
+    player1.setMedal(50);
+    player1.setObjects(List.of(new Object()));
+
+    Card c1 = new Card();
+    c1.setTotalIron(0);
+    c1.setTotalGold(0);
+    c1.setTotalSteal(0);
+
+    ArrayList<Dwarf> dwarves = new ArrayList<>();
+    Dwarf d1 = new Dwarf();
+    d1.setCard(c1);
+    d1.setPlayer(player1);
+    dwarves.add(d1);
+
+    Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
+
+    assertTrue(res);
+   }
+
+   @Test
+   void canAddDwarfTestShouldReturnFalse(){
+    Player player1 = new Player();
+
+    player1.setName("Player1");
+
+    player1.setSteal(0);
+    player1.setGold(0);
+    player1.setIron(1);
+    player1.setMedal(0);
+    player1.setObjects(List.of(new Object()));
+
+    Card c1 = new Card();
+    c1.setTotalIron(-1);
+    c1.setTotalGold(0);
+    c1.setTotalSteal(0);
+
+    ArrayList<Dwarf> dwarves = new ArrayList<>();
+    Dwarf d1 = new Dwarf();
+    d1.setCard(c1);
+    d1.setPlayer(player1);
+    dwarves.add(d1);
+
+    Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
+
+    assertTrue(!res);
+   }
+
+   @Test
+   void canAddDwarfTestShouldReturnFalse2(){
+    Player player1 = new Player();
+
+    Object o = new Object();
+    o.setName("testobj");
+
+    player1.setName("Player1");
+
+    player1.setSteal(0);
+    player1.setGold(0);
+    player1.setIron(0);
+    player1.setMedal(0);
+    player1.setObjects(List.of(o));
+
+    Card c1 = new Card();
+    c1.setTotalIron(0);
+    c1.setTotalGold(0);
+    c1.setTotalSteal(0);
+    c1.setObject(o);
+
+    ArrayList<Dwarf> dwarves = new ArrayList<>();
+    Dwarf d1 = new Dwarf();
+    d1.setCard(c1);
+    d1.setPlayer(player1);
+    dwarves.add(d1);
+
+    Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
+
+    assertTrue(!res);
+   }
+   
+   @Test
+   void canAddDwarfTestShouldReturnTrue2(){
+    Player player1 = new Player();
+
+    Object o = new Object();
+    o.setName("testobj");
+
+    Object o1 = new Object();
+    o1.setName("testobj1");
+
+    player1.setName("Player1");
+
+    player1.setSteal(0);
+    player1.setGold(0);
+    player1.setIron(0);
+    player1.setMedal(0);
+    player1.setObjects(List.of(o));
+
+    Card c1 = new Card();
+    c1.setTotalIron(0);
+    c1.setTotalGold(0);
+    c1.setTotalSteal(0);
+    c1.setObject(o1);
+
+    ArrayList<Dwarf> dwarves = new ArrayList<>();
+    Dwarf d1 = new Dwarf();
+    d1.setCard(c1);
+    d1.setPlayer(player1);
+    dwarves.add(d1);
+
+    Boolean res = gameService.canAddDwarf(player1, c1, dwarves);
+
+    assertTrue(res);
    }
 }

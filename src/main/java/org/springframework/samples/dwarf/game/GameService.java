@@ -238,6 +238,72 @@ public class GameService {
         return saveGame(g);
     }
 
+    @Transactional(readOnly = true)
+    public Boolean canAddDwarf(Player p, Card c, List<Dwarf> dwarves) {
+        Boolean res = true;
+
+        List<Card> myUsedCards = new ArrayList<>();
+        for (Dwarf d:dwarves) {
+            if (d.getCard() == null || d.getPlayer() == null) {
+                continue;
+            }
+            if (d.getPlayer().getName().equals(p.getName())) {
+                myUsedCards.add(d.getCard());
+            }
+        }
+
+        myUsedCards.add(c);
+
+        Integer totalIron = 0;
+        Integer totalGold = 0;
+        Integer totalSteal = 0;
+        List<Object> totalItems = new ArrayList<>();
+
+        for (Card usedCard: myUsedCards) {
+            if (usedCard.getTotalIron() < 0) {
+                totalIron += usedCard.getTotalIron();
+            }
+            if (usedCard.getTotalGold() < 0) {
+                totalIron += usedCard.getTotalIron();
+            }
+            if (usedCard.getTotalSteal() < 0) {
+                totalIron += usedCard.getTotalIron();
+            }
+
+            if (usedCard.getObject() != null) {
+                Object o = usedCard.getObject();
+                if (!totalItems.contains(o)) {
+                    totalItems.add(o);
+                }
+            }
+        }
+
+        if (totalIron * -1 > p.getIron()){
+            res = false;
+        } else if (totalGold * -1 > p.getGold()){
+            res = false;
+        } else if (totalSteal * -1 > p.getSteal()){
+            res = false;
+        }if (p.getObjects() != null && totalItems.size()>0){
+            List<Object> playerObjects = p.getObjects();
+            Boolean choosed = false;
+            for (Object o:totalItems) {
+                if (!res){
+                    break; 
+                }
+
+                for (Object playerObj: playerObjects) {
+                    if (playerObj.getName().equals(o.getName()))
+                    res = false;
+                    break;
+                }
+            }
+        }
+        
+        return res;
+
+    }
+
     @Transactional
     public Game addDwarf(Game g, Player p , Card card) {
         Dwarf dwarf = new Dwarf();

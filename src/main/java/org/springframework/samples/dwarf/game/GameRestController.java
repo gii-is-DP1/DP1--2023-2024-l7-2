@@ -27,6 +27,7 @@ import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
 import org.springframework.samples.dwarf.exceptions.TooManyPlayersInGameException;
 import org.springframework.samples.dwarf.exceptions.WrongTurnException;
 import org.springframework.samples.dwarf.exceptions.AccessDeniedException;
+import org.springframework.samples.dwarf.exceptions.CannotUseCardException;
 import org.springframework.samples.dwarf.invitation.Invitation;
 import org.springframework.samples.dwarf.invitation.InvitationService;
 import org.springframework.samples.dwarf.location.Location;
@@ -377,6 +378,10 @@ public class GameRestController {
         Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
         if(!gs.checkIfIsPlayerTurn(g, p)) {
             throw new WrongTurnException("Not player's turn");
+        }
+        List<Dwarf> roundDwarves = gs.getRoundDwarfs(g,g.getRound());
+        if (!gs.canAddDwarf(p,card,roundDwarves)) {
+            throw new CannotUseCardException("Cannot use that card");
         }
         g = gs.addDwarf(g, p, card);
 
