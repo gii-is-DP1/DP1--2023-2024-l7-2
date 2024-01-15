@@ -89,6 +89,16 @@ public class ExceptionHandlerController {
 	}
 
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(value = WrongThreadException.class)
+	public final ResponseEntity<ErrorMessage> wrongTurnException(WrongTurnException ex,
+			WebRequest request) {
+		ErrorMessage message = new ErrorMessage(HttpStatus.BAD_REQUEST.value(), new Date(), ex.getMessage(),
+				request.getDescription(false));
+
+		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+	}
+
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(value = CannotUseCardException.class)
 	public final ResponseEntity<ErrorMessage> handleCannotUseCardException(CannotUseCardException ex,
 			WebRequest request) {

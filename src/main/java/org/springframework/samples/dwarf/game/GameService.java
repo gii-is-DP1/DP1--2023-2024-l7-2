@@ -25,6 +25,7 @@ import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
 import org.springframework.samples.dwarf.dwarf.DwarfService;
+import org.springframework.samples.dwarf.exceptions.WrongTurnException;
 import org.springframework.samples.dwarf.location.Location;
 import org.springframework.samples.dwarf.location.LocationService;
 import org.springframework.samples.dwarf.mainboard.MainBoard;
@@ -50,7 +51,6 @@ public class GameService {
     CardDeckService cds;
     LocationService ls;
     SpecialCardService scs;
-    CardService cs;
     ChatService chatservice;
 
 
@@ -64,7 +64,7 @@ public class GameService {
 
     @Autowired
     public GameService(GameRepository gr, PlayerService ps, UserService us,
-            MainBoardService mbs, CardDeckService cds, LocationService ls,SpecialCardService scs, CardService cs, 
+            MainBoardService mbs, CardDeckService cds, LocationService ls,SpecialCardService scs, 
             DwarfService ds,
             ChatService chatService) {
         this.gr = gr;
@@ -74,7 +74,6 @@ public class GameService {
         this.cds = cds;
         this.ls = ls;
         this.scs=scs;
-        this.cs = cs;
         this.ds=ds;
         this.chatservice = chatService;
     }
@@ -435,11 +434,6 @@ public class GameService {
         List<Dwarf> thisRoundDwarves = dwarves.stream().filter(d -> d.getRound() == round
                 && d.getPlayer() != null).toList();
 
-        // if (checkAllPositionsOccupied(thisRoundDwarves)) {
-        //     return true;
-        // }
-
-
         List<Player> remainingTurns = getRemainingTurns(plys, thisRoundDwarves, g.getPlayerStart());
 
         return thisRoundDwarves.size() >= remainingTurns.size() 
@@ -679,8 +673,23 @@ public class GameService {
     }
 
     @Transactional
+    public Boolean checkIfIsPlayerTurn(Game g, Player p) {
+        List<Dwarf> dwarves = g.getDwarves();
+        dwarves = dwarves.stream().filter(d -> d.getRound() == g.getRound() && d.getPlayer() != null).toList();
+
+        Player p2 = getCurrentTurnPlayer(g.getPlayers(), dwarves, g.getPlayerStart());
+
+        return p.getName().equals(p2.getName());
+    }
+
+    @Transactional
     public void handleSpecialCard(Game g, SpecialCard specialCard, Boolean usesBothDwarves, Player p ,
             SpecialCardRequestHandler request) {
+
+        if (!checkIfIsPlayerTurn(g, p)) {
+            throw new WrongTurnException("Not player's turn");
+        }
+        
         Integer round = g.getRound();
         scs.handleIfBothDwarvesAreUsed(g, p, round, usesBothDwarves);
 

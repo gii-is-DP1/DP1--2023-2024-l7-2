@@ -64,20 +64,10 @@ public class SecurityConfiguration {
 						.requestMatchers("/api/v1/developers").permitAll() // api developers
 
 						// achievements rules
-						.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/v1/achievements/**"))
-						.permitAll()
-						.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/v1/achievements"))
-						.permitAll()
-						.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/api/v1/achievements"))
-						.permitAll()
+
 						.requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/v1/achievements"))
 						.hasAuthority(ADMIN)
 						.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
-
-						// game rules
-						.requestMatchers("/api/v1/game").authenticated()
-						.requestMatchers(AntPathRequestMatcher.antMatcher("/api/v1/game/**")).authenticated()
-
 						.anyRequest().authenticated())
 
 				.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

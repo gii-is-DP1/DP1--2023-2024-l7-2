@@ -32,11 +32,6 @@ public class MainBoardService {
     final String objectCard = "ObjectCard";
     final String otherCard = "Other";
 
-    private final Integer MAX_POSITION = 9;
-    private final Integer MIN_POSITION = 1;
-    private final Integer MAX_NUMBER_SPECIAL_CARD_DECK = 9;
-
-
     private final MainBoardRepository repo;
     private final SpecialCardRepository specCardRepo;
     private final CardDeckService cds;

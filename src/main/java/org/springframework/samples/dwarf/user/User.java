@@ -1,10 +1,8 @@
 package org.springframework.samples.dwarf.user;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
-import org.springframework.samples.dwarf.game.Game;
+import java.util.List;
+
 import org.springframework.samples.dwarf.model.NamedEntity;
 import org.springframework.samples.dwarf.statistic.Achievement;
 

@@ -22,19 +22,14 @@ import org.springframework.samples.dwarf.chat.Chat;
 import org.springframework.samples.dwarf.chat.ChatService;
 import org.springframework.samples.dwarf.chat.Message;
 import org.springframework.samples.dwarf.dwarf.Dwarf;
-import org.springframework.samples.dwarf.dwarf.DwarfService;
 import org.springframework.samples.dwarf.exceptions.ExistingUserException;
 import org.springframework.samples.dwarf.exceptions.GameAlreadyStartedException;
 import org.springframework.samples.dwarf.exceptions.ResourceNotFoundException;
+import org.springframework.samples.dwarf.exceptions.WrongTurnException;
 import org.springframework.samples.dwarf.exceptions.AccessDeniedException;
-import org.springframework.samples.dwarf.exceptions.BadRequestException;
 import org.springframework.samples.dwarf.invitation.Invitation;
 import org.springframework.samples.dwarf.invitation.InvitationService;
 import org.springframework.samples.dwarf.location.Location;
-import org.springframework.samples.dwarf.location.LocationService;
-import org.springframework.samples.dwarf.mainboard.MainBoard;
-import org.springframework.samples.dwarf.mainboard.MainBoardService;
-import org.springframework.samples.dwarf.object.Object;
 import org.springframework.samples.dwarf.player.Player;
 import org.springframework.samples.dwarf.player.PlayerService;
 import org.springframework.samples.dwarf.spectator.Spectator;
@@ -376,6 +371,9 @@ public class GameRestController {
         }
 
         Player p = gs.getPlayerByUserAndGame(us.findCurrentUser(), g);
+        if(!gs.checkIfIsPlayerTurn(g, p)) {
+            throw new WrongTurnException("Not player's turn");
+        }
         g = gs.addDwarf(g, p, card);
 
         return new ResponseEntity<>(HttpStatus.OK);
