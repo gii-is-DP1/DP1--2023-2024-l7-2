@@ -48,7 +48,7 @@ public class PlayerRepositoryTest {
         playerRepository.save(player);
 
         // When
-        Player result = playerRepository.findByName("TestPlayer");
+        Player result = playerRepository.findByName("TestPlayer").get(0);
 
         // Then
         assertNotNull(result);

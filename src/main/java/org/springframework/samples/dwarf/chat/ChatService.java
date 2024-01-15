@@ -56,8 +56,7 @@ public class ChatService {
     public void saveMessage(Chat c, Message msg) {
         msg = messageRepository.save(msg);
 
-        ArrayList<Message> msgs = new ArrayList<>();
-        msgs.addAll(c.getMessages());
+        List<Message> msgs = c.getMessages();
         msgs.add(msg);
 
         c.setMessages(msgs);

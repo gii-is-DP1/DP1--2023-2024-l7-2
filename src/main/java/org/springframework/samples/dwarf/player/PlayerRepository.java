@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface PlayerRepository extends CrudRepository<Player, Integer> {
     List<Player> findAll();
 
-    public Player findByName(String name);
+    public List<Player> findByName(String name);
 
     public Player findByColor(String color);
 

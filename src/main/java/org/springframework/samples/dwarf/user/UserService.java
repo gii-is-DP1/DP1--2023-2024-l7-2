@@ -96,25 +96,10 @@ public class UserService {
 	@Transactional
 	public void deleteUser(Integer id) {
 		User toDelete = findUserById(id);
-		deleteRelations(id, toDelete.getAuthority().getAuthority());
+		friendRequestService.deleteAllFriendRequests(toDelete);
 		// this.userRepository.deleteOwnerRelation(id);
 		// this.userRepository.deleteVetRelation(id);
 		this.userRepository.delete(toDelete);
-	}
-
-	private void deleteRelations(Integer id, String auth) {
-		// TODO: owner authoritie does not exists anymore
-		switch (auth) {
-			case "OWNER":
-				// Optional<Owner> owner = ownerService.optFindOwnerByUser(id);
-				// if (owner.isPresent())
-				// ownerService.deleteOwner(owner.get().getId());
-
-			default:
-				// The only relations that have user are Owner and Vet
-				break;
-		}
-
 	}
 
 	public User userIsLoogedIn(String username) {

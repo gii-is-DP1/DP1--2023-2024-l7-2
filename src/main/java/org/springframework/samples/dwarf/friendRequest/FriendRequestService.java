@@ -51,6 +51,14 @@ public class FriendRequestService {
 
     }
 
+    @Transactional
+    public void deleteAllFriendRequests(User u){
+        List<FriendRequest> frs = friendRequestRepository.findByUser(u);
+        for (FriendRequest fr: frs) {
+            friendRequestRepository.delete(fr);
+        }
+    }
+
     @Transactional(readOnly = true)
     public List<User> getFriends(User u) {
         ArrayList<User> res = new ArrayList<>();

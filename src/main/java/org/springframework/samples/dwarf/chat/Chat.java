@@ -15,8 +15,7 @@ import lombok.Setter;
 @Entity
 public class Chat extends BaseEntity {
 
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
-            CascadeType.REFRESH })
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     List<Message> messages;
 
 }

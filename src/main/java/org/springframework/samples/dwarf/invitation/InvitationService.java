@@ -35,6 +35,11 @@ public class InvitationService {
     }
 
     @Transactional
+    public List<Invitation> findByUser(User u) {
+        return repo.findByUser(u);
+    }
+
+    @Transactional
     public Invitation saveInvitation(Invitation invi) throws DataAccessException {
         return repo.save(invi);
     }
